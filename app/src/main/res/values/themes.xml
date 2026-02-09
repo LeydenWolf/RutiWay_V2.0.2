@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.RutiWay" parent="Theme.Material3.DayNight.NoActionBar">
+    <item name="colorPrimary">#5bc0de</item>
+        <item name="colorPrimaryDark">#0a0a0c</item>
+        <item name="colorAccent">#2b7cff</item>
+
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+</resources>

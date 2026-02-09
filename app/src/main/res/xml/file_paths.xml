@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-files-path name="rutis" path="." /> <!-- /Android/data/com.leyden.rutiway/files/rutis/ -->
+    <external-cache-path name="cache" path="." /> <!-- cache GPX temporal -->
+    <files-path name="internal" path="." /> <!-- /data/data/com.leyden.rutiway/files/ -->
+</paths>
