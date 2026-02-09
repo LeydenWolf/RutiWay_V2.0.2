@@ -1,0 +1,2115 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>RUTIWAY Ver. 2.0.2</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --bg: #0a0a0c; --accent: #5bc0de; --r1: #2b7cff; --r2: #ff4b2b;
+            --toggle-on: #2b7cff; --toggle-off: #333; --active-btn: #e0e0e0;
+            --btn-width: 65px; --selected-gold: #ffd700;
+            --safe-bottom: env(safe-area-inset-bottom, 20px);
+        }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #c0caf5; font-family: 'Poppins', sans-serif; overflow: hidden; touch-action: none; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 1; }
+
+        /* --- PDF PRINT (SOLO TEXTO) --- */
+        #print-report { display: none; }
+        @media print {
+            @page { size: A4; margin: 10mm; }
+            body, html { height: auto; overflow: visible; background: white; color: black; }
+            body > *:not(#print-report) { display: none !important; }
+            #print-report { display: block !important; width: 100%; }
+            .rep-header { display: flex; justify-content: space-between; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px; }
+            .rep-title { font-size: 24px; font-weight: 900; color: black; }
+            .rep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+            .rep-box { border: 1px solid #ccc; padding: 10px; background: #f9f9f9; margin-bottom: 15px; page-break-inside: avoid; }
+            .config-tags span { display: inline-block; background: #eee; padding: 2px 5px; border: 1px solid #ddd; font-weight: bold; font-size: 10px; margin-right: 5px; }
+        }
+
+        /* --- INTERFAZ FLOTANTE --- */
+
+        /* 1. INTERRUPTOR MENU/MAPA (FIJO CENTRO DERECHA) */
+        #fixed-switch-btn {
+            position: absolute; top: 50%; right: 0; transform: translateY(-50%); z-index: 6001;
+        }
+        .side-switch-btn {
+            background: var(--accent); border: none; border-radius: 8px 0 0 8px;
+            color: black; height: 50px; width: 40px; display: flex; align-items: center;
+            justify-content: center; box-shadow: -2px 2px 10px rgba(0,0,0,0.5);
+            font-weight: 900; font-size: 0.8rem; cursor: pointer; writing-mode: vertical-rl; text-orientation: mixed;
+        }
+
+        /* 2. STATS (FIJO ENCIMA DE GENERAR) */
+        #float-stats {
+            position: absolute; bottom: 90px; right: 20px; width: 170px; z-index: 4000;
+            pointer-events: auto;
+        }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 100%; pointer-events: auto; }
+        .stat-v {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+            padding: 4px 0; text-align: center; cursor: pointer;
+        }
+        .stat-v:active { background: rgba(255,255,255,0.2); }
+        .stat-v label { font-size: 8px; color: var(--accent); font-weight: 900; display: block; margin-bottom: 0; }
+        .stat-v b { font-size: 0.9rem; color: white; display: block; line-height: 1.1; }
+        .weather-btn {
+            grid-column: span 2; background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+            padding: 4px 0; height: 35px; text-align: center; cursor: pointer;
+            display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; color: white;
+        }
+
+        /* 3. LEYENDA (FIJA ABAJO IZQUIERDA) */
+        #fixed-legend { position: absolute; bottom: 30px; left: 15px; z-index: 3500; pointer-events: none; }
+        .map-legend { background: rgba(10, 10, 12, 0.9); border: 1px solid var(--accent); padding: 10px; border-radius: 8px; min-width: 140px; font-size: 0.7rem; }
+        .leg-i { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; color: #ddd; justify-content: space-between; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+        /* Botón Generar (Siempre visible) */
+        .main-btn { position: absolute; bottom: 20px; right: 20px; width: auto; min-width: 170px; padding: 16px 25px; background: #1a1b26; border: 2px solid var(--r1); color: var(--r1); border-radius: 40px; font-weight: 900; font-size: 0.9rem; z-index: 6000; cursor: pointer; text-transform: uppercase; box-shadow: 0 8px 25px rgba(0,0,0,0.7); }
+        .main-btn.blink { animation: blink 0.7s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* Botones Circulares */
+        #center-btn { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 50px; height: 40px; background: rgba(26, 27, 38, 0.95); color: var(--accent); border: 1.5px solid var(--accent); font-size: 20px; border-radius: 8px; display: flex; align-items: center; justify-content: center; z-index: 4000; cursor: pointer; }
+        #clear-map-btn { position: absolute; top: 125px; right: 20px; z-index: 3000; width: 45px; height: 45px; background: rgba(26, 27, 38, 0.9); border: 1.5px solid #ff4b2b; border-radius: 50%; color: #ff4b2b; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; }
+        #map-cycle-btn { position: absolute; top: 180px; right: 20px; z-index: 3000; width: 45px; height: 45px; background: rgba(26,27,38,0.95); border: 1px solid var(--accent); border-radius: 50%; color: var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; }
+        #my-places-btn { position: absolute; top: 235px; right: 20px; z-index: 3000; width: 45px; height: 45px; background: rgba(26,27,38,0.95); border: 1px solid var(--accent); border-radius: 50%; color: var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; }
+        #redo-search-btn { display: none; position: absolute; top: 80px; left: 50%; transform: translateX(-50%); z-index: 3000; background: white; color: black; border: none; padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; animation: popIn 0.3s; }
+
+        body.menu-active .hide-on-menu { display: none !important; }
+
+        /* MENU TRIGGER IZQUIERDA (SOLO MODO MAPA) */
+        #menu-trigger-left { position: absolute; top: 20px; left: 20px; z-index: 4000; }
+        .top-btn-left { background: var(--accent); border: none; border-radius: 8px; color: black; height: 40px; width: var(--btn-width); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.6); font-weight: 900; text-transform: uppercase; font-size: 0.75rem; cursor: pointer; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { position: fixed; top: 0; left: -100%; width: 320px; height: 100%; background: var(--bg); z-index: 5000; transition: 0.3s; padding: 20px; padding-bottom: 200px; border-right: 1px solid var(--accent); overflow-y: auto; box-sizing: border-box; }
+        body.menu-active .sidebar { left: 0; }
+
+        .brand-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .brand-logo { width: 45px; height: 45px; border-radius: 8px; border: 1px solid var(--accent); object-fit: cover; cursor: pointer; }
+        .brand-title { margin: 0; font-size: 1.1rem; font-weight: 900; line-height: 1; animation: titlePulse 4s infinite ease-in-out; }
+        @keyframes titlePulse { 0% { color: #fff; } 50% { color: var(--r1); text-shadow: 0 0 10px var(--r1); } 100% { color: #fff; } }
+        .brand-sub { font-family: 'Poppins', sans-serif; font-weight: 300; font-size: 0.75rem; color: var(--r1); display: block; margin-top: 2px; }
+        .brand-ver { font-size: 0.7rem; color: #555; }
+
+        .lang-container { position: relative; text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
+        .lang-select-btn { background: #222; border: 1px solid #444; color: white; font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; cursor: pointer; margin-bottom: 2px; min-width: 30px; text-align: center; }
+        .lang-dropdown { display: none; position: absolute; top: 25px; right: 0; background: #1a1b26; border: 1px solid var(--accent); border-radius: 4px; z-index: 6000; min-width: 120px; max-height: 250px; overflow-y: auto; }
+        .lang-opt { padding: 8px; font-size: 0.75rem; border-bottom: 1px solid #333; cursor: pointer; color: #ccc; }
+        .lang-opt:hover { background: rgba(255,255,255,0.1); color: white; }
+        .lang-disabled { color: #555; pointer-events: none; font-style: italic; background: #111; }
+
+        .collapsible { background: none; border: none; color: var(--accent); width: 100%; text-align: left; padding: 12px 0; font-weight: 900; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; margin-top: 5px; }
+        .coll-content { display: none; padding-top: 15px; }
+        .coll-content.active { display: block; }
+
+        /* INPUTS */
+        .in-wrap { position: relative; margin-bottom: 8px; display: flex; align-items: center; }
+        .in-wrap-icon { width: 25px; text-align: center; color: #aaa; margin-right: 5px; font-size: 1rem; }
+        .in-wrap input, .in-wrap select { flex: 1; background: #1a1b26; border: 1px solid #414868; padding: 10px; color: white; border-radius: 4px; box-sizing: border-box; font-size: 0.8rem; appearance: none; }
+        .clear-btn { position: absolute; right: 10px; color: #565f89; cursor: pointer; font-size: 18px; }
+
+        .add-stop-row { display: flex; justify-content: center; margin-bottom: 8px; }
+        .add-stop-btn { padding: 4px 15px; background: rgba(91, 192, 222, 0.15); border: 1px dashed var(--accent); color: var(--accent); border-radius: 4px; cursor: pointer; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+
+        .stop-row { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; background: rgba(91, 192, 222, 0.1); border-radius: 4px; padding: 4px; }
+        .stop-row input { flex: 1; background: #1a1b26; border: 1px solid var(--accent); color: white; padding: 8px; border-radius: 4px; font-size: 0.75rem; }
+        .modal-help-text { font-size: 0.75rem; color: #aaa; margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px; border-left: 3px solid var(--accent); }
+        .stop-del { color: #ff4b2b; cursor: pointer; font-weight: bold; width: 30px; text-align: center; font-size: 1.2rem; }
+/* INICIO - SUGERENCIAS VISIBLE SOBRE INPUT */
+.suggestions {
+    background: #1a1b26;
+    position: absolute;
+    width: calc(100% - 30px);  /* ← ANCHO JUSTO */
+    z-index: 6000;
+    display: none;
+    border: 1px solid #414868;
+    max-height: 150px;
+    overflow-y: auto;
+    top: 100%;  /* ← JUSTO DEBAJO DEL INPUT */
+    left: 30px;  /* ← DESPUES DEL ICONO */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+/* FIN */
+        .sugg-i { padding: 10px; border-bottom: 1px solid #24283b; cursor: pointer; font-size: 0.75rem; color: white; }
+        .sugg-i:hover { background: rgba(255,255,255,0.1); }
+
+        /* FILES GRID 2x2 */
+        .files-grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .file-col-btn { background: #222; color: var(--accent); padding: 15px 5px; border-radius: 6px; border: 1px solid #333; cursor: pointer; text-align: center; font-weight: bold; font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: background 0.2s; }
+        .file-col-btn:hover { background: #333; }
+        .sub-coll { display: none; background: rgba(255,255,255,0.05); border: 1px dashed #444; padding: 10px; border-radius: 4px; margin-bottom: 10px; flex-direction: column; gap: 5px; }
+        .file-sub-btn { width: 100%; padding: 10px; background: #444; color: white; border: none; border-radius: 4px; text-align: left; font-size: 0.75rem; cursor: pointer; }
+        .file-sub-btn:hover { background: #555; }
+
+        /* HISTORIAL */
+        .hist-item { background:#1a1b26; padding:10px; border-radius:6px; margin-bottom:8px; border-left:4px solid #555; display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+        .hist-item.active-hist { border: 1px solid var(--selected-gold); }
+        .hist-info { flex:1; display:flex; flex-direction:column; }
+        .hist-top { display:flex; justify-content:space-between; align-items:center; }
+        .hist-data { font-size: 0.7rem; color: var(--accent); }
+        .hist-icons { font-size: 0.8rem; color: #aaa; display:flex; gap:5px; margin-left: 10px; align-items:center; }
+        .hist-del { color:#ff4b2b; font-weight:bold; padding:0 10px; font-size:1.2rem; margin-left: 5px; }
+
+        /* Donate */
+        .donate-sidebar { position: relative; width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ffd700; border-radius: 8px; background: rgba(255, 215, 0, 0.05); color: #ffd700; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; animation: softPulse 3s infinite ease-in-out; box-sizing: border-box; text-decoration: none; overflow: hidden; }
+
+        /* MOTO EN PANEL */
+        .mini-moto { position: absolute; bottom: 2px; font-size: 1rem; color: rgba(255,255,255,0.2); animation: miniMotoRide 4s linear infinite; z-index: 1; }
+        @keyframes miniMotoRide { 0% { left: 110%; } 100% { left: -20px; } }
+
+        /* MOTO EN MODAL */
+        #moto-anim-layer { display:none; position:fixed; top:120px; width:100%; height:100px; z-index:8000; pointer-events:none; }
+        .modal-moto { position: absolute; right: -100px; font-size: 3rem; animation: motoRideRightToLeft 4s linear forwards; }
+        @keyframes motoRideRightToLeft {
+            0% { right: -100px; opacity: 1; }
+            100% { right: 110%; opacity: 1; }
+        }
+        .moto-smoke { position: absolute; font-size: 1rem; color: #ccc; animation: smoke 0.5s infinite; left: 100%; }
+        @keyframes smoke { 0% { opacity:0; transform: scale(0.5); } 50% { opacity:1; } 100% { opacity:0; transform: scale(1.5) translate(10px, -10px); } }
+
+        .coffee-inside { display: none; margin-left: 5px; animation: titlePulse 2s infinite ease-in-out; color: white; }
+
+        /* MODALS */
+        .custom-modal { display: none; position: fixed; z-index: 7000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; }
+        .modal-content { background-color: #1a1b26; margin: auto; padding: 20px; border: 1px solid var(--accent); width: 90%; max-width: 400px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); color: #c0caf5; position: relative; animation: popIn 0.3s; max-height: 85vh; overflow-y: auto; text-align: center; }
+        .close-modal { color: #ff4b2b; float: right; font-size: 28px; font-weight: 900; cursor: pointer; margin-top: -10px; }
+        .acc-btn { background: #333; color: white; width: 100%; text-align: left; padding: 12px; border: none; border-bottom: 1px solid #444; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; font-size: 0.8rem; }
+        .acc-panel { padding: 15px; display: none; background: rgba(0,0,0,0.2); font-size: 0.8rem; text-align: left; line-height: 1.6; }
+
+        /* CATEGORIAS BUSQUEDA POI */
+        .cat-btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .cat-btn { background: #222; color: white; border: 1px solid #444; border-radius: 8px; padding: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.75rem; }
+        .cat-btn:hover { background: #333; }
+
+        /* WEATHER */
+        .w-sun { color: #ffd700; text-shadow: 0 0 5px orange; }
+        .w-cloud { color: #87ceeb; }
+        .w-rain { color: #2b7cff; }
+        .w-fog { color: #ff9800; }
+        .w-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+        .w-day { background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px; text-align: center; }
+        .w-hourly { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 5px; border-top: 1px solid #333; padding-top: 10px; }
+
+        /* LOADER */
+        #loading-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: transparent; z-index: 6000; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+        .loading-backdrop { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 5999; }
+        .gears { font-size: 3.5rem; position: relative; width: 80px; height: 60px; }
+        .gear-1 { position: absolute; left: 0; animation: spin 2s infinite linear; color: #555; }
+        .gear-2 { position: absolute; right: 0; bottom: 0; font-size: 2.5rem; animation: spin-rev 2s infinite linear; color: var(--r1); }
+        .close-loading { margin-top: 15px; color: #ff4b2b; font-size: 2rem; font-weight: bold; cursor: pointer; text-shadow: 0 0 5px black; pointer-events: auto; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin-rev { 100% { transform: rotate(-360deg); } }
+
+        /* UTILS */
+        .flex-row-config { display: flex; justify-content: space-between; align-items: center; gap: 5px; margin-bottom: 12px; border-bottom: 1px solid #222; padding-bottom: 8px; }
+        .conf-item { flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--toggle-off); transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--toggle-on); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .gas-wrapper { display: flex; align-items: center; background: #1a1b26; border: 1px solid #414868; border-radius: 20px; padding: 2px 8px; font-size: 0.8rem; gap: 2px; }
+        .gas-input-styled { width: 35px !important; background: transparent !important; border:none !important; color: white !important; font-weight: bold; text-align: center; padding: 0 !important; }
+        .contact-btn-wide { width: 100%; padding: 12px; margin-bottom: 5px; border: 1px solid #333; border-radius: 8px; background: #222; color: var(--accent); font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; text-decoration: none; font-size: 0.8rem; box-sizing: border-box; }
+        .row-s { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.85rem; align-items: center; border-bottom: 1px solid #222; padding-bottom: 8px; flex-wrap: wrap; }
+
+        .popup-btn { padding: 8px 16px; background: var(--r1); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9rem; margin-top: 5px; }
+        .popup-btn:hover { background: var(--r2); }
+  /* INICIO - SPLASH SCREEN STYLES */
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0a0a0c 0%, #1a1b26 50%, #0a0a0c 100%);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: splashFadeIn 0.5s ease-in;
+}
+
+#splash-screen.hide {
+    animation: splashFadeOut 0.5s ease-out forwards;
+}
+
+.splash-content {
+    text-align: center;
+    padding: 20px;
+    max-width: 400px;
+}
+
+.splash-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    margin: 0 0 10px 0;
+    animation: titlePulse 4s infinite ease-in-out;
+    color: #fff;
+}
+
+.splash-subtitle {
+    font-size: 1rem;
+    color: var(--accent);
+    margin: 0 0 40px 0;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+/* INICIO - LOGO MÁS GRANDE (DOBLE) */
+.splash-logo {
+    width: 66vw;           /* ← CAMBIO: Era 33vw, ahora 66vw */
+    max-width: 500px;      /* ← CAMBIO: Era 250px, ahora 500px */
+    height: auto;
+    border-radius: 20px;
+    border: 3px solid var(--accent);
+    box-shadow: 0 10px 40px rgba(91, 192, 222, 0.3);
+    margin: 0 0 40px 0;
+    animation: logoFloat 3s ease-in-out infinite;
+}
+/* FIN */
+
+.splash-by {
+    font-size: 1.2rem;
+    margin: 0 0 40px 0;
+    animation: byPulse 2s infinite ease-in-out;
+}
+
+.splash-ver {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.splash-btn {
+    background: linear-gradient(135deg, var(--r1) 0%, var(--r2) 100%);
+    border: none;
+    color: white;
+    padding: 18px 40px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(255, 75, 43, 0.4);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+.splash-btn:hover, .splash-btn:active {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(255, 75, 43, 0.6);
+}
+
+.splash-tap {
+    font-size: 0.75rem;
+    color: #565f89;
+    margin: 0;
+    font-style: italic;
+}
+
+@keyframes splashFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes splashFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes byPulse {
+    0%, 100% {
+        color: var(--r1);
+        text-shadow: 0 0 10px var(--r1);
+    }
+    50% {
+        color: #fff;
+        text-shadow: 0 0 20px rgba(255,255,255,0.5);
+    }
+}
+/* FIN - SPLASH SCREEN STYLES */
+
+    </style>
+</head>
+<body>
+<!-- INICIO - SPLASH SCREEN BIENVENIDA -->
+<div id="splash-screen">
+    <div class="splash-content">
+        <h1 class="splash-title">RutiWay</h1>
+        <p class="splash-subtitle">La app de crear rutas</p>
+        <img src="assets/rutiwaylogo.png" class="splash-logo"
+             onerror="this.src='rutiwaylogo.png'" alt="RutiWay Logo">
+        <p class="splash-by">By Leyden <span class="splash-ver">Ver. 2.0.2</span></p>
+        <button class="splash-btn" onclick="closeSplash()">
+            🏍️ ¡Comenzamos!
+        </button>
+        <p class="splash-tap">Toca en cualquier lugar para continuar</p>
+    </div>
+</div>
+<!-- FIN - SPLASH SCREEN -->
+
+<div class="loading-backdrop" id="loading-back"></div>
+<div id="loading-panel">
+    <div class="gears"><i class="fa fa-cog gear-1"></i><i class="fa fa-cog gear-2"></i></div>
+    <div class="close-loading" onclick="cancelGen()">×</div>
+</div>
+
+<div id="app-modal" class="custom-modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeM()">×</span>
+        <div class="modal-title" id="m-title"></div>
+        <div class="modal-body" id="m-body"></div>
+    </div>
+</div>
+
+<div id="fixed-switch-btn">
+    <button class="side-switch-btn" id="toggle-sidebar-btn" onclick="toggleS()">MAPA</button>
+</div>
+
+<div id="menu-trigger-left" class="hide-on-menu">
+    <button id="menu-btn-left" class="top-btn-left" onclick="toggleS()">MENU</button>
+</div>
+
+<div id="float-stats" class="hide-on-menu">
+    <div class="stats-grid">
+        <div class="stat-v" onclick="openSearchModal('km')"><label id="lbl-km">KM</label><b id="v-k">0.0</b></div>
+        <div class="stat-v" onclick="openSearchModal('min')"><label id="lbl-trip">VIAJE</label><b id="v-time">0h 0m</b></div>
+        <div class="stat-v" onclick="showTollsList()"><label id="lbl-toll">PEAJES</label><b id="v-t">0.00€</b></div>
+        <div class="stat-v" style="border-color:var(--r2)" onclick="showWarningsList()"><label id="lbl-warn" style="color:var(--r2)">AVISOS</label><b id="v-p">0</b></div>
+        <div class="weather-btn" onclick="getDestWeather()"><i class="fa fa-cloud-sun"></i><span id="lbl-dest">DESTINO</span></div>
+    </div>
+</div>
+
+<div id="fixed-legend" class="hide-on-menu">
+    <div class="map-legend">
+        <div id="l-routes"></div>
+        <hr style="border:0; border-top:1px solid #444; margin:5px 0">
+        <div class="leg-i"><span class="leg-left"><span class="dot" style="background:#ff4b2b"></span> Radares</span></div>
+        <div class="leg-i"><span class="leg-left"><span class="dot" style="background:#ff9800"></span> Gasol</span></div>
+        <div class="leg-i"><span class="leg-left"><span class="dot" style="background:#4caf50"></span> Peajes (€)</span></div>
+        <div class="leg-i"><span class="leg-left">📍 Paradas</span></div>
+    </div>
+</div>
+
+<button id="center-btn" class="hide-on-menu" onclick="doC()"><i class="fa fa-crosshairs"></i></button>
+<div id="clear-map-btn" class="hide-on-menu" onclick="wipeMap()" title="Limpiar Mapa"><i class="fa fa-broom"></i></div>
+<div id="map-cycle-btn" class="hide-on-menu" onclick="cycleMap()"><i class="fa fa-moon"></i></div>
+<div id="my-places-btn" class="hide-on-menu" onclick="togglePlacesBtn()"><i class="fa fa-flag"></i></div>
+<button id="redo-search-btn" class="hide-on-menu" onclick="renderVisiblePlaces()"><i class="fa fa-sync-alt"></i> Buscar en esta zona</button>
+
+<div class="sidebar active" id="sidebar">
+    <div class="brand-header">
+        <img src="rutiway_logo.png" class="brand-logo" onclick="openFullMenu()" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3082/3082383.png'">
+        <div style="flex:1">
+            <h2 class="brand-title">RUTIWAY</h2>
+            <span class="brand-sub">by Leyden</span>
+        </div>
+        <div class="lang-container">
+            <div class="lang-select-btn" id="lang-btn" onclick="toggleLangDropdown()">Cast</div>
+            <div id="lang-list" class="lang-dropdown"></div>
+            <div class="brand-ver">Ver. 2.0.2</div>
+        </div>
+    </div>
+
+    <button class="collapsible" onclick="togColl('p-search')"><span class="t-plan">PLANIFICACIÓN</span> <i class="fa fa-caret-down"></i></button>
+    <div id="p-search" class="coll-content active">
+        <div style="display:flex; gap:5px; margin-bottom:8px;">
+            <div class="in-wrap" style="flex:1; margin:0;">
+                <div class="in-wrap-icon" id="flag-display" style="font-size:1.4rem">🇪🇸</div>
+                <select id="s-country" onchange="updateCountry(); saveConfig();">
+                    <option value="España" selected>España</option>
+                    <option value="France">Francia</option>
+                    <option value="Italia">Italia</option>
+                    <option value="Andorra">Andorra</option>
+                    <option value="Portugal">Portugal</option>
+                </select>
+            </div>
+            <div class="in-wrap" style="flex:1; margin:0;"><select id="s-region" onchange="saveConfig()"></select></div>
+        </div>
+
+        <div class="in-wrap">
+            <div class="in-wrap-icon"><i class="fa fa-circle" style="color:#4caf50; font-size:0.8rem"></i></div>
+            <input id="ori" type="text" value="Cerdanyola del valles" placeholder="Escribe tu Origen">
+            <span class="clear-btn" onclick="clr('ori')">×</span>
+            <div id="ori-s" class="suggestions"></div>
+        </div>
+
+        <div id="stops-container"></div>
+        <div class="add-stop-row">
+            <div class="add-stop-btn" onclick="addBlankStop()">
+                <i class="fa fa-map-marker-alt"></i> <span>+ Parada</span>
+            </div>
+        </div>
+
+        <div class="in-wrap">
+            <div class="in-wrap-icon"><i class="fa fa-flag-checkered"></i></div>
+            <input id="des" type="text" value="Sort" placeholder="Escribe tu Destino">
+            <span class="clear-btn" onclick="clr('des')">×</span>
+            <div id="des-s" class="suggestions"></div>
+        </div>
+    </div>
+
+    <div id="donate-btn-target" class="donate-sidebar" onclick="openNative('https://paypal.me/leydenruben')">
+        <div class="mini-moto">🛵</div>
+        <div style="display:flex; align-items:center; gap:5px; z-index:2">
+            <i class="fab fa-paypal"></i> <span id="t-invite">Invítame a gasolina</span> <i class="fa fa-gas-pump"></i>
+            <i class="fa fa-mug-hot coffee-inside"></i>
+        </div>
+    </div>
+
+    <button class="collapsible" onclick="togColl('p-config')"><span class="t-conf">CONFIGURACIÓN RIDER</span> <i class="fa fa-caret-down"></i></button>
+    <div id="p-config" class="coll-content active">
+        <div class="flex-row-config">
+            <div class="conf-item"><div><i class="fa fa-route"></i> Revirado</div> <label class="switch" style="transform:scale(0.8)"><input type="checkbox" id="c-curvy" checked onchange="saveConfig(); markUpdate()"><span class="slider"></span></label></div>
+            <div style="width:1px; height:20px; background:#333; margin:0 5px;"></div>
+            <div class="conf-item"><div><span style="font-size:1.2em">🤯</span> Gasolina x2</div> <label class="switch" style="transform:scale(0.8)"><input type="checkbox" id="c-gas-x2" onchange="saveConfig(); markUpdate()"><span class="slider"></span></label></div>
+        </div>
+        <div class="row-s"><div><i class="fa fa-money-bill-wave"></i> Evitar peajes</div> <label class="switch"><input type="checkbox" id="c-toll" onchange="saveConfig(); markUpdate()"><span class="slider"></span></label></div>
+    </div>
+
+    <button class="collapsible" onclick="togExcl('p-info')"><span class="t-info">INFORMACIÓN EN RUTA</span> <i class="fa fa-caret-down"></i></button>
+    <div id="p-info" class="coll-content excl-group">
+        <div class="row-s"><div><i class="fa fa-camera"></i> Escanear Radares</div> <label class="switch"><input type="checkbox" id="c-r" checked onchange="saveConfig(); markUpdate()"><span class="slider"></span></label></div>
+        <div class="row-s"><div><i class="fa fa-info-circle"></i> Info Detalles POI</div> <label class="switch"><input type="checkbox" id="c-info" checked onchange="saveConfig(); markUpdate()"><span class="slider"></span></label></div>
+        <div class="row-s"><div><i class="fa fa-cloud-sun"></i> Clima cada 50km</div> <label class="switch"><input type="checkbox" id="c-weat" checked onchange="saveConfig(); markUpdate()"><span class="slider"></span></label></div>
+        <div class="row-s">
+            <div><i class="fa fa-gas-pump" style="color:#ff9800; margin-right:5px"></i> Ver Gasolineras</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div class="gas-wrapper"><input type="number" id="gas-range" class="gas-input-styled" value="2" min="1" max="99" onchange="saveConfig(); markUpdate()"> Km</div>
+                <label class="switch"><input type="checkbox" id="c-gas-vis" checked onchange="saveConfig(); markUpdate()"><span class="slider"></span></label>
+            </div>
+        </div>
+        <div class="row-s">
+            <div><i class="fa fa-tachometer-alt" style="color:#5bc0de; margin-right:5px"></i> Vel. Media (Km/h)</div>
+            <div class="gas-wrapper"><input type="number" id="avg-speed" class="gas-input-styled" value="70" min="10" max="140" onchange="updateSpeed()"></div>
+        </div>
+    </div>
+
+    <button class="collapsible" onclick="togExcl('p-hist')"><span class="t-hist">HISTORIAL</span> <span id="total-routes-badge" style="font-size:0.6rem; margin-left:5px; color:#aaa"></span><i class="fa fa-caret-down"></i></button>
+    <div id="p-hist" class="coll-content excl-group"><div id="h-list" style="font-size:0.7rem; color:#aaa; margin-bottom: 10px;"></div></div>
+
+    <button class="collapsible" onclick="togExcl('p-files')">ARCHIVOS <i class="fa fa-caret-down"></i></button>
+    <div id="p-files" class="coll-content excl-group">
+        <div class="files-grid-2x2">
+            <div class="file-col-btn" onclick="togSubExcl('gpx-box')">
+                <i class="fa fa-file-code" style="font-size:1.5rem"></i> GESTIÓN GPX
+            </div>
+            <div class="file-col-btn" onclick="togSubExcl('maps-box')">
+                <i class="fa fa-map" style="font-size:1.5rem"></i> MAPS
+            </div>
+        </div>
+        <div id="gpx-box" class="sub-coll">
+            <button class="file-sub-btn" onclick="saveGPX()">💾 Descargar GPX</button>
+            <label class="file-sub-btn">📥 Importar GPX <input type="file" id="import-gpx" style="display:none" onchange="impG(this)"></label>
+        </div>
+        <div id="maps-box" class="sub-coll">
+            <button class="file-sub-btn" onclick="shareRoute()">📤 Compartir con...</button>
+            <button class="file-sub-btn" onclick="openInMaps()">🗺️ Abrir App Maps</button>
+            <button class="file-sub-btn" onclick="impMaps()">🔗 Lector Enlaces</button>
+        </div>
+
+        <button class="contact-btn-wide" style="margin-top:5px; border:1px solid #ddd; background:#eee; color:black" onclick="prePrintCheck()"><i class="fa fa-file-pdf"></i> GENERAR PDF</button>
+    </div>
+
+    <button class="collapsible" onclick="togExcl('p-contact')"><span class="t-contact">CONTACTO / LEGAL</span> <i class="fa fa-caret-down"></i></button>
+    <div id="p-contact" class="coll-content excl-group">
+        <div id="p-contact-content">
+            <button class="contact-btn-wide" onclick="window.location.href='mailto:leydenwho.app@gmail.com?subject=RutiWay%20Soporte'"><i class="fa fa-envelope"></i> leydenwho.app@gmail.com</button>
+            <button class="contact-btn-wide" style="border-color:#5bc0de; color:#5bc0de;" onclick="openFullMenu()"><i class="fa fa-balance-scale"></i> RutiWay - Legal / Ayuda</button>
+            <button class="contact-btn-wide" style="border-color:#ffd700; color:#ffd700;" onclick="openInstructions()"><i class="fa fa-lightbulb"></i> Instrucciones de Uso</button>
+            <div class="donate-sidebar" style="width:100%; box-sizing:border-box; margin-top:10px;" onclick="openNative('https://paypal.me/leydenruben')">
+                <div class="mini-moto">🛵</div>
+                <div style="display:flex; align-items:center; justify-content:center; gap:5px; z-index:2; width:100%">
+                    <i class="fab fa-paypal"></i> <span id="t-invite-2">Invítame a gasolina</span> <i class="fa fa-gas-pump"></i>
+                    <i class="fa fa-mug-hot coffee-inside"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="map"></div>
+<button class="main-btn" id="m-btn" onclick="resolveAndGen()">GENERAR RUTA #1</button>
+
+<div id="moto-anim-layer">
+    <div class="modal-moto">🛵💨 <span class="moto-smoke">☁️</span></div>
+</div>
+
+<!-- INICIO BLOQUE: PRINT REPORT HTML CORREGIDO -->
+<div id="print-report">
+    <div class="rep-header">
+        <div class="rep-title">RUTIWAY <span style="font-size:1rem; color:#555">Rider Report</span></div>
+        <div class="rep-meta" id="rep-date"></div>
+    </div>
+    <div class="rep-grid">
+        <div class="rep-box">
+            <h3>🏁 Ruta</h3>
+            <div class="rep-item"><b>Origen:</b> <span id="rep-ori"></span></div>
+            <div class="rep-item"><b>Destino:</b> <span id="rep-des"></span></div>
+            <div class="rep-item"><b>Distancia:</b> <span id="rep-km"></span></div>
+            <div class="rep-item"><b>Tiempo:</b> <span id="rep-time"></span></div>
+            <div class="rep-item"><b>Peajes:</b> <span id="rep-toll"></span></div>
+            <div class="rep-item"><b>Avisos:</b> <span id="rep-warn"></span></div>
+        </div>
+        <div class="rep-box">
+            <h3>⚙️ Configuración &amp; Clima</h3>
+            <div id="rep-settings" class="config-tags"></div>
+            <div class="rep-item" style="margin-top:5px" id="rep-weather"></div>
+        </div>
+    </div>
+    <div class="rep-box">
+        <h3>⚠️ Avisos e Incidencias</h3>
+        <div id="rep-list"></div>
+    </div>
+</div>
+<!-- FIN BLOQUE -->
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="places.js" onerror="console.log('No places.js found');"></script>
+
+<script>
+    const KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjliYzk2MjNjZTA1OTRmMjc5ZDBmZjBmYTY0ZmU3Yzg2IiwiaCI6Im11cm11cjY0In0=";
+    const map = L.map('map', {zoomControl:false}).setView([41.49, 2.14], 10);
+    const baseLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+    map.createPane('routePane'); map.getPane('routePane').style.zIndex = 400;
+    map.createPane('markerPane'); map.getPane('markerPane').style.zIndex = 800;
+
+    let o=[2.140, 41.491], d=[1.127, 42.406], stops=[], activeRoute=null, history=[], warningsLog=[];
+    // INICIO BLOQUE: VARIABLES GLOBALES PDF MEJORADO
+    let weatherDataLog = []; // Almacena clima cada 50km para PDF
+    let destWeatherData = null; // Almacena clima del destino
+    // FIN BLOQUE
+    let pL=L.layerGroup().addTo(map), wL=L.layerGroup().addTo(map), rLines=L.featureGroup().addTo(map);
+    let myPlacesLayer = L.layerGroup().addTo(map);
+    const COLS=['#2b7cff','#ff9800','#4caf50','#ff4b2b','#9c27b0','#f39c12'];
+    let placesVisible = false;
+    let routeGenCount = localStorage.getItem('tardisRouteCount') ? parseInt(localStorage.getItem('tardisRouteCount')) : 0;
+    let abortController = null;
+    let avgSpeed = 70;
+    let savedTargetCoords = null;
+    let currentLang = 'Cast';
+
+    const LANGS = {
+        'España': { flag: '🇪🇸', def: 'Cast', options: ['Cast', 'Cat', 'Val', 'Gale', 'Eus', 'Ara', 'Inglés'] },
+        'France': { flag: '🇫🇷', def: 'Fr', options: ['Fr', 'Br', 'Occ', 'Inglés'] },
+        'Andorra': { flag: '🇦🇩', def: 'Cat', options: ['Cat', 'Cast', 'Fr', 'Pt', 'Inglés'] },
+        'Portugal': { flag: '🇵🇹', def: 'Pt', options: ['Pt', 'Inglés'] }
+    };
+    const UNAVAILABLE = ['Val', 'Gale', 'Eus', 'Ara', 'Br', 'Occ'];
+
+    const DICT = {
+        'Cast': { plan: 'PLANIFICACIÓN', conf: 'CONFIGURACIÓN RIDER', info: 'INFORMACIÓN EN RUTA', hist: 'HISTORIAL', cont: 'CONTACTO / LEGAL', inv: 'Invítame a gasolina' },
+        'Cat': { plan: 'PLANIFICACIÓ', conf: 'CONFIGURACIÓ RIDER', info: 'INFORMACIÓ EN RUTA', hist: 'HISTORIAL', cont: 'CONTACTE / LEGAL', inv: 'Convida\'m a benzina' },
+        'Fr': { plan: 'PLANIFICATION', conf: 'CONFIGURATION RIDER', info: 'INFOS SUR ROUTE', hist: 'HISTORIQUE', cont: 'CONTACT / LEGAL', inv: 'Offrez-moi du gaz' },
+        'Pt': { plan: 'PLANEAMENTO', conf: 'CONFIGURAÇÃO RIDER', info: 'INFORMAÇÃO ROTA', hist: 'HISTÓRICO', cont: 'CONTACTO / LEGAL', inv: 'Ofereça gasolina' },
+        'Inglés': { plan: 'PLANNING', conf: 'RIDER CONFIG', info: 'ROUTE INFO', hist: 'HISTORY', cont: 'CONTACT / LEGAL', inv: 'Buy me gas' }
+    };
+
+    // INICIO - WINDOW ONLOAD CON SPLASH
+window.onload = function() {
+    updateCountry();
+    setTimeout(loadConfig, 100);
+    updateBtnStyle();
+    updateRouteCountUI();
+
+    // SPLASH: Cerrar al hacer clic en cualquier parte
+    document.getElementById('splash-screen').addEventListener('click', closeSplash);
+
+    // NO abrir menú automáticamente (esperar splash)
+}
+
+function closeSplash() {
+    const splash = document.getElementById('splash-screen');
+    splash.classList.add('hide');
+    setTimeout(() => {
+        splash.style.display = 'none';
+        // AHORA SÍ abrir el menú
+        document.body.classList.add('menu-active');
+    }, 500);
+}
+// FIN - WINDOW ONLOAD CON SPLASH
+
+    function updateCountry() {
+        const country = document.getElementById('s-country').value;
+        const data = LANGS[country] || LANGS['España'];
+        document.getElementById('flag-display').innerText = data.flag;
+        currentLang = data.def;
+        document.getElementById('lang-btn').innerText = currentLang;
+        updateLangDropdown();
+        translateUI(); updateRegions();
+    }
+
+    function toggleLangDropdown() {
+        const el = document.getElementById('lang-list');
+        el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function updateLangDropdown() {
+        const country = document.getElementById('s-country').value;
+        const opts = LANGS[country].options;
+        const list = document.getElementById('lang-list');
+        list.innerHTML = '';
+        opts.forEach(l => {
+            const isUnavail = UNAVAILABLE.includes(l);
+            const div = document.createElement('div');
+            div.className = 'lang-opt' + (isUnavail ? ' lang-disabled' : '');
+            div.innerText = l + (isUnavail ? ' (No disponible)' : '');
+            if(!isUnavail) {
+                div.onclick = () => {
+                    currentLang = l;
+                    document.getElementById('lang-btn').innerText = l;
+                    toggleLangDropdown();
+                    translateUI();
+                };
+            }
+            list.appendChild(div);
+        });
+    }
+
+    function translateUI() {
+        const t = DICT[currentLang];
+        if(!t) return;
+        document.querySelector('.t-plan').innerText = t.plan;
+        document.querySelector('.t-conf').innerText = t.conf;
+        document.querySelector('.t-info').innerText = t.info;
+        document.querySelector('.t-hist').innerText = t.hist;
+        document.querySelector('.t-contact').innerText = t.cont;
+        document.getElementById('t-invite').innerText = t.inv;
+        document.getElementById('t-invite-2').innerText = t.inv;
+    }
+
+    function updateRegions() {
+    const country = document.getElementById('s-country').value;
+    const regionSelect = document.getElementById('s-region');
+    let options = '<option value="" selected>Todas</option>'; // TODAS por defecto
+
+    if(country === 'España') {
+        options += `
+            <option value="Andalucia">Andalucía</option>
+            <option value="Aragon">Aragón</option>
+            <option value="Asturias">Asturias</option>
+            <option value="Baleares">Islas Baleares</option>
+            <option value="Canarias">Islas Canarias</option>
+            <option value="Cantabria">Cantabria</option>
+            <option value="Castilla y Leon">Castilla y León</option>
+            <option value="Castilla-La Mancha">Castilla-La Mancha</option>
+            <option value="Catalunya">Catalunya</option>
+            <option value="Ceuta">Ceuta</option>
+            <option value="Extremadura">Extremadura</option>
+            <option value="Galicia">Galicia</option>
+            <option value="La Rioja">La Rioja</option>
+            <option value="Madrid">Comunidad de Madrid</option>
+            <option value="Melilla">Melilla</option>
+            <option value="Murcia">Región de Murcia</option>
+            <option value="Navarra">Navarra</option>
+            <option value="Pais Vasco">País Vasco</option>
+            <option value="Valencia">Comunidad Valenciana</option>
+        `;
+    }
+    else if(country === 'France') {
+        options += `
+            <option value="Auvergne-Rhone-Alpes">Auvergne-Rhône-Alpes</option>
+            <option value="Bourgogne-Franche-Comte">Bourgogne-Franche-Comté</option>
+            <option value="Bretagne">Bretagne</option>
+            <option value="Centre-Val de Loire">Centre-Val de Loire</option>
+            <option value="Corse">Corse</option>
+            <option value="Grand Est">Grand Est</option>
+            <option value="Hauts-de-France">Hauts-de-France</option>
+            <option value="Ile-de-France">Île-de-France</option>
+            <option value="Normandie">Normandie</option>
+            <option value="Nouvelle-Aquitaine">Nouvelle-Aquitaine</option>
+            <option value="Occitanie">Occitanie</option>
+            <option value="Pays de la Loire">Pays de la Loire</option>
+            <option value="Provence-Alpes-Cote d'Azur">Provence-Alpes-Côte d'Azur</option>
+        `;
+    }
+    else if(country === 'Italia') {
+        options += `
+            <option value="Abruzzo">Abruzzo</option>
+            <option value="Basilicata">Basilicata</option>
+            <option value="Calabria">Calabria</option>
+            <option value="Campania">Campania</option>
+            <option value="Emilia-Romagna">Emilia-Romagna</option>
+            <option value="Friuli-Venezia Giulia">Friuli-Venezia Giulia</option>
+            <option value="Lazio">Lazio</option>
+            <option value="Liguria">Liguria</option>
+            <option value="Lombardia">Lombardia</option>
+            <option value="Marche">Marche</option>
+            <option value="Molise">Molise</option>
+            <option value="Piemonte">Piemonte</option>
+            <option value="Puglia">Puglia</option>
+            <option value="Sardegna">Sardegna</option>
+            <option value="Sicilia">Sicilia</option>
+            <option value="Toscana">Toscana</option>
+            <option value="Trentino-Alto Adige">Trentino-Alto Adige</option>
+            <option value="Umbria">Umbria</option>
+            <option value="Valle d'Aosta">Valle d'Aosta</option>
+            <option value="Veneto">Veneto</option>
+        `;
+    }
+    else if(country === 'Portugal') {
+        options += `
+            <option value="Acores">Açores</option>
+            <option value="Alentejo">Alentejo</option>
+            <option value="Algarve">Algarve</option>
+            <option value="Centro">Centro</option>
+            <option value="Lisboa">Lisboa</option>
+            <option value="Madeira">Madeira</option>
+            <option value="Norte">Norte</option>
+        `;
+    }
+    else if(country === 'Andorra') {
+        options += `
+            <option value="Andorra la Vella">Andorra la Vella</option>
+            <option value="Canillo">Canillo</option>
+            <option value="Encamp">Encamp</option>
+            <option value="Escaldes-Engordany">Escaldes-Engordany</option>
+            <option value="La Massana">La Massana</option>
+            <option value="Ordino">Ordino</option>
+            <option value="Sant Julia de Loria">Sant Julià de Lòria</option>
+        `;
+    }
+
+    regionSelect.innerHTML = options;
+}
+
+
+    function updateSpeed() { avgSpeed = document.getElementById('avg-speed').value; saveConfig(); }
+
+    function updateRouteCountUI() {
+        document.getElementById('total-routes-badge').innerText = `Total Generadas: ${routeGenCount}`;
+        if(routeGenCount > 6) { document.querySelectorAll('.coffee-inside').forEach(el => el.style.display = 'inline-block'); }
+        else { document.querySelectorAll('.coffee-inside').forEach(el => el.style.display = 'none'); }
+    }
+
+    function checkSupportPopup() {
+        if (routeGenCount > 6 && (routeGenCount - 1) % 6 === 0) {
+            showM("⛽ Soporte RutiWay", `<div style="font-size:3rem;">🛵</div><p>¡Llevas <b>${routeGenCount}</b> rutas legendarias!</p><p>Invítame a un depósito para seguir rodando.</p><button class="popup-btn" style="background:#ffd700; color:black; margin-top:10px;" onclick="triggerMotoAnimation()">¡Gas a fondo!</button>`);
+        }
+    }
+
+    function triggerMotoAnimation() {
+        closeM();
+        if(!document.body.classList.contains('menu-active')) toggleS();
+        const layer = document.getElementById('moto-anim-layer');
+        layer.style.display = 'block';
+        setTimeout(() => { layer.style.display = 'none'; }, 3500);
+    }
+
+    function openFullMenu() {
+        const legalTxt = `<b>1. Privacidad:</b> RutiWay no almacena su ubicación. Se usa en tiempo real para el cálculo de rutas.<br><b>2. Datos:</b> Utilizamos servicios de OpenRouteService y OpenMeteo. No compartimos datos personales.<br><b>3. Archivos:</b> Los GPX y PDF se generan y guardan localmente en su dispositivo.`;
+        const pIns = `
+            <b>1. Logo RutiWay:</b> Pulsa para abrir esta pantalla de Ayuda.<br>
+            <b>2. Idioma (Ver.X.X):</b> Pulsa para cambiar el idioma de la app.<br>
+            <b>3. Bandera/País:</b> Selecciona el país para cargar sus idiomas y regiones.<br>
+            <b>4. Círculo Verde (Origen):</b> Escribe dirección o mantén pulsado en el mapa.<br>
+            <b>5. + Parada:</b> Añade puntos intermedios. Copia aquí direcciones de Maps.<br>
+            <b>6. Bandera Cuadros (Destino):</b> Escribe dirección o mantén pulsado en el mapa.<br>
+            <b>7. Invítame a gasolina:</b> Botón para donaciones vía PayPal.<br>
+            <b>CONFIGURACIÓN RIDER:</b><br>
+            - <b>Revirado:</b> Prioriza carreteras con curvas.<br>
+            - <b>Gasolina x2:</b> Divide la ruta en tramos más cortos (más paradas).<br>
+            - <b>Evitar peaje:</b> Intenta no usar carreteras de pago (precios aprox).<br>
+            <b>INFORMACIÓN EN RUTA:</b> Activa/desactiva la visualización de Radares, POIs, Clima y Gasolineras en el mapa.<br>
+            <b>HISTORIAL:</b> Muestra las rutas generadas. Indica el total. Pulsa para ver en mapa.<br>
+            <b>ARCHIVOS:</b><br>
+            - <b>Gestión GPX:</b> Importar y Exportar trazas GPX.<br>
+            - <b>MAPS:</b> Compartir ruta o abrirla en apps externas.<br>
+            - <b>GENERAR PDF:</b> Crea un informe de ruta para imprimir/guardar.<br>
+            <b>GENERAR RUTA:</b> Calcula y muestra la ruta en el mapa. Parpadea si hay cambios.
+        `;
+        const mIns = `
+            <b>Pulsación Larga en Mapa:</b> Añade una parada en ese punto exacto.<br>
+            <b>Botón KM:</b> Muestra la distancia total. Pulsa para buscar POIs por KM.<br>
+            <b>Botón VIAJE:</b> Muestra tiempo estimado. Pulsa para ver tiempo y ajustar Velocidad Media.<br>
+            <b>Botón PEAJES:</b> Coste estimado. Pulsa para ver lista de peajes.<br>
+            <b>Botón AVISOS:</b> Número de incidencias. Pulsa para ver lista (radares, peajes).<br>
+            <b>Botón DESTINO (Clima):</b> Pulsa para ver el pronóstico del tiempo en el destino.<br>
+            <b>Iconos Clima en Ruta:</b> Tócalos para ver temperatura y localidad.<br>
+            <b>Botón MAPA/MENU (Derecha):</b> Alterna entre ver el mapa completo o abrir el panel lateral.<br>
+            <b>Botón MENU (Izquierda):</b> Abre el panel lateral (solo visible en modo mapa).<br>
+            <b>Botón Centrar (Mira):</b> Centra el mapa en la ruta activa.<br>
+            <b>Botón Escoba:</b> Limpia el mapa y el historial.<br>
+            <b>Botón Luna/Sol:</b> Cambia el estilo del mapa (satélite, oscuro, etc.).<br>
+            <b>Botón Bandera (Sitios):</b> Muestra/oculta tus sitios guardados.<br>
+            <b>Botón Leyenda (Abajo Izq):</b> Muestra qué significa cada color e icono del mapa.
+        `;
+        const html = `
+            <div style="text-align:center; margin-bottom:15px;">
+                <img src="rutiway_logo.png" style="width:200px; border-radius:16px; border:2px solid #5bc0de"> <h3>RutiWay Legal y Ayuda</h3>
+            </div>
+            <button class="acc-btn" onclick="toggleAcc('acc-legal')">⚖️ LEGAL / PRIVACIDAD <i class="fa fa-caret-down"></i></button>
+            <div id="acc-legal" class="acc-panel">${legalTxt}</div>
+            <button class="acc-btn" onclick="toggleAcc('acc-panel')">📱 INSTRUCCIONES PANEL <i class="fa fa-caret-down"></i></button>
+            <div id="acc-panel" class="acc-panel" style="font-size:0.75rem">${pIns}</div>
+            <button class="acc-btn" onclick="toggleAcc('acc-map')">🗺️ INSTRUCCIONES MAPA <i class="fa fa-caret-down"></i></button>
+            <div id="acc-map" class="acc-panel" style="font-size:0.75rem">${mIns}</div>
+            <div class="donate-sidebar" style="margin-top:20px;" onclick="openNative('https://paypal.me/leydenruben')"><div class="mini-moto">🛵</div><div style="display:flex; align-items:center; justify-content:center; gap:5px; z-index:2; width:100%"><i class="fab fa-paypal"></i> Invítame a gasolina <i class="fa fa-gas-pump"></i></div></div>
+        `;
+        showM("", html);
+    }
+    function toggleAcc(id) { const el = document.getElementById(id); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
+    function openInstructions() { openFullMenu(); }
+
+    map.on('contextmenu', async (e)=>{
+        const coords = [e.latlng.lng, e.latlng.lat];
+        stops.push({c: coords, name: `Parada ${stops.length + 1}`});
+        renderStops(); markUpdate();
+        try { const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lon=${coords[0]}&lat=${coords[1]}`); const data = await res.json(); stops[stops.length - 1].name = data.address.road || "Parada Mapa"; renderStops(); } catch(err) {}
+    });
+
+    let mIdx = 0;
+    const mapLayers = ['https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'];
+    function cycleMap(){ mIdx = (mIdx + 1) % mapLayers.length; baseLayer.setUrl(mapLayers[mIdx]); }
+
+    function togglePlacesBtn() {
+        const btn = document.getElementById('my-places-btn');
+        if(!placesVisible) { renderVisiblePlaces(); map.on('moveend', showSearchBtn); placesVisible = true; btn.style.color = '#4caf50'; btn.style.borderColor = '#4caf50'; }
+        else { myPlacesLayer.clearLayers(); map.off('moveend', showSearchBtn); document.getElementById('redo-search-btn').style.display = 'none'; placesVisible = false; btn.style.color = 'var(--accent)'; btn.style.borderColor = 'var(--accent)'; }
+    }
+    function showSearchBtn() { if(placesVisible) document.getElementById('redo-search-btn').style.display = 'block'; }
+    function renderVisiblePlaces() { document.getElementById('redo-search-btn').style.display = 'none'; myPlacesLayer.clearLayers(); if(typeof savedPlaces !== 'undefined' && savedPlaces.features) { const bounds = map.getBounds(); let count = 0; savedPlaces.features.forEach(f => { const coords = f.geometry.coordinates; const latLng = L.latLng(coords[1], coords[0]); if(bounds.contains(latLng)) { const props = f.properties; const marker = L.marker(latLng, { pane: 'markerPane', icon: L.divIcon({className: 'flag-icon', html: '🚩', iconSize: [24,24], iconAnchor: [12,24]}) }).addTo(myPlacesLayer); marker.bindPopup(`<b>${props.name || 'Sitio Guardado'}</b><br>${props.address || ''}<br><button class="popup-btn" onclick="openNative('${props.google_maps_url}')">Abrir en Maps</button>`); count++; } }); if(count === 0) showM("Info", "No hay sitios guardados en esta vista."); } else { showM("Aviso", "No se encontró lugares guardados."); } }
+
+    function saveConfig() { const cfg = { country: document.getElementById('s-country').value, region: document.getElementById('s-region').value, curvy: document.getElementById('c-curvy').checked, gasX2: document.getElementById('c-gas-x2').checked, toll: document.getElementById('c-toll').checked, radar: document.getElementById('c-r').checked, info: document.getElementById('c-info').checked, weat: document.getElementById('c-weat').checked, gasR: document.getElementById('gas-range').value, gasV: document.getElementById('c-gas-vis').checked, hist: history, speed: document.getElementById('avg-speed').value, lang: currentLang }; localStorage.setItem('tardisCfg', JSON.stringify(cfg)); }
+    function loadConfig() { const d = localStorage.getItem('tardisCfg'); if(d) { const c = JSON.parse(d); if(c.country) document.getElementById('s-country').value = c.country; updateCountry(); if(c.lang) { currentLang = c.lang; document.getElementById('lang-btn').innerText = currentLang; } if(c.region) setTimeout(() => document.getElementById('s-region').value = c.region, 10); document.getElementById('c-curvy').checked = c.curvy; document.getElementById('c-gas-x2').checked = c.gasX2; document.getElementById('c-toll').checked = c.toll; document.getElementById('c-r').checked = c.radar; document.getElementById('c-info').checked = c.info; document.getElementById('c-weat').checked = c.weat; document.getElementById('gas-range').value = c.gasR || 2; document.getElementById('c-gas-vis').checked = c.gasV; if(c.speed) { document.getElementById('avg-speed').value = c.speed; avgSpeed = c.speed; } if(c.hist && c.hist.length > 0) { history = c.hist; renderHistory(); try { const last = history[0]; L.geoJSON(last.geo, {pane: 'routePane', style:{color:last.color, weight:8}}).addTo(rLines); o = last.geo.features[0].geometry.coordinates[0]; document.getElementById('v-k').textContent = last.dist; document.getElementById('v-time').textContent = last.duration; updateLegendRoutes(); activeRoute = history[0]; } catch(e){} } } }
+
+    function renderHistory() { document.getElementById('h-list').innerHTML = history.map((item, idx) => { const icons = []; let typeIcon = ''; if(item.type === 'gpx') typeIcon = '📄'; else if(item.type === 'maps') typeIcon = '🔗'; if(item.cfg.curvy) icons.push('<i class="fa fa-route"></i>'); if(item.cfg.gasX2) icons.push('🤯'); if(!item.cfg.toll) icons.push('€'); const isActive = activeRoute === item ? 'active-hist' : ''; return `<div class="hist-item ${isActive}" style="border-left-color:${item.color}" onclick="selectHistoryItem(${idx})"><div class="hist-info"><div class="hist-top"><b>#${item.num} ${typeIcon}</b> <span class="hist-data">${item.dist} KM • ${item.duration}</span></div><div style="display:flex; justify-content:space-between; margin-top:5px;"><span style="font-size:0.7rem; color:#888">${item.time}</span><div class="hist-icons">${icons.join(' ')}</div></div></div><div class="hist-del" onclick="event.stopPropagation(); delHist(${idx})">×</div></div>`; }).join(''); }
+    function delHist(idx) { history.splice(idx, 1); renderHistory(); updateLegendRoutes(); saveConfig(); if(history.length === 0) wipeMap(); }
+    function selectHistoryItem(idx) {
+        activeRoute = history[idx];
+        renderHistory();
+        rLines.clearLayers();
+        L.geoJSON(activeRoute.geo, {pane: 'routePane', style:{color:activeRoute.color, weight:8}}).addTo(rLines);
+        L.marker([activeRoute.o[1], activeRoute.o[0]], { pane: 'markerPane', icon: L.divIcon({className: 'start-badge', html: '🏳️', iconSize: [28,28], iconAnchor: [14,14]}) }).addTo(rLines);
+        L.marker([activeRoute.d[1], activeRoute.d[0]], { pane: 'markerPane', icon: L.divIcon({className: 'end-flag', html: '🏁', iconSize: [30,30], iconAnchor: [5,25]}) }).addTo(rLines);
+
+        document.getElementById('ori').value = activeRoute.oriText || `${activeRoute.o[1].toFixed(4)}, ${activeRoute.o[0].toFixed(4)}`;
+        document.getElementById('des').value = activeRoute.desText || `${activeRoute.d[1].toFixed(4)}, ${activeRoute.d[0].toFixed(4)}`;
+        o = activeRoute.o;
+        d = activeRoute.d;
+
+        stops = activeRoute.stops ? JSON.parse(JSON.stringify(activeRoute.stops)) : [];
+        renderStops();
+
+        if(activeRoute.cfg) {
+            document.getElementById('c-curvy').checked = activeRoute.cfg.curvy || false;
+            document.getElementById('c-gas-x2').checked = activeRoute.cfg.gasX2 || false;
+            document.getElementById('c-toll').checked = activeRoute.cfg.toll || false;
+            document.getElementById('c-r').checked = activeRoute.cfg.radar !== undefined ? activeRoute.cfg.radar : true;
+            document.getElementById('c-info').checked = activeRoute.cfg.info !== undefined ? activeRoute.cfg.info : true;
+            document.getElementById('c-weat').checked = activeRoute.cfg.weat !== undefined ? activeRoute.cfg.weat : true;
+            document.getElementById('c-gas-vis').checked = activeRoute.cfg.gasV !== undefined ? activeRoute.cfg.gasV : true;
+            if(activeRoute.cfg.gasR) document.getElementById('gas-range').value = activeRoute.cfg.gasR;
+            if(activeRoute.cfg.speed) {
+                document.getElementById('avg-speed').value = activeRoute.cfg.speed;
+                avgSpeed = activeRoute.cfg.speed;
+            }
+        }
+
+        if(activeRoute.stops) {
+            activeRoute.stops.forEach((s, i) => {
+                const coords = s.c || s;
+                L.marker([coords[1], coords[0]], { pane: 'markerPane', icon: L.divIcon({className: 'w-mark-round', html: `📍`, iconSize: [24,24]}) }).addTo(rLines);
+            });
+        }
+        map.fitBounds(L.geoJSON(activeRoute.geo).getBounds(), {padding:[50,50]});
+        document.getElementById('v-k').textContent = activeRoute.dist;
+        document.getElementById('v-time').textContent = activeRoute.duration;
+        const toll = activeRoute.cfg.toll ? '0.00' : (activeRoute.dist*0.05).toFixed(2);
+        document.getElementById('v-t').textContent = toll + "€";
+        closeS();
+        pL.clearLayers();
+        warningsLog = [];
+        findP(activeRoute.geo);
+    }
+
+    function showM(t,h){ document.getElementById('m-title').innerHTML=t; document.getElementById('m-body').innerHTML=h; document.getElementById('app-modal').style.display='flex'; }
+    function closeM(){ document.getElementById('app-modal').style.display='none'; }
+    window.onclick = function(e) { if(e.target == document.getElementById('app-modal')) closeM(); }
+
+    function addBlankStop() { stops.push({c: null, name: ''}); renderStops(); }
+    function renderStops() { const c = document.getElementById('stops-container'); c.innerHTML = ''; stops.forEach((s, i) => { const val = s.name ? s.name : ''; c.innerHTML += `<div class="stop-row"><div class="in-wrap-icon" style="font-size:0.8rem">📍</div><input type="text" value="${val}" placeholder="Escribe o pulsa en mapa" onchange="stops[${i}].name=this.value"><div class="stop-del" onclick="removeStop(${i})">X</div></div>`; }); }
+    function removeStop(i) { stops.splice(i, 1); renderStops(); markUpdate(); }
+
+    function togColl(id){ const e=document.getElementById(id); e.classList.toggle('active'); if(e.classList.contains('active')) e.scrollIntoView({behavior: "smooth", block: "nearest"}); }
+    function togExcl(id){ document.querySelectorAll('.excl-group').forEach(el => { if(el.id !== id) el.classList.remove('active'); }); const e = document.getElementById(id); e.classList.toggle('active'); if(e.classList.contains('active')) e.scrollIntoView({behavior: "smooth", block: "nearest"}); }
+    // INICIO-FIN BLOQUE: FIX TOGGLE SUB-COLLAPSIBLE
+function togSubExcl(id) {
+    const gpx = document.getElementById('gpx-box');
+    const maps = document.getElementById('maps-box');
+
+    // Obtener el display actual (computado)
+    const gpxDisplay = window.getComputedStyle(gpx).display;
+    const mapsDisplay = window.getComputedStyle(maps).display;
+
+    if(id === 'gpx-box') {
+        // Cerrar MAPS
+        maps.style.display = 'none';
+
+        // Alternar GPX
+        if(gpxDisplay === 'none' || gpxDisplay === '') {
+            gpx.style.display = 'flex';
+        } else {
+            gpx.style.display = 'none';
+        }
+    }
+
+    if(id === 'maps-box') {
+        // Cerrar GPX
+        gpx.style.display = 'none';
+
+        // Alternar MAPS
+        if(mapsDisplay === 'none' || mapsDisplay === '') {
+            maps.style.display = 'flex';
+        } else {
+            maps.style.display = 'none';
+        }
+    }
+}
+// FIN BLOQUE
+
+
+    function toggleS(){
+        const sb = document.getElementById('sidebar');
+        sb.classList.toggle('active');
+        document.body.classList.toggle('menu-active');
+        const btn = document.getElementById('toggle-sidebar-btn');
+        if(sb.classList.contains('active')) { btn.innerText = "MAPA"; } else { btn.innerText = "MENU"; }
+    }
+    function closeS(){ document.getElementById('sidebar').classList.remove('active'); document.body.classList.remove('menu-active'); document.getElementById('toggle-sidebar-btn').innerText = "MENU"; }
+
+    function doC(){ if(rLines.getLayers().length) map.fitBounds(rLines.getBounds(), {padding:[50,50]}); }
+    function markUpdate(){ document.getElementById('m-btn').classList.add('blink'); }
+    function wipeMap(){ pL.clearLayers(); wL.clearLayers(); rLines.clearLayers(); history=[]; warningsLog=[]; document.getElementById('v-k').innerText='0.0'; document.getElementById('v-time').innerText='0h 0m'; document.getElementById('v-t').innerText='0.00€'; document.getElementById('v-p').innerText='0'; document.getElementById('h-list').innerHTML=''; stops=[]; renderStops(); updateLegendRoutes(); updateBtnStyle(); saveConfig(); }
+    function updateBtnStyle() { const idx = history.length; const color = COLS[idx % COLS.length]; const btn = document.getElementById('m-btn'); btn.innerText = `GENERAR RUTA #${idx + 1}`; btn.style.color = color; btn.style.borderColor = color; btn.classList.remove('blink'); }
+    function updateLegendRoutes() { const c = document.getElementById('l-routes'); c.innerHTML = history.slice(0, 3).map(h => { const icons = []; if(h.cfg && h.cfg.curvy) icons.push('<i class="fa fa-route" title="Revirado"></i>'); if(h.cfg && h.cfg.gasX2) icons.push('🤯'); if(h.cfg && !h.cfg.toll) icons.push('<i class="fa fa-money-bill-wave" title="Peajes"></i>'); else if(h.cfg) icons.push('<span style="font-size:7px; color:#4caf50">NO €</span>'); return `<div class="leg-i"><span class="leg-left"><span class="dot" style="background:${h.color}"></span> Ruta #${h.num}</span> <span class="route-icons">${icons.join(' ')}</span></div>`; }).join(''); }
+    function clr(id){ document.getElementById(id).value=''; if(id==='ori') o=null; if(id==='des') d=null; markUpdate(); }
+
+    async function search(id, sid, type) { const i=document.getElementById(id), s=document.getElementById(sid); i.oninput = async () => { if(type==='o') o=null; else d=null; if(i.value.length<3) return s.style.display='none'; const country = document.getElementById('s-country').value || 'España'; const region = document.getElementById('s-region').value || ''; const query = `${i.value}, ${region}, ${country}`; const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`); const data = await res.json(); s.innerHTML=''; s.style.display='block'; data.forEach(x => { const dv=document.createElement('div'); dv.className='sugg-i'; dv.textContent=x.display_name.split(',')[0]; dv.onmousedown = ()=>{ const coords = [parseFloat(x.lon), parseFloat(x.lat)]; if(type==='o') o=coords; else d=coords; s.style.display='none'; i.value=x.display_name.split(',')[0]; markUpdate(); }; s.appendChild(dv); }); }; i.onblur = () => { setTimeout(()=>s.style.display='none', 200); }; }
+    search('ori','ori-s','o'); search('des','des-s','d');
+
+    async function resolveAndGen() {
+        const oriText = document.getElementById('ori').value; const desText = document.getElementById('des').value;
+        for(let i=0; i<stops.length; i++) { if(!stops[i].name && !stops[i].c) { return showM("Falta Parada", `La Parada ${i+1} está vacía. Rellénala o bórrala.`); } }
+        if((!o && oriText) || (o && oriText === '')) await autoGeo('ori', 'o');
+        if((!d && desText) || (d && desText === '')) await autoGeo('des', 'd');
+        if (!o && oriText) { return showM("Error", "No encuentro la dirección de Origen."); }
+        if (!d && desText) { return showM("Error", "No encuentro la dirección de Destino."); }
+        gen();
+    }
+// INICIO - autoGeo() COMPLETO Y CORREGIDO
+async function autoGeo(idInput, varName) {
+    const val = document.getElementById(idInput).value;
+    if(!val) return false;
+
+    const country = document.getElementById('s-country').value || 'España';
+    const region = document.getElementById('s-region').value || '';
+
+    try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val + ',' + region + ',' + country)}&limit=1`);
+        const data = await res.json();
+
+        if(data.length > 0) {
+            const coords = [parseFloat(data[0].lon), parseFloat(data[0].lat)];
+            if(varName==='o') o=coords;
+            else d=coords;
+            return true;
+        } else {
+            // MOSTRAR AVISO ROJO
+            const sugg = document.getElementById(idInput + '-s');
+            sugg.innerHTML = `
+                <div class="sugg-i" style="
+                    color: #ff4444;
+                    text-decoration: line-through;
+                    font-style: italic;
+                    background: rgba(255,68,68,0.1);
+                    border-left: 3px solid #ff4444;
+                    padding: 12px;
+                ">
+                    ❌ Revise País/Comunidad (Todas)
+                </div>
+            `;
+            sugg.style.display = 'block';
+            setTimeout(() => sugg.style.display = 'none', 3000);
+            return false;
+        }
+    } catch(e){
+        return false;
+    }
+    return false;
+}
+// FIN
+    function getWIcon(code) { if (code <= 1) return { icon: 'fa-sun', col: 'w-sun' }; if (code <= 3) return { icon: 'fa-cloud-sun', col: 'w-cloud' }; if (code <= 60) return { icon: 'fa-cloud-rain', col: 'w-rain' }; return { icon: 'fa-smog', col: 'w-fog' }; }
+    function calculateDeviations(coords) { if(coords.length < 2) return coords; let newCoords = []; for(let i=0; i<coords.length-1; i++) { newCoords.push(coords[i]); const p1 = coords[i]; const p2 = coords[i+1]; const midLat = (p1[1] + p2[1]) / 2; const midLon = (p1[0] + p2[0]) / 2; const dLon = p2[0] - p1[0]; const dLat = p2[1] - p1[1]; const devLon = midLon - dLat * 0.8; const devLat = midLat + dLon * 0.8; newCoords.push([devLon, devLat]); } newCoords.push(coords[coords.length-1]); return newCoords; }
+
+    function checkDuplicateRoute(currentCfg) {
+        if(!o || !d) return false; if(history.length === 0) return false; const tol = 0.001;
+        for(let i=0; i<history.length; i++) {
+            const h = history[i]; if(!h.o || !h.d || !h.cfg) continue;
+            if(currentCfg.curvy !== h.cfg.curvy || currentCfg.toll !== h.cfg.toll || currentCfg.gasX2 !== h.cfg.gasX2) continue;
+            if(Math.abs(o[0] - h.o[0]) > tol || Math.abs(o[1] - h.o[1]) > tol || Math.abs(d[0] - h.d[0]) > tol || Math.abs(d[1] - h.d[1]) > tol) continue;
+            showM("Info", `<h3 style='margin-bottom:10px;'>⚠️ Ruta #${h.num} encontrada</h3><div style="display:flex; justify-content:center; gap:10px;"><button class="popup-btn" style="width:auto; display:inline-block; padding:8px 15px;" onclick="selectHistoryItem(${i}); closeM();">Ver Ruta</button><button class="popup-btn" style="background:#555; color:white; width:auto; display:inline-block; padding:8px 15px;" onclick="forceGen(); closeM();">Nueva</button></div>`); return true;
+        }
+        return false;
+    }
+
+    let pendingCfg = null;
+    function gen() { if(!o||!d) return showM("⚠️ Falta Datos", "Escribe origen y destino."); document.getElementById('m-btn').classList.remove('blink'); const cfg = { curvy: document.getElementById('c-curvy').checked, toll: document.getElementById('c-toll').checked, gasX2: document.getElementById('c-gas-x2').checked }; if(checkDuplicateRoute(cfg)) { pendingCfg = cfg; return; } executeGen(cfg); }
+    function forceGen() { if(pendingCfg) executeGen(pendingCfg); }
+    function cancelGen() { document.getElementById('loading-back').style.display = 'none'; document.getElementById('loading-panel').style.display = 'none'; if(abortController) abortController.abort(); }
+
+    async function executeGen(cfg) {
+        document.getElementById('loading-back').style.display = 'block'; document.getElementById('loading-panel').style.display = 'flex';
+        abortController = new AbortController();
+        routeGenCount++; localStorage.setItem('tardisRouteCount', routeGenCount); updateRouteCountUI();
+
+        checkSupportPopup();
+
+        const color = COLS[history.length % COLS.length]; const routeNum = history.length + 1; const stopsCoords = stops.map(s => s.c || s); let pathPoints = [o, ...stopsCoords, d]; if(cfg.gasX2) { pathPoints = calculateDeviations(pathPoints); }
+        const body = { coordinates: pathPoints }; if(cfg.toll) body.options = { avoid_features: ["tollways"] }; if(cfg.curvy) body.preference = "shortest";
+        try {
+            const res = await fetch(`https://api.openrouteservice.org/v2/directions/driving-car/geojson`, { method:'POST', headers:{'Authorization':KEY, 'Content-Type':'application/json'}, body: JSON.stringify(body), signal: abortController.signal });
+            const data = await res.json(); if(!data.features) throw new Error();
+            const route = data.features[0];
+            activeRoute = {
+                geo: route,
+                dist: (route.properties.summary.distance/1000).toFixed(1),
+                duration: "",
+                color: color,
+                num: routeNum,
+                cfg: cfg,
+                o:o,
+                d:d,
+                oriText: document.getElementById('ori').value,
+                desText: document.getElementById('des').value,
+                stops: JSON.parse(JSON.stringify(stops)),
+                type:'gen'
+            };
+            L.geoJSON(data, {pane: 'routePane', style:{color:color, weight:8}}).addTo(rLines);
+            L.marker([o[1], o[0]], { pane: 'markerPane', icon: L.divIcon({className: 'start-badge', html: '🏳️', iconSize: [28,28], iconAnchor: [14,14]}) }).addTo(rLines);
+            L.marker([d[1], d[0]], { pane: 'markerPane', icon: L.divIcon({className: 'end-flag', html: '🏁', iconSize: [30,30], iconAnchor: [5,25]}) }).addTo(rLines);
+            stopsCoords.forEach((s, idx) => { L.marker([s[1], s[0]], { pane: 'markerPane', icon: L.divIcon({className: 'w-mark-round', html: `📍`, iconSize: [24,24]}) }).addTo(rLines); });
+            const durSeconds = route.properties.summary.duration; const h = Math.floor(durSeconds / 3600); const m = Math.floor((durSeconds % 3600) / 60); activeRoute.duration = `${h}h ${m}m`; activeRoute.time = new Date().toLocaleTimeString();
+            const toll = cfg.toll ? '0.00' : (activeRoute.dist*0.05).toFixed(2); document.getElementById('v-k').textContent = activeRoute.dist; document.getElementById('v-time').textContent = activeRoute.duration; document.getElementById('v-t').textContent = toll + "€";
+            history.unshift(activeRoute); renderHistory(); updateLegendRoutes(); saveConfig();
+            pL.clearLayers(); warningsLog = [];
+            procW(activeRoute.geo); findP(activeRoute.geo);
+            doC(); closeS(); updateBtnStyle();
+        } catch(e) { if(e.name !== 'AbortError') showM("Error", "No se pudo calcular la ruta. Verifica tu conexión."); }
+        document.getElementById('loading-back').style.display = 'none'; document.getElementById('loading-panel').style.display = 'none';
+    }
+
+    async function procW(route) {
+        if(!document.getElementById('c-weat').checked) return;
+
+        // RESETEAR DATOS DEL CLIMA
+        weatherDataLog = [];
+
+        const coords = route.geometry.coordinates;
+        let dAcc = 0;
+        let kmAccum = 0;
+
+        for(let i = 1; i < coords.length; i++) {
+            const segDist = L.latLng(coords[i-1][1], coords[i-1][0]).distanceTo(L.latLng(coords[i][1], coords[i][0]));
+            dAcc += segDist;
+            kmAccum += segDist / 1000;
+
+            if(dAcc >= 50000) {
+                try {
+                    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords[i][1]}&longitude=${coords[i][0]}&current_weather=true`);
+                    const wd = await r.json();
+                    const rev = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lon=${coords[i][0]}&lat=${coords[i][1]}`);
+                    const addr = await rev.json();
+                    const locName = addr.address.village || addr.address.town || "Ruta";
+                    const w = getWIcon(wd.current_weather.weathercode);
+
+                    // GUARDAR DATOS PARA PDF
+                    weatherDataLog.push({
+                        km: kmAccum.toFixed(1),
+                        temp: Math.round(wd.current_weather.temperature),
+                        location: locName,
+                        icon: w.icon,
+                        code: wd.current_weather.weathercode
+                    });
+
+                    const mark = L.marker([coords[i][1], coords[i][0]], {
+                        pane: 'markerPane',
+                        icon: L.divIcon({className:'w-mark-round', html:`<i class="fa ${w.icon} ${w.col}"></i><span>${Math.round(wd.current_weather.temperature)}°</span>`})
+                    }).addTo(wL);
+
+                    mark.bindPopup(`<b>🌦️ Clima en Ruta</b><br>Temp: ${wd.current_weather.temperature}°C<br>📍 ${locName}`);
+                } catch(e) {}
+                dAcc = 0;
+            }
+        }
+    }
+
+
+    function openSearchModal(type) {
+    if(!activeRoute) return showM("Info", "Genera una ruta primero.");
+
+    const totalDist = parseFloat(activeRoute.dist);
+    const totalTime = activeRoute.duration;
+
+    let modalHtml = '';
+
+    if(type === 'km') {
+        const defaultKm = (totalDist / 2).toFixed(0);
+        modalHtml = `
+            <h3>🗺️ Buscar Parada por Kilómetros</h3>
+            <p style="font-size:0.9rem; color:#aaa; margin-bottom:15px;">Distancia total: ${totalDist} KM</p>
+            <div style="margin-bottom:15px;">
+                <label style="font-size:0.8rem; color:var(--accent); display:block; margin-bottom:5px;">¿A cuántos KM del origen?</label>
+                <input type="number" id="km-input" value="${defaultKm}" min="1" max="${totalDist}" style="width:100%; padding:10px; background:#1a1b26; border:1px solid #414868; color:white; border-radius:4px; font-size:1rem; text-align:center;">
+            </div>
+
+            <button class="popup-btn" style="background:#4caf50;margin-bottom:15px;width:100%;" onclick="showLocationAtKm();">
+                <i class="fa fa-map-marker-alt"></i> Ver ubicación de este punto
+            </button>
+
+            <div id="location-display" style="font-size:0.75rem;color:#aaa;margin-bottom:15px;padding:10px;background:rgba(255,255,255,0.05);border-radius:6px;display:none;text-align:left;">
+                <i class="fa fa-spinner fa-spin"></i> Buscando dirección...
+            </div>
+
+            <div id="poi-search-section" style="display:none;">
+                <p style="font-size:0.85rem;color:#888;margin-bottom:10px;margin-top:15px;border-top:1px solid #333;padding-top:15px;">Busca cerca de este punto:</p>
+
+                <div class="cat-btn-grid">
+                    <div class="cat-btn" onclick="searchNearbyWithCoords('fuel', 'km')">
+                        <i class="fa fa-gas-pump" style="font-size:1.5rem; color:#ff9800;"></i>
+                        <span>Gasolinera</span>
+                    </div>
+                    <div class="cat-btn" onclick="searchNearbyWithCoords('restaurant', 'km')">
+                        <i class="fa fa-utensils" style="font-size:1.5rem; color:#4caf50;"></i>
+                        <span>Comer</span>
+                    </div>
+                    <div class="cat-btn" onclick="searchNearbyWithCoords('hotel', 'km')">
+                        <i class="fa fa-bed" style="font-size:1.5rem; color:#2b7cff;"></i>
+                        <span>Dormir</span>
+                    </div>
+                </div>
+                <div class="modal-help-text">
+                    💡 <b>Pulsa botón y elige el lugar en MAPS, copia dirección o nombre y ponlo en +PARADA</b>
+                </div>
+            </div>
+        `;
+    } else if(type === 'min') {
+        const timeMatch = totalTime.match(/(\d+)h\s*(\d+)m/);
+        let totalMinutes = 0;
+        if(timeMatch) {
+            totalMinutes = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
+        }
+        const defaultMin = Math.floor(totalMinutes / 2);
+
+        modalHtml = `
+            <h3>⏱️ Buscar Parada por Tiempo</h3>
+            <p style="font-size:0.9rem; color:#aaa; margin-bottom:15px;">Tiempo total: ${totalTime}</p>
+            <div style="margin-bottom:10px;">
+                <label style="font-size:0.8rem; color:var(--accent); display:block; margin-bottom:5px;">Velocidad Media (Km/h)</label>
+                <input type="number" id="speed-input" value="${avgSpeed}" min="10" max="140" style="width:100%; padding:8px; background:#1a1b26; border:1px solid #414868; color:white; border-radius:4px; font-size:0.9rem; text-align:center;">
+            </div>
+            <div style="margin-bottom:15px;">
+                <label style="font-size:0.8rem; color:var(--accent); display:block; margin-bottom:5px;">¿A cuántos MINUTOS del origen?</label>
+                <input type="number" id="time-input" value="${defaultMin}" min="1" max="${totalMinutes}" style="width:100%; padding:10px; background:#1a1b26; border:1px solid #414868; color:white; border-radius:4px; font-size:1rem; text-align:center;">
+            </div>
+
+            <button class="popup-btn" style="background:#4caf50;margin-bottom:15px;width:100%;" onclick="showLocationAtTime();">
+                <i class="fa fa-clock"></i> Ver ubicación en ese tiempo
+            </button>
+
+            <div id="location-display-time" style="font-size:0.75rem;color:#aaa;margin-bottom:15px;padding:10px;background:rgba(255,255,255,0.05);border-radius:6px;display:none;text-align:left;">
+                <i class="fa fa-spinner fa-spin"></i> Buscando dirección...
+            </div>
+
+            <div id="poi-search-section-time" style="display:none;">
+                <p style="font-size:0.85rem;color:#888;margin-bottom:10px;margin-top:15px;border-top:1px solid #333;padding-top:15px;">Busca cerca de este punto:</p>
+
+                <div class="cat-btn-grid">
+                    <div class="cat-btn" onclick="searchNearbyWithCoords('fuel', 'min')">
+                        <i class="fa fa-gas-pump" style="font-size:1.5rem; color:#ff9800;"></i>
+                        <span>Gasolinera</span>
+                    </div>
+                    <div class="cat-btn" onclick="searchNearbyWithCoords('restaurant', 'min')">
+                        <i class="fa fa-utensils" style="font-size:1.5rem; color:#4caf50;"></i>
+                        <span>Comer</span>
+                    </div>
+                    <div class="cat-btn" onclick="searchNearbyWithCoords('hotel', 'min')">
+                        <i class="fa fa-bed" style="font-size:1.5rem; color:#2b7cff;"></i>
+                        <span>Dormir</span>
+                    </div>
+                </div>
+                <div class="modal-help-text">
+                    💡 <b>Pulsa botón y elige el lugar en MAPS, copia dirección o nombre y ponlo en +PARADA</b>
+                </div>
+            </div>
+        `;
+    }
+
+    showM("", modalHtml);
+}
+
+
+function searchNearby(category, mode) {
+  if (!activeRoute || !activeRoute.geo) return;
+  const coords = activeRoute.geo.geometry.coordinates;
+  const totalDist = parseFloat(activeRoute.dist) * 1000;
+  let targetPoint;
+
+  if (mode === 'km') {
+    const targetKm = parseFloat(document.getElementById('km-input').value) * 1000;
+    const fromStart = targetKm;
+    let accumDist = 0;
+    for (let i = 1; i < coords.length; i++) {
+      const segDist = L.latLng(coords[i-1][1], coords[i-1][0]).distanceTo(L.latLng(coords[i][1], coords[i][0]));
+      accumDist += segDist;
+      if (accumDist >= fromStart) {
+        targetPoint = coords[i];
+        break;
+      }
+    }
+  } else if (mode === 'min') {
+    const speed = parseFloat(document.getElementById('speed-input').value) || avgSpeed;
+    document.getElementById('avg-speed').value = speed;
+    saveConfig();
+    const targetMin = parseFloat(document.getElementById('time-input').value);
+    const targetKm = (speed * (targetMin / 60)) * 1000;
+    const fromStart = targetKm;
+    let accumDist = 0;
+    for (let i = 1; i < coords.length; i++) {
+      const segDist = L.latLng(coords[i-1][1], coords[i-1][0]).distanceTo(L.latLng(coords[i][1], coords[i][0]));
+      accumDist += segDist;
+      if (accumDist >= fromStart) {
+        targetPoint = coords[i];
+        break;
+      }
+    }
+  }
+
+  if (!targetPoint) targetPoint = coords[Math.floor(coords.length / 2)];
+
+  const categoryMap = {
+    fuel: 'gasolinera',
+    restaurant: 'restaurante',
+    hotel: 'hotel'
+  };
+
+  const searchQuery = categoryMap[category];
+
+  // ✅ CONSTRUIR URL COMPATIBLE CON GOOGLE MAPS APP
+  const query = `${searchQuery} cerca de ${targetPoint[1]},${targetPoint[0]}`;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+
+  closeM();
+
+  // ✅ USAR ANDROID BRIDGE PARA ABRIR GOOGLE MAPS
+  if (typeof Android !== 'undefined' && Android.openBrowser) {
+    Android.openBrowser(mapsUrl);
+  } else {
+    window.open(mapsUrl, '_blank');
+  }
+}
+
+    function showTollsList() {
+    if(!activeRoute) return showM("Info", "Genera una ruta primero.");
+    const distKm = parseFloat(activeRoute.dist);
+    const avoidTolls = activeRoute.cfg && activeRoute.cfg.toll;
+    const tollBooths = warningsLog.filter(w => w.t.includes('Peaje') || w.t.includes('€') || w.t.includes('💶'));
+    let html = '<h3 style="margin-bottom:15px">💶 Peajes en Ruta</h3>';
+    if(avoidTolls) {
+        html += '<div style="text-align:center; padding:20px; background:rgba(76,175,80,0.1); border-radius:8px; border:1px solid #4caf50">';
+        html += '<i class="fa fa-check-circle" style="color:#4caf50; font-size:2.5rem"></i>';
+        html += '<p style="color:#4caf50; font-weight:bold; margin-top:10px">✅ Ruta SIN PEAJES</p>';
+        html += '<p style="font-size:0.75rem; color:#888; margin-top:5px">Has activado "Evitar Peajes"</p></div>';
+        showM('', html);
+        return;
+    }
+    let totalEstimadoMoto = 0;
+    let totalEstimadoCoche = 0;
+    if(tollBooths.length > 0) {
+        totalEstimadoMoto = tollBooths.length * 3.5;
+        totalEstimadoCoche = tollBooths.length * 7;
+    } else {
+        totalEstimadoMoto = distKm * 0.04;
+        totalEstimadoCoche = distKm * 0.08;
+    }
+    html += '<div style="background:rgba(255,152,0,0.1); padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ff9800">';
+    html += '<div style="text-align:center"><div style="font-size:0.8rem; color:#ff9800; margin-bottom:10px">💰 COSTE ESTIMADO APROXIMADO</div>';
+    html += '<div style="display:flex; justify-content:space-around; margin-bottom:10px">';
+    html += '<div style="text-align:center"><div style="font-size:0.7rem; color:#aaa">🏍️ MOTO</div><div style="font-size:1.5rem; font-weight:bold; color:#ff9800">' + totalEstimadoMoto.toFixed(2) + '€</div></div>';
+    html += '<div style="text-align:center"><div style="font-size:0.7rem; color:#aaa">🚗 COCHE</div><div style="font-size:1.5rem; font-weight:bold; color:#ff9800">' + totalEstimadoCoche.toFixed(2) + '€</div></div>';
+    html += '</div><div style="font-size:0.65rem; color:#666">Basado en ' + distKm + ' km' + (tollBooths.length > 0 ? ' y ' + tollBooths.length + ' cabina(s) detectada(s)' : '') + '</div></div></div>';
+    if(tollBooths.length > 0) {
+        html += '<h4 style="font-size:0.85rem; margin-bottom:10px; color:var(--accent)">📍 Cabinas Detectadas:</h4><div style="font-size:0.85rem">';
+        tollBooths.forEach((toll, idx) => {
+            const tollName = toll.n || 'Peaje ' + (idx + 1);
+            const priceMotorbike = '2.50€ - 5.00€';
+            const priceCar = '5.00€ - 10.00€';
+            html += '<div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:6px; margin-bottom:8px; border-left:3px solid #4caf50">';
+            html += '<div style="font-weight:bold; margin-bottom:8px; color:#fff"><i class="fa fa-coins"></i> ' + tollName + '</div>';
+            html += '<div style="display:flex; justify-content:space-around; font-size:0.75rem; padding:8px; background:rgba(0,0,0,0.2); border-radius:4px">';
+            html += '<div style="text-align:center; flex:1"><div style="color:#aaa; margin-bottom:3px">🏍️ Moto</div><div style="color:#ff9800; font-weight:bold">' + priceMotorbike + '</div></div>';
+            html += '<div style="width:1px; background:#333; margin:0 10px"></div>';
+            html += '<div style="text-align:center; flex:1"><div style="color:#aaa; margin-bottom:3px">🚗 Coche</div><div style="color:#ff9800; font-weight:bold">' + priceCar + '</div></div></div></div>';
+        });
+        html += '</div>';
+    } else {
+        html += '<div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:6px; margin-bottom:10px; text-align:center">';
+        html += '<i class="fa fa-info-circle" style="color:#5bc0de; font-size:1.5rem"></i>';
+        html += '<p style="font-size:0.85rem; color:#aaa; margin-top:10px">No se detectaron cabinas de peaje específicas en el escaneo.</p>';
+        html += '<p style="font-size:0.75rem; color:#666">El precio es una estimación basada en la distancia recorrida por autopista.</p></div>';
+    }
+    html += '<div style="background:rgba(255,255,0,0.05); padding:10px; border-radius:6px; border-left:3px solid #ffd700; margin-top:15px">';
+    html += '<div style="font-size:0.7rem; color:#888"><b style="color:#ffd700">⚠️ IMPORTANTE:</b><br>';
+    html += '• Precios <b>aproximados</b> y orientativos<br>• Varían según concesionaria y tramo<br>';
+    html += '• Pueden cambiar sin previo aviso<br>• Consulta precios oficiales antes del viaje</div></div>';
+    showM('', html);
+}
+
+    function showWarningsList() {
+        if(!activeRoute) return showM("Info", "Genera una ruta primero.");
+
+        if(warningsLog.length === 0) {
+            return showM("⚠️ Avisos", "<p style='text-align:center; color:#4caf50; font-size:1.2rem;'>✅ Sin avisos en esta ruta</p>");
+        }
+
+        let html = '<h3 style="margin-bottom:15px;">⚠️ Lista de Avisos</h3>';
+        html += '<div style="font-size:0.85rem;">';
+
+        warningsLog.forEach((warning, idx) => {
+            let icon = '⚠️';
+            let color = '#ff9800';
+            let speedInfo = '';
+
+            if(warning.t.includes('Radar') || warning.t.includes('📷')) {
+                icon = '📷';
+                color = '#ff4b2b';
+                speedInfo = warning.n && warning.n !== '?' ? `<span style="font-size:0.75rem; color:#aaa;">Vel. Máx: ${warning.n} km/h</span>` : '<span style="font-size:0.75rem; color:#666;">Vel. Máx: ❓</span>';
+            } else if(warning.t.includes('Peaje') || warning.t.includes('💶')) {
+                icon = '💰';
+                color = '#4caf50';
+            }
+
+            html += `
+                <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:6px; margin-bottom:8px; border-left:3px solid ${color};">
+                    <div style="font-weight:bold; margin-bottom:3px;">${icon} ${warning.t}</div>
+                    ${speedInfo}
+                </div>
+            `;
+        });
+
+        html += '</div>';
+
+        showM("", html);
+    }
+
+    async function getDestWeather() {
+        if(!d) return showM("Info", "Establece un destino primero.");
+
+        showM("⏳ Clima", "<div style='text-align:center;'><i class='fa fa-spinner fa-spin' style='font-size:2rem;'></i><p>Consultando pronóstico...</p></div>");
+
+        try {
+            const revRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lon=${d[0]}&lat=${d[1]}`);
+            const revData = await revRes.json();
+            const destName = revData.address.city || revData.address.town || revData.address.village || "Destino";
+
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${d[1]}&longitude=${d[0]}&daily=weathercode,temperature_2m_max,temperature_2m_min&hourly=weathercode,temperature_2m&timezone=auto&forecast_days=3`);
+            const weatherData = await weatherRes.json();
+
+            // GUARDAR DATOS PARA PDF
+            destWeatherData = {
+                location: destName,
+                daily: weatherData.daily,
+                hourly: weatherData.hourly
+            };
+
+            let html = `<h3 style="margin-bottom:10px;">🌦️ TIEMPO EN DESTINO</h3>`;
+            html += `<p style="font-size:0.9rem; color:var(--accent); margin-bottom:15px;">${destName}</p>`;
+
+            html += '<div class="w-grid">';
+            for(let i = 0; i < 3; i++) {
+                const date = new Date(weatherData.daily.time[i]);
+                const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
+                const wcode = weatherData.daily.weathercode[i];
+                const wicon = getWIcon(wcode);
+                const tempMax = Math.round(weatherData.daily.temperature_2m_max[i]);
+                const tempMin = Math.round(weatherData.daily.temperature_2m_min[i]);
+
+                html += `
+                    <div class="w-day">
+                        <div style="font-weight:bold; font-size:0.75rem; margin-bottom:5px;">${dayName}</div>
+                        <i class="fa ${wicon.icon} ${wicon.col}" style="font-size:1.5rem;"></i>
+                        <div style="margin-top:5px; font-size:0.75rem;">${tempMax}° / ${tempMin}°</div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+
+            html += '<div style="margin-top:15px;"><h4 style="font-size:0.8rem; margin-bottom:10px; color:var(--accent);">Próximas Horas</h4>';
+            html += '<div class="w-hourly">';
+
+            for(let i = 0; i < 8; i++) {
+                const hour = new Date(weatherData.hourly.time[i]).getHours();
+                const wcode = weatherData.hourly.weathercode[i];
+                const wicon = getWIcon(wcode);
+                const temp = Math.round(weatherData.hourly.temperature_2m[i]);
+
+                html += `
+                    <div style="min-width:60px; text-align:center; background:rgba(255,255,255,0.05); padding:8px; border-radius:6px;">
+                        <div style="font-size:0.7rem; margin-bottom:5px;">${hour}:00</div>
+                        <i class="fa ${wicon.icon} ${wicon.col}" style="font-size:1.2rem;"></i>
+                        <div style="margin-top:5px; font-size:0.75rem;">${temp}°</div>
+                    </div>
+                `;
+            }
+
+            html += '</div></div>';
+
+            showM("", html);
+
+        } catch(err) {
+            showM("Error", "No se pudo obtener el pronóstico del tiempo.");
+        }
+    }
+
+    async function findP(route) { const gasRange = (document.getElementById('gas-range').value || 2) * 1000; const showInfo = document.getElementById('c-info').checked; const showGas = document.getElementById('c-gas-vis').checked; const coords = route.geometry.coordinates; const skip = Math.max(1, Math.floor(coords.length / 8)); let q = `[out:json][timeout:90];(`; for(let i=0; i<coords.length; i+=skip) { if(showGas) q += `node(around:${gasRange},${coords[i][1]},${coords[i][0]})[amenity=fuel];`; if(document.getElementById('c-r').checked) q += `node(around:800,${coords[i][1]},${coords[i][0]})["highway"="speed_camera"];`; q += `node(around:3000,${coords[i][1]},${coords[i][0]})[barrier=toll_booth];`; } q += `);out body;`; try { const res = await fetch('https://overpass-api.de/api/interpreter', {method:'POST', body:q}); const d = await res.json(); if(d.elements) { d.elements.forEach(el => { let col = '#ff9800'; let type = '⛽ Gasolinera'; if(el.tags.highway === 'speed_camera') { col = '#ff4b2b'; type = '📷 Radar'; warningsLog.push({t: type, n: el.tags.maxspeed || '?'}); } if(el.tags.barrier === 'toll_booth') { col = '#4caf50'; type = '💶 Peaje'; warningsLog.push({t: type, n: el.tags.name || 'Peaje'}); } if(el.tags.amenity === 'fuel' && !showGas) return; const html = el.tags.barrier === 'toll_booth' ? '€' : ''; const m = L.circleMarker([el.lat, el.lon], {pane: 'markerPane', radius:9, fillColor:col, color:'#fff', weight:2, fillOpacity:1}).addTo(pL).bindTooltip(html, {permanent:true, direction:'center', className:'no-bg'}); if(showInfo) { let info = "POI"; if(el.tags.amenity === 'fuel') info = `<b>⛽ ${el.tags.brand || el.tags.name || 'Gasolinera'}</b>`; m.bindPopup(info); } }); document.getElementById('v-p').textContent = warningsLog.length; } } catch(e){} }
+    function prePrintCheck() { if(!activeRoute) { if(history.length === 0) return showM("PDF", "No hay rutas en el historial."); let html = '<div style="text-align:center; margin-bottom:10px;">Selecciona ruta para PDF:</div>'; history.forEach((h, i) => { html += `<button class="popup-btn" style="margin-bottom:5px" onclick="selectHistoryItem(${i}); setTimeout(printRouteReport, 1000); closeM();">Ruta #${h.num} (${h.dist} KM)</button>`; }); showM("Generar PDF", html); } else { setTimeout(printRouteReport, 100); } }
+
+    // INICIO-FIN BLOQUE: FIX GENERAR PDF
+function printRouteReport() {
+    // Validación inicial
+    if(!activeRoute) {
+        return showM("Error", "No hay ruta activa para generar PDF.");
+    }
+
+    // DATOS BÁSICOS
+    document.getElementById('rep-date').innerText = new Date().toLocaleString('es-ES', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    document.getElementById('rep-ori').innerText = document.getElementById('ori').value || "N/A";
+    document.getElementById('rep-des').innerText = document.getElementById('des').value || "N/A";
+    document.getElementById('rep-km').innerText = activeRoute.dist + ' KM';
+    document.getElementById('rep-time').innerText = activeRoute.duration;
+
+    const toll = (activeRoute.cfg && activeRoute.cfg.toll) ? '0.00' : (activeRoute.dist * 0.05).toFixed(2);
+    document.getElementById('rep-toll').textContent = toll + "€";
+    document.getElementById('rep-warn').innerText = warningsLog.length;
+
+    // CONFIGURACIÓN DETALLADA (ACTIVADA Y NO ACTIVADA)
+    let settingsHtml = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.75rem;">';
+
+    const allSettings = [
+        {key: 'curvy', label: '🔄 Revirado', active: activeRoute.cfg && activeRoute.cfg.curvy},
+        {key: 'gasX2', label: '⛽ Gasolina X2', active: activeRoute.cfg && activeRoute.cfg.gasX2},
+        {key: 'toll', label: '💰 Evitar Peajes', active: activeRoute.cfg && !activeRoute.cfg.toll},
+        {key: 'radar', label: '📷 Radares', active: activeRoute.cfg && activeRoute.cfg.radar},
+        {key: 'info', label: 'ℹ️ POI', active: activeRoute.cfg && activeRoute.cfg.info},
+        {key: 'weat', label: '🌦️ Clima', active: activeRoute.cfg && activeRoute.cfg.weat},
+        {key: 'gasV', label: '⛽ Ver Gasolineras', active: activeRoute.cfg && activeRoute.cfg.gasV}
+    ];
+
+    allSettings.forEach(s => {
+        const color = s.active ? '#4caf50' : '#999';
+        const status = s.active ? '✓ Activo' : '✗ Inactivo';
+        settingsHtml += `<div style="background:#f0f0f0; padding:5px; border-left:3px solid ${color}; border-radius:3px;">
+            <b>${s.label}</b><br>
+            <span style="font-size:0.65rem; color:${color}">${status}</span>
+        </div>`;
+    });
+
+    if(activeRoute.cfg && activeRoute.cfg.speed) {
+        settingsHtml += `<div style="background:#e3f2fd; padding:5px; border-left:3px solid #2196f3; border-radius:3px; grid-column: span 2;">
+            <b>⏱️ Velocidad Media</b><br>
+            <span style="font-size:0.65rem; color:#2196f3">${activeRoute.cfg.speed} km/h</span>
+        </div>`;
+    }
+
+    settingsHtml += '</div>';
+    document.getElementById('rep-settings').innerHTML = settingsHtml;
+
+    // CLIMA DEL DESTINO
+    let weatherHtml = '';
+    if(destWeatherData) {
+        weatherHtml = `<div style="background:#e8f5e9; padding:8px; border-radius:4px; margin-top:8px;">
+            <b>🌍 ${destWeatherData.location}</b><br>
+            <span style="font-size:0.7rem;">Próximos días: `;
+
+        for(let i = 0; i < Math.min(3, destWeatherData.daily.time.length); i++) {
+            const date = new Date(destWeatherData.daily.time[i]);
+            const day = date.toLocaleDateString('es-ES', {weekday: 'short'});
+            const tempMax = Math.round(destWeatherData.daily.temperature_2m_max[i]);
+            const tempMin = Math.round(destWeatherData.daily.temperature_2m_min[i]);
+            weatherHtml += `${day}: ${tempMax}°/${tempMin}° `;
+        }
+        weatherHtml += `</span></div>`;
+    } else {
+        weatherHtml = '<p style="font-size:0.7rem; color:#888;">Consulta el clima desde el panel principal antes de generar el PDF.</p>';
+    }
+    document.getElementById('rep-weather').innerHTML = weatherHtml;
+
+    // LISTA CRONOLÓGICA: ORIGEN → AVISOS → CLIMA → PEAJES → DESTINO
+    let listHtml = '<div style="font-size:0.75rem;">';
+
+    // ORIGEN
+    listHtml += `<div style="background:#e3f2fd; padding:8px; margin-bottom:5px; border-left:4px solid #2196f3; border-radius:3px;">
+        <b>🚦 KM 0.0 - ORIGEN</b><br>
+        📍 ${document.getElementById('ori').value}
+    </div>`;
+
+    // PARADAS
+    if(stops && stops.length > 0) {
+        stops.forEach((s, idx) => {
+            const name = s.name || `Parada ${idx + 1}`;
+            listHtml += `<div style="background:#fff3e0; padding:6px; margin-bottom:5px; border-left:3px solid #ff9800; border-radius:3px;">
+                <b>🛑 PARADA ${idx + 1}</b><br>
+                ${name}
+            </div>`;
+        });
+    }
+
+    // CREAR ARRAY CRONOLÓGICO (ORDENAR POR KM)
+    let chronological = [];
+
+    // Añadir avisos (radares, peajes, gasolineras)
+    warningsLog.forEach((w, idx) => {
+        chronological.push({
+            type: 'warning',
+            data: w,
+            sortKey: idx
+        });
+    });
+
+    // Añadir datos del clima
+    weatherDataLog.forEach(weather => {
+        chronological.push({
+            type: 'weather',
+            data: weather,
+            sortKey: parseFloat(weather.km)
+        });
+    });
+
+    // Ordenar por KM (sortKey)
+    chronological.sort((a, b) => a.sortKey - b.sortKey);
+
+    // MOSTRAR ELEMENTOS CRONOLÓGICOS
+    chronological.forEach(item => {
+        if(item.type === 'warning') {
+            const w = item.data;
+            let icon = '📍';
+            let color = '#ff9800';
+
+            if(w.t && w.t.includes('Radar')) {
+                icon = '📷';
+                color = '#ff4b2b';
+            } else if(w.t && w.t.includes('Peaje')) {
+                icon = '💰';
+                color = '#4caf50';
+            } else if(w.t && w.t.includes('Gasolinera')) {
+                icon = '⛽';
+                color = '#ff9800';
+            }
+
+            listHtml += `<div style="background:rgba(255,255,255,0.5); padding:6px; margin-bottom:5px; border-left:3px solid ${color}; border-radius:3px;">
+                <b>${icon} ${w.t}</b>
+                ${w.n ? '<br>' + w.n : ''}
+            </div>`;
+        } else if(item.type === 'weather') {
+            const weather = item.data;
+            listHtml += `<div style="background:#e8f5e9; padding:6px; margin-bottom:5px; border-left:3px solid #4caf50; border-radius:3px;">
+                <b>🌦️ KM ${weather.km} - CLIMA</b><br>
+                🌡️ ${weather.temp}°C en ${weather.location}
+            </div>`;
+        }
+    });
+
+    // DESTINO
+    listHtml += `<div style="background:#c8e6c9; padding:8px; margin-top:5px; border-left:4px solid #4caf50; border-radius:3px;">
+        <b>🏁 KM ${activeRoute.dist} - DESTINO</b><br>
+        📍 ${document.getElementById('des').value}
+    </div>`;
+
+    listHtml += '</div>';
+
+    if(chronological.length === 0 && (!stops || stops.length === 0)) {
+        listHtml = '<p style="font-size:0.75rem; color:#888; text-align:center;">Sin incidencias ni paradas en esta ruta.</p>';
+    }
+
+    document.getElementById('rep-list').innerHTML = listHtml;
+
+    // DISPARAR IMPRESIÓN
+    if(typeof Android !== 'undefined' && Android.print) {
+        Android.print();
+    } else {
+        window.print();
+    }
+}
+
+
+    function shareRoute() {
+        if(!activeRoute) return showM("Compartir", "Genera o selecciona una ruta.");
+
+        let mapLink = `https://www.google.com/maps/dir/?api=1&origin=${activeRoute.o[1]},${activeRoute.o[0]}&destination=${activeRoute.d[1]},${activeRoute.d[0]}&travelmode=driving`;
+
+        if(stops.length > 0) {
+            const waypoints = stops.map(s => {
+                const c = s.c || s;
+                return `${c[1]},${c[0]}`;
+            }).join('|');
+            mapLink += `&waypoints=${waypoints}`;
+        }
+
+        const text = `🛵 *RUTIWAY - Ruta #${activeRoute.num}*\n🏁 *Distancia:* ${activeRoute.dist} km\n⏱️ *Tiempo:* ${activeRoute.duration}\n\n📍 *Origen:* ${document.getElementById('ori').value || 'Ubicación'}\n🏁 *Destino:* ${document.getElementById('des').value || 'Ubicación'}\n🛑 *Paradas:* ${stops.length}\n\n⚠️ *Incidencias:* ${warningsLog.length} avisos\n\n🗺️ *Ver Ruta en Google Maps:*\n${mapLink}`;
+
+        if(typeof Android !== 'undefined' && Android.shareRoute) {
+            Android.shareRoute(text);
+        } else {
+            navigator.clipboard.writeText(text);
+            showM("Copiado", "Texto copiado al portapapeles.");
+        }
+    }
+    function openNative(url) { if(typeof Android !== 'undefined' && Android.openBrowser) Android.openBrowser(url); else window.open(url, '_blank'); }
+    function impMaps() { const url = prompt("Google Maps URL:"); if(url && typeof Android !== 'undefined') Android.resolveShortUrl(url); }
+    function onUrlResolved(l) { const lonP = l.match(/!2d(-?\d+\.\d+)/g); const latP = l.match(/!3d(-?\d+\.\d+)/g); if(lonP && latP) { o = [parseFloat(lonP[0].replace('!2d','')), parseFloat(latP[0].replace('!3d',''))]; d = [parseFloat(lonP[lonP.length-1].replace('!2d','')), parseFloat(latP[latP.length-1].replace('!3d',''))]; stops = []; for(let i=1; i < lonP.length-1; i++) { stops.push({c: [parseFloat(lonP[i].replace('!2d','')), parseFloat(latP[i].replace('!3d',''))], name: `Parada ${i}`}); } renderStops(); markUpdate(); showM("Enlace Leído", "Ruta importada correctamente. Pulsa GENERAR."); } else { showM("Error", "No se pudo leer el enlace de Maps."); } }
+    function openInMaps() {
+        if(!activeRoute) return showM("Error", "Genera una ruta primero.");
+
+        let url = `https://www.google.com/maps/dir/?api=1&origin=${o[1]},${o[0]}&destination=${d[1]},${d[0]}&travelmode=driving`;
+
+        if(stops.length > 0) {
+            const waypoints = stops.map(s => {
+                const c = s.c || s;
+                return `${c[1]},${c[0]}`;
+            }).join('|');
+            url += `&waypoints=${waypoints}`;
+        }
+
+        if (typeof Android !== 'undefined' && Android.openBrowser) {
+            Android.openBrowser(url);
+        } else {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                window.location.href = url;
+            } else {
+                window.open(url, '_blank');
+            }
+        }
+    }
+
+    // INICIO-FIN BLOQUE: GUARDAR GPX CON LOGS Y CARPETA RUTIWAY
+function saveGPX() {
+    if(!activeRoute) return showM("GPX", "Genera ruta primero.");
+
+    console.log("═══════════════════════════════════");
+    console.log("🔧 INICIO saveGPX()");
+    console.log("═══════════════════════════════════");
+
+    // Generar contenido GPX
+    let g = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    g += '<gpx version="1.1" creator="RUTIWAY">\n';
+    g += '  <trk>\n    <trkseg>';
+
+    activeRoute.geo.geometry.coordinates.forEach(function(c) {
+        g += '<trkpt lat="' + c[1] + '" lon="' + c[0] + '"></trkpt>\n';
+    });
+
+    g += '</trkseg></trk></gpx>';
+
+    console.log("✅ GPX generado:", g.length, "caracteres");
+
+    // Generar nombre con FECHA Y HORA (formato restaurado)
+    const now = new Date();
+    const fecha = now.getFullYear()
+        + String(now.getMonth() + 1).padStart(2, '0')
+        + String(now.getDate()).padStart(2, '0') + '_'
+        + String(now.getHours()).padStart(2, '0')
+        + String(now.getMinutes()).padStart(2, '0')
+        + String(now.getSeconds()).padStart(2, '0');
+
+    const filename = 'RutiWay_' + fecha + '.gpx';
+    console.log("📝 Nombre archivo:", filename);
+
+    // Verificar si Android Bridge existe
+    console.log("🔍 typeof Android:", typeof Android);
+
+    if(typeof Android !== 'undefined') {
+        console.log("✅ Android Bridge detectado");
+        console.log("🔍 typeof Android.saveGPX:", typeof Android.saveGPX);
+
+        if(typeof Android.saveGPX === 'function') {
+            console.log("✅ Android.saveGPX es una función");
+
+            try {
+                console.log("📤 Llamando Android.saveGPX()...");
+                Android.saveGPX(g, filename);
+                console.log("✅ Android.saveGPX() ejecutado sin errores");
+                showM("✅ Guardado", "GPX guardado en:<br>Descargas/RutiWay/<br>" + filename);
+                return;
+            } catch(e) {
+                console.error("❌ ERROR Android.saveGPX():", e);
+                showM("❌ Error Android", e.message);
+            }
+        } else {
+            console.error("❌ Android.saveGPX NO es una función");
+            showM("❌ Error", "Android.saveGPX no disponible");
+        }
+    } else {
+        console.log("⚠️ Android Bridge NO detectado - usando descarga directa");
+    }
+
+    // Fallback: descarga directa (funciona en PC)
+    console.log("📥 Usando método de descarga directa...");
+    try {
+        const blob = new Blob([g], { type: 'application/gpx+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+
+        setTimeout(function() {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            console.log("✅ Descarga directa completada");
+        }, 1000);
+
+        showM("✅ Descargado", "Archivo: " + filename);
+    } catch(e) {
+        console.error("❌ ERROR descarga directa:", e);
+        showM("❌ Error", "No se pudo descargar: " + e.message);
+    }
+
+    console.log("═══════════════════════════════════");
+    console.log("🏁 FIN saveGPX()");
+    console.log("═══════════════════════════════════");
+}
+// FIN BLOQUE
+// INICIO - FUNCIÓN PDF CRONOLÓGICO MEJORADO
+function printReport() {
+    if(!activeRoute) return showM("PDF", "Genera ruta primero.");
+
+    console.log("📄 Iniciando generación PDF cronológico");
+
+    // Preparar datos cronológicos
+    let cronologia = "🏍️ RUTIWAY - INFORME CRONOLÓGICO\n";
+    cronologia += `📅 ${new Date().toLocaleDateString('es-ES')} ${new Date().toLocaleTimeString('es-ES')}\n`;
+    cronologia += `🛣️ Ruta #${activeRoute.num} | ${activeRoute.dist} km | ${activeRoute.duration}\n\n`;
+
+    // Origen y destino
+    cronologia += `🚀 ORIGEN: ${document.getElementById('ori').value || 'Ubicación actual'}\n`;
+    cronologia += `🏁 DESTINO: ${document.getElementById('des').value || 'Ubicación'}\n\n`;
+
+    // Paradas
+    if(stops.length > 0) {
+        cronologia += `🛑 PARADAS (${stops.length}):\n`;
+        stops.forEach((stop, i) => {
+            cronologia += `   ${i+1}. ${stop.name || `Parada ${i+1}`}\n`;
+        });
+        cronologia += "\n";
+    }
+
+    // Avisos cronológicos
+    if(warningsLog.length > 0) {
+        cronologia += `⚠️ INCIDENCIAS (${warningsLog.length}):\n`;
+        warningsLog.forEach(w => {
+            cronologia += `   ${w.km} km: ${w.text}\n`;
+        });
+        cronologia += "\n";
+    }
+
+    // Clima destino
+    cronologia += `🌤️ CLIMA DESTINO: ${weatherDest || 'No disponible'}\n\n`;
+
+    // Configuración usada
+    cronologia += `⚙️ CONFIGURACIÓN:\n`;
+    cronologia += `   Revirado: ${revirado ? 'Sí' : 'No'}\n`;
+    cronologia += `   Gasolina: ${gasx2 ? 'Cada ' + gasRadio + ' km' : 'Sin dividir'}\n`;
+    cronologia += `   Peajes: ${evitaPeajes ? 'Evitar' : 'Permitir'}\n`;
+    cronologia += `   Velocidad: ${velMedia} km/h\n\n`;
+
+    cronologia += "🗺️ Abrir en Google Maps:\n";
+    cronologia += `https://www.google.com/maps/dir/?api=1&origin=${activeRoute.o[1]},${activeRoute.o[0]}&destination=${activeRoute.d[1]},${activeRoute.d[0]}`;
+
+    // Mostrar modal de confirmación
+    showM("PDF", cronologia.replace(/\n/g, "<br>"), "Imprimir", () => {
+        // Llamar Android.print() si existe
+        if(typeof Android !== 'undefined' && Android.print) {
+            console.log("📤 Llamando Android.print()");
+            Android.print();
+        } else {
+            // Fallback window.print()
+            console.log("🖨️ Usando window.print() (PC)");
+            window.print();
+        }
+    });
+}
+// FIN
+
+    function impG(input) {
+    console.log("impG iniciado");
+
+    if(!input || !input.files || input.files.length === 0) {
+        console.error("No hay archivo seleccionado");
+        showM("⚠️ Aviso", "No se seleccionó ningún archivo");
+        return;
+    }
+
+    console.log("Archivo seleccionado:", input.files[0].name);
+
+    const r = new FileReader();
+
+    r.onerror = function(e) {
+        console.error("Error FileReader:", e);
+        showM("❌ Error", "No se pudo leer el archivo");
+    };
+
+    r.onload = function(e) {
+        console.log("Archivo cargado, procesando...");
+        try {
+            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
+
+            // Verificar errores de parsing
+            const parserError = xml.querySelector('parsererror');
+            if(parserError) {
+                console.error("Error parsing XML:", parserError.textContent);
+                showM("❌ Error", "Archivo GPX inválido");
+                return;
+            }
+
+            const trkpts = xml.querySelectorAll('trkpt');
+            console.log("Puntos encontrados:", trkpts.length);
+
+            if(trkpts.length === 0) {
+                showM("⚠️ Aviso", "El archivo no contiene puntos de ruta");
+                return;
+            }
+
+            const pts = Array.from(trkpts).map(function(p) {
+                return [
+                    parseFloat(p.getAttribute('lat')),
+                    parseFloat(p.getAttribute('lon'))
+                ];
+            });
+
+            console.log("Dibujando en mapa...");
+            L.polyline(pts, {color: '#fff', weight: 4, dashArray: '10,10'}).addTo(rLines);
+            map.fitBounds(L.polyline(pts).getBounds());
+
+            o = [pts[0][1], pts[0][0]];
+            d = [pts[pts.length-1][1], pts[pts.length-1][0]];
+            stops = [];
+
+            document.getElementById('ori').value = o[1].toFixed(4) + ', ' + o[0].toFixed(4);
+            document.getElementById('des').value = d[1].toFixed(4) + ', ' + d[0].toFixed(4);
+            renderStops();
+
+            closeS();
+            showM("✅ GPX Cargado", pts.length + " puntos importados correctamente");
+            console.log("GPX importado exitosamente");
+
+        } catch(err) {
+            console.error("Error procesando GPX:", err);
+            showM("❌ Error", "No se pudo procesar el archivo GPX");
+        }
+    };
+
+    console.log("Leyendo archivo...");
+    r.readAsText(input.files[0]);
+    input.value = '';
+}async function showLocationAtKm() {
+  if (!activeRoute || !activeRoute.geo) return;
+
+  const kmInput = document.getElementById('km-input');
+  const targetKm = parseFloat(kmInput.value) * 1000;
+  const coords = activeRoute.geo.geometry.coordinates;
+
+  let targetPoint = null;
+  let accumDist = 0;
+
+  for (let i = 1; i < coords.length; i++) {
+    const segDist = L.latLng(coords[i-1][1], coords[i-1][0]).distanceTo(L.latLng(coords[i][1], coords[i][0]));
+    accumDist += segDist;
+    if (accumDist >= targetKm) {
+      targetPoint = coords[i];
+      break;
+    }
+  }
+
+  if (!targetPoint) targetPoint = coords[Math.floor(coords.length / 2)];
+
+  // ✅ GUARDAR COORDENADAS GLOBALMENTE
+  savedTargetCoords = targetPoint;
+
+  const display = document.getElementById('location-display');
+  display.style.display = 'block';
+  display.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Buscando dirección...';
+
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${targetPoint[1]}&lon=${targetPoint[0]}`);
+    const data = await res.json();
+
+    const city = data.address.city || data.address.town || data.address.village || '';
+    const road = data.address.road || '';
+    const country = data.address.country || '';
+
+    display.innerHTML = `
+      <div>
+        <b style="color:var(--accent);"><i class="fa fa-map-marker-alt"></i> Punto en KM ${kmInput.value}</b><br>
+        <span style="font-size:0.85rem;color:#fff;margin-top:5px;display:block;">${road ? road + ', ' : ''}${city}</span>
+        <span style="font-size:0.75rem;color:#888;">${country}</span><br>
+        <span style="font-size:0.7rem;color:#666;margin-top:3px;display:block;">📍 ${targetPoint[1].toFixed(5)}, ${targetPoint[0].toFixed(5)}</span>
+        <button class="popup-btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;width:100%;background:#2b7cff;" onclick="copyLocationToClipboard('${targetPoint[1]}', '${targetPoint[0]}', 'km');">
+          <i class="fa fa-copy"></i> Copiar ubicación
+        </button>
+      </div>
+    `;
+  } catch (err) {
+    display.innerHTML = '<span style="color:#ff4b2b;"><i class="fa fa-exclamation-triangle"></i> Error al buscar dirección</span>';
+  }
+}
+
+async function showLocationAtTime() {
+  if (!activeRoute || !activeRoute.geo) return;
+
+  const timeInput = document.getElementById('time-input');
+  const speedInput = document.getElementById('speed-input');
+  const targetMin = parseFloat(timeInput.value);
+  const speed = parseFloat(speedInput.value) || avgSpeed;
+  const targetKm = (speed * (targetMin / 60)) * 1000;
+  const coords = activeRoute.geo.geometry.coordinates;
+
+  let targetPoint = null;
+  let accumDist = 0;
+
+  for (let i = 1; i < coords.length; i++) {
+    const segDist = L.latLng(coords[i-1][1], coords[i-1][0]).distanceTo(L.latLng(coords[i][1], coords[i][0]));
+    accumDist += segDist;
+    if (accumDist >= targetKm) {
+      targetPoint = coords[i];
+      break;
+    }
+  }
+
+  if (!targetPoint) targetPoint = coords[Math.floor(coords.length / 2)];
+
+  // ✅ GUARDAR COORDENADAS GLOBALMENTE
+  savedTargetCoords = targetPoint;
+
+  const display = document.getElementById('location-display-time');
+  display.style.display = 'block';
+  display.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Buscando dirección...';
+
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${targetPoint[1]}&lon=${targetPoint[0]}`);
+    const data = await res.json();
+
+    const city = data.address.city || data.address.town || data.address.village || '';
+    const road = data.address.road || '';
+    const country = data.address.country || '';
+    const kmEquivalent = (targetKm / 1000).toFixed(1);
+
+    display.innerHTML = `
+      <div>
+        <b style="color:var(--accent);"><i class="fa fa-clock"></i> A ${targetMin} min (≈ ${kmEquivalent} km)</b><br>
+        <span style="font-size:0.85rem;color:#fff;margin-top:5px;display:block;">${road ? road + ', ' : ''}${city}</span>
+        <span style="font-size:0.75rem;color:#888;">${country}</span><br>
+        <span style="font-size:0.7rem;color:#666;margin-top:3px;display:block;">📍 ${targetPoint[1].toFixed(5)}, ${targetPoint[0].toFixed(5)}</span>
+        <button class="popup-btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;width:100%;background:#2b7cff;" onclick="copyLocationToClipboard('${targetPoint[1]}', '${targetPoint[0]}', 'min');">
+          <i class="fa fa-copy"></i> Copiar ubicación
+        </button>
+      </div>
+    `;
+  } catch (err) {
+    display.innerHTML = '<span style="color:#ff4b2b;"><i class="fa fa-exclamation-triangle"></i> Error al buscar dirección</span>';
+  }
+}
+function copyLocationToClipboard(lat, lon, mode) {
+  const coords = `${lat},${lon}`;
+
+  if (typeof Android !== 'undefined' && Android.copyToClipboard) {
+    Android.copyToClipboard(coords);
+  } else {
+    // Fallback para navegador
+    navigator.clipboard.writeText(coords).catch(() => {
+      const textarea = document.createElement('textarea');
+      textarea.value = coords;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    });
+  }
+
+  // Mostrar confirmación
+  const displayId = mode === 'km' ? 'location-display' : 'location-display-time';
+  const sectionId = mode === 'km' ? 'poi-search-section' : 'poi-search-section-time';
+  const display = document.getElementById(displayId);
+
+  display.innerHTML = `
+    <div style="text-align:center;">
+      <i class="fa fa-check-circle" style="color:#4caf50;font-size:2rem;"></i>
+      <p style="margin-top:10px;color:#4caf50;font-weight:bold;">✓ Ubicación copiada</p>
+      <p style="font-size:0.7rem;color:#888;">📍 ${lat}, ${lon}</p>
+    </div>
+  `;
+
+  // Mostrar sección de búsqueda POI
+  document.getElementById(sectionId).style.display = 'block';
+}
+
+function searchNearbyWithCoords(category, mode) {
+  if (!savedTargetCoords) {
+    showM('Error', 'Primero copia la ubicación del punto.');
+    return;
+  }
+
+  const categoryMap = {
+    fuel: 'gasolinera',
+    restaurant: 'restaurante',
+    hotel: 'hotel'
+  };
+
+  const searchQuery = categoryMap[category];
+  const query = `${searchQuery} cerca de ${savedTargetCoords[1]},${savedTargetCoords[0]}`;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+
+  closeM();
+
+  if (typeof Android !== 'undefined' && Android.openBrowser) {
+    Android.openBrowser(mapsUrl);
+  } else {
+    window.open(mapsUrl, '_blank');
+  }
+}
+
+</script>
+</body>
+</html>

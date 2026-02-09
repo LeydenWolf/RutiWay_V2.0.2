@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.RutiWay" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#0a0a0c</item>
+        <item name="android:windowBackground">#0a0a0c</item>
+        <item name="colorPrimary">#5bc0de</item>
+        <item name="colorPrimaryVariant">#2b7cff</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#ff4b2b</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
