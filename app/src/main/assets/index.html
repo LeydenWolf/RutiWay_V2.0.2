@@ -347,6 +347,18 @@
     }
 }
 /* FIN - SPLASH SCREEN STYLES */
+/* Indicador visual de parada validada */
+input[id^="stop-input-"] {
+  transition: border-color 0.3s ease;
+}
+
+input[id^="stop-input-"]:focus {
+  border-color: #5bc0de !important;
+}
+/* Transiciones suaves para inputs validados */
+#ori, #des {
+  transition: border-color 0.3s ease, border-width 0.3s ease;
+}
 
     </style>
 </head>
@@ -949,7 +961,113 @@ function closeSplash() {
     window.onclick = function(e) { if(e.target == document.getElementById('app-modal')) closeM(); }
 
     function addBlankStop() { stops.push({c: null, name: ''}); renderStops(); }
-    function renderStops() { const c = document.getElementById('stops-container'); c.innerHTML = ''; stops.forEach((s, i) => { const val = s.name ? s.name : ''; c.innerHTML += `<div class="stop-row"><div class="in-wrap-icon" style="font-size:0.8rem">📍</div><input type="text" value="${val}" placeholder="Escribe o pulsa en mapa" onchange="stops[${i}].name=this.value"><div class="stop-del" onclick="removeStop(${i})">X</div></div>`; }); }
+// INICIO - RENDERIZAR PARADAS CON BÚSQUEDA
+function renderStops() {
+  const c = document.getElementById('stops-container');
+  c.innerHTML = '';
+
+  stops.forEach((s, i) => {
+    const val = s.name ? s.name : '';
+    const inputId = `stop-input-${i}`;
+    const suggId = `stop-sugg-${i}`;
+
+    c.innerHTML += `
+      <div class="stop-row">
+        <div class="in-wrap-icon" style="font-size:0.8rem">🚩</div>
+        <div style="position:relative; flex:1;">
+          <input
+            type="text"
+            id="${inputId}"
+            value="${val}"
+            placeholder="Escribe dirección o pulsa en mapa"
+            style="width:100%; padding:8px; background:#1a1b26; border:1px solid #414868; color:white; border-radius:4px; font-size:0.75rem;"
+          >
+          <div id="${suggId}" class="suggestions"></div>
+        </div>
+        <div class="stop-del" onclick="removeStop(${i})">✖</div>
+      </div>
+    `;
+  });
+
+  // Asignar búsqueda a cada parada
+  stops.forEach((s, i) => {
+    attachStopSearch(i);
+  });
+}
+
+// NUEVA FUNCIÓN: Búsqueda para paradas
+function attachStopSearch(index) {
+  const inputId = `stop-input-${index}`;
+  const suggId = `stop-sugg-${index}`;
+  const input = document.getElementById(inputId);
+  const sugg = document.getElementById(suggId);
+
+  if (!input || !sugg) return;
+
+  let timeout = null;
+
+  input.oninput = async function() {
+    stops[index].name = input.value;
+
+    if (input.value.length < 3) {
+      sugg.style.display = 'none';
+      return;
+    }
+
+    // DEBOUNCE
+    if (timeout) clearTimeout(timeout);
+
+    timeout = setTimeout(async () => {
+      const country = document.getElementById('s-country').value || 'España';
+      const region = document.getElementById('s-region').value || '';
+      const query = `${input.value}, ${region}, ${country}`;
+
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+        const data = await res.json();
+
+        sugg.innerHTML = '';
+        sugg.style.display = 'block';
+
+        data.forEach(x => {
+          const dv = document.createElement('div');
+          dv.className = 'sugg-i';
+          dv.textContent = x.display_name.split(',')[0];
+
+          dv.onmousedown = function() {
+  const coords = [parseFloat(x.lon), parseFloat(x.lat)];
+  stops[index].c = coords;
+  stops[index].name = x.display_name.split(',')[0];
+  input.value = stops[index].name;
+  sugg.style.display = 'none';
+
+  // ✅ NUEVO: Cambiar borde a verde para indicar que está OK
+  input.style.borderColor = '#4caf50';
+  input.style.borderWidth = '2px';
+
+  markUpdate();
+};
+
+
+          sugg.appendChild(dv);
+        });
+      } catch(err) {
+        console.error('Error búsqueda parada:', err);
+      }
+    }, 500);
+  };
+
+  input.onblur = function() {
+    setTimeout(() => { sugg.style.display = 'none'; }, 200);
+  };
+}
+
+function removeStop(i) {
+  stops.splice(i, 1);
+  renderStops();
+  markUpdate();
+}
+// FIN
     function removeStop(i) { stops.splice(i, 1); renderStops(); markUpdate(); }
 
     function togColl(id){ const e=document.getElementById(id); e.classList.toggle('active'); if(e.classList.contains('active')) e.scrollIntoView({behavior: "smooth", block: "nearest"}); }
@@ -1006,18 +1124,155 @@ function togSubExcl(id) {
     function updateLegendRoutes() { const c = document.getElementById('l-routes'); c.innerHTML = history.slice(0, 3).map(h => { const icons = []; if(h.cfg && h.cfg.curvy) icons.push('<i class="fa fa-route" title="Revirado"></i>'); if(h.cfg && h.cfg.gasX2) icons.push('🤯'); if(h.cfg && !h.cfg.toll) icons.push('<i class="fa fa-money-bill-wave" title="Peajes"></i>'); else if(h.cfg) icons.push('<span style="font-size:7px; color:#4caf50">NO €</span>'); return `<div class="leg-i"><span class="leg-left"><span class="dot" style="background:${h.color}"></span> Ruta #${h.num}</span> <span class="route-icons">${icons.join(' ')}</span></div>`; }).join(''); }
     function clr(id){ document.getElementById(id).value=''; if(id==='ori') o=null; if(id==='des') d=null; markUpdate(); }
 
-    async function search(id, sid, type) { const i=document.getElementById(id), s=document.getElementById(sid); i.oninput = async () => { if(type==='o') o=null; else d=null; if(i.value.length<3) return s.style.display='none'; const country = document.getElementById('s-country').value || 'España'; const region = document.getElementById('s-region').value || ''; const query = `${i.value}, ${region}, ${country}`; const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`); const data = await res.json(); s.innerHTML=''; s.style.display='block'; data.forEach(x => { const dv=document.createElement('div'); dv.className='sugg-i'; dv.textContent=x.display_name.split(',')[0]; dv.onmousedown = ()=>{ const coords = [parseFloat(x.lon), parseFloat(x.lat)]; if(type==='o') o=coords; else d=coords; s.style.display='none'; i.value=x.display_name.split(',')[0]; markUpdate(); }; s.appendChild(dv); }); }; i.onblur = () => { setTimeout(()=>s.style.display='none', 200); }; }
-    search('ori','ori-s','o'); search('des','des-s','d');
+// INICIO - BÚSQUEDA CON DEBOUNCE
+let searchTimeouts = {}; // Variable para almacenar timeouts
+
+async function search(id, sid, type) {
+  const i = document.getElementById(id);
+  const s = document.getElementById(sid);
+
+  i.oninput = async () => {
+    if (type === 'o') o = null;
+    else d = null;
+
+    if (i.value.length < 3) {
+      s.style.display = 'none';
+      return;
+    }
+
+    // DEBOUNCE: Limpiar timeout anterior
+    if (searchTimeouts[id]) {
+      clearTimeout(searchTimeouts[id]);
+    }
+
+    // Esperar 500ms antes de buscar
+    searchTimeouts[id] = setTimeout(async () => {
+      const country = document.getElementById('s-country').value || 'España';
+      const region = document.getElementById('s-region').value || '';
+      const query = `${i.value}, ${region}, ${country}`;
+
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+        const data = await res.json();
+
+        s.innerHTML = '';
+        s.style.display = 'block';
+
+        data.forEach(x => {
+          const dv = document.createElement('div');
+          dv.className = 'sugg-i';
+          dv.textContent = x.display_name.split(',')[0];
+
+          dv.onmousedown = () => {
+  const coords = [parseFloat(x.lon), parseFloat(x.lat)];
+  if (type === 'o') o = coords;
+  else d = coords;
+  s.style.display = 'none';
+  i.value = x.display_name.split(',')[0];
+
+  // ✅ NUEVO: Borde verde al seleccionar
+  i.style.borderColor = '#4caf50';
+  i.style.borderWidth = '2px';
+
+  markUpdate();
+};
+
+
+          s.appendChild(dv);
+        });
+      } catch(err) {
+        console.error('Error búsqueda:', err);
+      }
+    }, 500); // ← ESPERA 500ms
+  };
+
+  i.onblur = () => {
+    setTimeout(() => { s.style.display = 'none'; }, 200);
+  };
+}
+
+search('ori', 'ori-s', 'o');
+search('des', 'des-s', 'd');
+// FIN
+
 
     async function resolveAndGen() {
-        const oriText = document.getElementById('ori').value; const desText = document.getElementById('des').value;
-        for(let i=0; i<stops.length; i++) { if(!stops[i].name && !stops[i].c) { return showM("Falta Parada", `La Parada ${i+1} está vacía. Rellénala o bórrala.`); } }
-        if((!o && oriText) || (o && oriText === '')) await autoGeo('ori', 'o');
-        if((!d && desText) || (d && desText === '')) await autoGeo('des', 'd');
-        if (!o && oriText) { return showM("Error", "No encuentro la dirección de Origen."); }
-        if (!d && desText) { return showM("Error", "No encuentro la dirección de Destino."); }
-        gen();
+  const oriText = document.getElementById('ori').value;
+  const desText = document.getElementById('des').value;
+
+  // VALIDAR PARADAS
+  for (let i = 0; i < stops.length; i++) {
+    if (!stops[i].c || !stops[i].c[0] || !stops[i].c[1]) {
+      return showM('❌ Parada Incompleta', `
+        <p><b>Parada ${i+1}</b> no tiene coordenadas válidas.</p>
+        <p style="font-size:0.8rem; color:#aaa; margin-top:10px;">
+          💡 <b>Solución:</b><br>
+          1. Escribe la dirección<br>
+          2. Selecciona una opción de las sugerencias<br>
+          3. O elimina la parada si no la necesitas
+        </p>
+        <button class="popup-btn" style="margin-top:10px;" onclick="closeM()">Entendido</button>
+      `);
     }
+
+    if (!stops[i].name || stops[i].name.trim() === '') {
+      stops[i].name = `Parada ${i+1}`;
+    }
+  }
+
+  console.log('=== Validando Origen/Destino ===');
+  console.log('Origen coords:', o);
+  console.log('Destino coords:', d);
+
+  // VALIDAR ORIGEN
+  if (!oriText || oriText.trim() === '') {
+    return showM('❌ Falta Origen', 'Debes escribir una dirección de Origen.');
+  }
+
+  if (!o || !o[0] || !o[1]) {
+    console.log('Intentando geocodificar origen...');
+    const success = await autoGeo('ori', 'o');
+    if (!success || !o) {
+      return showM('❌ Error Origen', `
+        <p>No se pudo encontrar: <b>${oriText}</b></p>
+        <p style="font-size:0.8rem; color:#aaa; margin-top:10px;">
+          💡 Selecciona una opción de las sugerencias al escribir.
+        </p>
+      `);
+    }
+  }
+
+  // VALIDAR DESTINO
+  if (!desText || desText.trim() === '') {
+    return showM('❌ Falta Destino', 'Debes escribir una dirección de Destino.');
+  }
+
+  if (!d || !d[0] || !d[1]) {
+    console.log('Intentando geocodificar destino...');
+    const success = await autoGeo('des', 'd');
+    if (!success || !d) {
+      return showM('❌ Error Destino', `
+        <p>No se pudo encontrar: <b>${desText}</b></p>
+        <p style="font-size:0.8rem; color:#aaa; margin-top:10px;">
+          💡 Selecciona una opción de las sugerencias al escribir.
+        </p>
+      `);
+    }
+  }
+
+  // VALIDACIÓN FINAL
+  if (!o || o.length !== 2 || !o[0] || !o[1]) {
+    return showM('❌ Error', 'Origen con coordenadas inválidas. Selecciona de nuevo.');
+  }
+
+  if (!d || d.length !== 2 || !d[0] || !d[1]) {
+    return showM('❌ Error', 'Destino con coordenadas inválidas. Selecciona de nuevo.');
+  }
+
+  console.log('✅ Todas las validaciones OK');
+  gen();
+}
+
 // INICIO - autoGeo() COMPLETO Y CORREGIDO
 async function autoGeo(idInput, varName) {
     const val = document.getElementById(idInput).value;
@@ -1031,11 +1286,24 @@ async function autoGeo(idInput, varName) {
         const data = await res.json();
 
         if(data.length > 0) {
-            const coords = [parseFloat(data[0].lon), parseFloat(data[0].lat)];
-            if(varName==='o') o=coords;
-            else d=coords;
-            return true;
-        } else {
+    const coords = [parseFloat(data[0].lon), parseFloat(data[0].lat)];
+
+    if(varName==='o') {
+        o = coords;
+        // ✅ Borde verde en origen
+        document.getElementById(idInput).style.borderColor = '#4caf50';
+        document.getElementById(idInput).style.borderWidth = '2px';
+    } else {
+        d = coords;
+        // ✅ Borde verde en destino
+        document.getElementById(idInput).style.borderColor = '#4caf50';
+        document.getElementById(idInput).style.borderWidth = '2px';
+    }
+
+    console.log(`✅ autoGeo: ${varName} =`, coords);
+    return true;
+}
+ else {
             // MOSTRAR AVISO ROJO
             const sugg = document.getElementById(idInput + '-s');
             sugg.innerHTML = `
@@ -1062,18 +1330,69 @@ async function autoGeo(idInput, varName) {
 // FIN
     function getWIcon(code) { if (code <= 1) return { icon: 'fa-sun', col: 'w-sun' }; if (code <= 3) return { icon: 'fa-cloud-sun', col: 'w-cloud' }; if (code <= 60) return { icon: 'fa-cloud-rain', col: 'w-rain' }; return { icon: 'fa-smog', col: 'w-fog' }; }
     function calculateDeviations(coords) { if(coords.length < 2) return coords; let newCoords = []; for(let i=0; i<coords.length-1; i++) { newCoords.push(coords[i]); const p1 = coords[i]; const p2 = coords[i+1]; const midLat = (p1[1] + p2[1]) / 2; const midLon = (p1[0] + p2[0]) / 2; const dLon = p2[0] - p1[0]; const dLat = p2[1] - p1[1]; const devLon = midLon - dLat * 0.8; const devLat = midLat + dLon * 0.8; newCoords.push([devLon, devLat]); } newCoords.push(coords[coords.length-1]); return newCoords; }
+// INICIO - CHECK DUPLICATE CON PARADAS
+function checkDuplicateRoute(currentCfg) {
+  if (!o || !d) return false;
+  if (history.length === 0) return false;
 
-    function checkDuplicateRoute(currentCfg) {
-        if(!o || !d) return false; if(history.length === 0) return false; const tol = 0.001;
-        for(let i=0; i<history.length; i++) {
-            const h = history[i]; if(!h.o || !h.d || !h.cfg) continue;
-            if(currentCfg.curvy !== h.cfg.curvy || currentCfg.toll !== h.cfg.toll || currentCfg.gasX2 !== h.cfg.gasX2) continue;
-            if(Math.abs(o[0] - h.o[0]) > tol || Math.abs(o[1] - h.o[1]) > tol || Math.abs(d[0] - h.d[0]) > tol || Math.abs(d[1] - h.d[1]) > tol) continue;
-            showM("Info", `<h3 style='margin-bottom:10px;'>⚠️ Ruta #${h.num} encontrada</h3><div style="display:flex; justify-content:center; gap:10px;"><button class="popup-btn" style="width:auto; display:inline-block; padding:8px 15px;" onclick="selectHistoryItem(${i}); closeM();">Ver Ruta</button><button class="popup-btn" style="background:#555; color:white; width:auto; display:inline-block; padding:8px 15px;" onclick="forceGen(); closeM();">Nueva</button></div>`); return true;
-        }
-        return false;
+  const tol = 0.001;
+
+  for (let i = 0; i < history.length; i++) {
+    const h = history[i];
+    if (!h.o || !h.d || !h.cfg) continue;
+
+    // Comparar configuración
+    if (currentCfg.curvy !== h.cfg.curvy ||
+        currentCfg.toll !== h.cfg.toll ||
+        currentCfg.gasX2 !== h.cfg.gasX2) continue;
+
+    // Comparar origen y destino
+    if (Math.abs(o[0] - h.o[0]) > tol ||
+        Math.abs(o[1] - h.o[1]) > tol ||
+        Math.abs(d[0] - h.d[0]) > tol ||
+        Math.abs(d[1] - h.d[1]) > tol) continue;
+
+    // ✅ NUEVO: Comparar número de paradas
+    const currentStops = stops.length;
+    const histStops = h.stops ? h.stops.length : 0;
+
+    if (currentStops !== histStops) continue; // Diferente número de paradas
+
+    // ✅ NUEVO: Comparar coordenadas de cada parada
+    let stopsDiffer = false;
+    for (let j = 0; j < currentStops; j++) {
+      const currentStop = stops[j];
+      const histStop = h.stops[j];
+
+      if (!currentStop.c || !histStop.c) {
+        stopsDiffer = true;
+        break;
+      }
+
+      if (Math.abs(currentStop.c[0] - histStop.c[0]) > tol ||
+          Math.abs(currentStop.c[1] - histStop.c[1]) > tol) {
+        stopsDiffer = true;
+        break;
+      }
     }
 
+    if (stopsDiffer) continue; // Paradas diferentes
+
+    // ✅ Si llegamos aquí, es REALMENTE duplicada
+    showM('Info', `
+      <h3 style="margin-bottom:10px">🔄 Ruta ${h.num} encontrada</h3>
+      <div style="display:flex; justify-content:center; gap:10px">
+        <button class="popup-btn" style="width:auto; display:inline-block; padding:8px 15px;" onclick="selectHistoryItem(${i}); closeM()">Ver Ruta</button>
+        <button class="popup-btn" style="background:#555; color:white; width:auto; display:inline-block; padding:8px 15px;" onclick="forceGen(); closeM()">Nueva</button>
+      </div>
+    `);
+
+    return true;
+  }
+
+  return false;
+}
+// FIN
     let pendingCfg = null;
     function gen() { if(!o||!d) return showM("⚠️ Falta Datos", "Escribe origen y destino."); document.getElementById('m-btn').classList.remove('blink'); const cfg = { curvy: document.getElementById('c-curvy').checked, toll: document.getElementById('c-toll').checked, gasX2: document.getElementById('c-gas-x2').checked }; if(checkDuplicateRoute(cfg)) { pendingCfg = cfg; return; } executeGen(cfg); }
     function forceGen() { if(pendingCfg) executeGen(pendingCfg); }
@@ -1722,96 +2041,133 @@ function printRouteReport() {
         }
     }
 
-    // INICIO-FIN BLOQUE: GUARDAR GPX CON LOGS Y CARPETA RUTIWAY
+    // INICIO - GUARDAR GPX CON WAYPOINTS Y METADATA
 function saveGPX() {
-    if(!activeRoute) return showM("GPX", "Genera ruta primero.");
+  if (!activeRoute) return showM('GPX', 'Genera ruta primero.');
 
-    console.log("═══════════════════════════════════");
-    console.log("🔧 INICIO saveGPX()");
-    console.log("═══════════════════════════════════");
+  console.log('=== INICIO saveGPX ===');
+  console.log('Generar contenido GPX completo');
 
-    // Generar contenido GPX
-    let g = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    g += '<gpx version="1.1" creator="RUTIWAY">\n';
-    g += '  <trk>\n    <trkseg>';
+  // Generar nombre con FECHA Y HORA
+  const now = new Date();
+  const fecha = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+  const filename = `RutiWay_${fecha}.gpx`;
 
-    activeRoute.geo.geometry.coordinates.forEach(function(c) {
-        g += '<trkpt lat="' + c[1] + '" lon="' + c[0] + '"></trkpt>\n';
-    });
+  // Crear GPX con estructura completa
+  let g = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="RUTIWAY v2.0.2" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>RutiWay - Ruta ${activeRoute.num}</name>
+    <desc>Distancia: ${activeRoute.dist} km | Tiempo: ${activeRoute.duration}</desc>
+    <author>
+      <name>RutiWay</name>
+    </author>
+    <time>${now.toISOString()}</time>
+    <keywords>${activeRoute.cfg.curvy ? 'curvy,' : ''}${!activeRoute.cfg.toll ? 'no-toll,' : ''}motorcycle</keywords>
+  </metadata>
+`;
 
-    g += '</trkseg></trk></gpx>';
+  // WAYPOINT: Origen
+  g += `  <wpt lat="${o[1]}" lon="${o[0]}">
+    <name>ORIGEN</name>
+    <desc>${document.getElementById('ori').value}</desc>
+    <sym>Flag, Green</sym>
+    <type>START</type>
+  </wpt>
+`;
 
-    console.log("✅ GPX generado:", g.length, "caracteres");
+  // WAYPOINTS: Paradas
+  stops.forEach((s, idx) => {
+    g += `  <wpt lat="${s.c[1]}" lon="${s.c[0]}">
+    <name>PARADA ${idx + 1}</name>
+    <desc>${s.name || 'Parada ' + (idx + 1)}</desc>
+    <sym>Pin, Blue</sym>
+    <type>WAYPOINT</type>
+  </wpt>
+`;
+  });
 
-    // Generar nombre con FECHA Y HORA (formato restaurado)
-    const now = new Date();
-    const fecha = now.getFullYear()
-        + String(now.getMonth() + 1).padStart(2, '0')
-        + String(now.getDate()).padStart(2, '0') + '_'
-        + String(now.getHours()).padStart(2, '0')
-        + String(now.getMinutes()).padStart(2, '0')
-        + String(now.getSeconds()).padStart(2, '0');
+  // WAYPOINT: Destino
+  g += `  <wpt lat="${d[1]}" lon="${d[0]}">
+    <name>DESTINO</name>
+    <desc>${document.getElementById('des').value}</desc>
+    <sym>Flag, Red</sym>
+    <type>END</type>
+  </wpt>
+`;
 
-    const filename = 'RutiWay_' + fecha + '.gpx';
-    console.log("📝 Nombre archivo:", filename);
+  // TRACK: Trayectoria completa
+  g += `  <trk>
+    <name>Ruta ${activeRoute.num} - ${activeRoute.dist} km</name>
+    <type>motorcycle</type>
+    <trkseg>
+`;
 
-    // Verificar si Android Bridge existe
-    console.log("🔍 typeof Android:", typeof Android);
+  activeRoute.geo.geometry.coordinates.forEach(function(c) {
+    g += `      <trkpt lat="${c[1]}" lon="${c[0]}"/>
+`;
+  });
 
-    if(typeof Android !== 'undefined') {
-        console.log("✅ Android Bridge detectado");
-        console.log("🔍 typeof Android.saveGPX:", typeof Android.saveGPX);
+  g += `    </trkseg>
+  </trk>
+</gpx>`;
 
-        if(typeof Android.saveGPX === 'function') {
-            console.log("✅ Android.saveGPX es una función");
+  console.log('GPX generado:', g.length, 'caracteres');
+  console.log('Waypoints incluidos:', 2 + stops.length, '(origen + paradas + destino)');
 
-            try {
-                console.log("📤 Llamando Android.saveGPX()...");
-                Android.saveGPX(g, filename);
-                console.log("✅ Android.saveGPX() ejecutado sin errores");
-                showM("✅ Guardado", "GPX guardado en:<br>Descargas/RutiWay/<br>" + filename);
-                return;
-            } catch(e) {
-                console.error("❌ ERROR Android.saveGPX():", e);
-                showM("❌ Error Android", e.message);
-            }
-        } else {
-            console.error("❌ Android.saveGPX NO es una función");
-            showM("❌ Error", "Android.saveGPX no disponible");
-        }
+  // Verificar si Android Bridge existe
+  console.log('typeof Android:', typeof Android);
+
+  if (typeof Android !== 'undefined') {
+    console.log('Android Bridge detectado');
+    console.log('typeof Android.saveGPX:', typeof Android.saveGPX);
+
+    if (typeof Android.saveGPX === 'function') {
+      console.log('Android.saveGPX es una función');
+      try {
+        console.log('Llamando Android.saveGPX...');
+        Android.saveGPX(g, filename);
+        console.log('Android.saveGPX ejecutado sin errores');
+        showM('✅ Guardado', `GPX guardado en<br><b>Descargas/RutiWay</b><br>${filename}<br><br>Incluye ${2 + stops.length} waypoints`);
+        return;
+      } catch(e) {
+        console.error('ERROR Android.saveGPX:', e);
+        showM('Error Android', e.message);
+      }
     } else {
-        console.log("⚠️ Android Bridge NO detectado - usando descarga directa");
+      console.error('Android.saveGPX NO es una función');
+      showM('Error', 'Android.saveGPX no disponible');
     }
-
+  } else {
+    console.log('Android Bridge NO detectado - usando descarga directa');
     // Fallback: descarga directa (funciona en PC)
-    console.log("📥 Usando método de descarga directa...");
+    console.log('Usando método de descarga directa...');
     try {
-        const blob = new Blob([g], { type: 'application/gpx+xml' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
+      const blob = new Blob([g], { type: 'application/gpx+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
 
-        setTimeout(function() {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            console.log("✅ Descarga directa completada");
-        }, 1000);
+      setTimeout(function() {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        console.log('Descarga directa completada');
+      }, 1000);
 
-        showM("✅ Descargado", "Archivo: " + filename);
+      showM('📥 Descargado', `Archivo: ${filename}<br>Con ${2 + stops.length} waypoints`);
     } catch(e) {
-        console.error("❌ ERROR descarga directa:", e);
-        showM("❌ Error", "No se pudo descargar: " + e.message);
+      console.error('ERROR descarga directa:', e);
+      showM('Error', 'No se pudo descargar: ' + e.message);
     }
+  }
 
-    console.log("═══════════════════════════════════");
-    console.log("🏁 FIN saveGPX()");
-    console.log("═══════════════════════════════════");
+  console.log('=== FIN saveGPX ===');
 }
-// FIN BLOQUE
+// FIN
 // INICIO - FUNCIÓN PDF CRONOLÓGICO MEJORADO
 function printReport() {
     if(!activeRoute) return showM("PDF", "Genera ruta primero.");
@@ -1872,129 +2228,143 @@ function printReport() {
     });
 }
 // FIN
+// INICIO - IMPORTAR GPX CON WAYPOINTS
+function impG(input) {
+  console.log('=== impG iniciado ===');
 
-    function impG(input) {
-    console.log("impG iniciado");
+  if (!input || !input.files || input.files.length === 0) {
+    console.error('No hay archivo seleccionado');
+    showM('Aviso', 'No se seleccionó ningún archivo');
+    return;
+  }
 
-    if(!input || !input.files || input.files.length === 0) {
-        console.error("No hay archivo seleccionado");
-        showM("⚠️ Aviso", "No se seleccionó ningún archivo");
+  console.log('Archivo seleccionado:', input.files[0].name);
+
+  const r = new FileReader();
+
+  r.onerror = function(e) {
+    console.error('Error FileReader:', e);
+    showM('Error', 'No se pudo leer el archivo');
+  };
+
+  r.onload = function(e) {
+    console.log('Archivo cargado, procesando...');
+
+    try {
+      const xml = new DOMParser().parseFromString(e.target.result, 'text/xml');
+
+      // Verificar errores de parsing
+      const parserError = xml.querySelector('parsererror');
+      if (parserError) {
+        console.error('Error parsing XML:', parserError.textContent);
+        showM('Error', 'Archivo GPX inválido o corrupto');
         return;
-    }
+      }
 
-    console.log("Archivo seleccionado:", input.files[0].name);
+      // Leer trackpoints (trayectoria)
+      const trkpts = xml.querySelectorAll('trkpt');
+      console.log('Trackpoints encontrados:', trkpts.length);
 
-    const r = new FileReader();
+      if (trkpts.length === 0) {
+        showM('Aviso', 'El archivo no contiene puntos de ruta (trkpt)');
+        return;
+      }
 
-    r.onerror = function(e) {
-        console.error("Error FileReader:", e);
-        showM("❌ Error", "No se pudo leer el archivo");
-    };
+      // Leer waypoints (paradas)
+      const wpts = xml.querySelectorAll('wpt');
+      console.log('Waypoints encontrados:', wpts.length);
 
-    r.onload = function(e) {
-        console.log("Archivo cargado, procesando...");
-        try {
-            const xml = new DOMParser().parseFromString(e.target.result, "text/xml");
+      // Procesar waypoints primero
+      let hasWaypoints = false;
+      if (wpts.length > 0) {
+        hasWaypoints = true;
+        stops = []; // Limpiar paradas existentes
 
-            // Verificar errores de parsing
-            const parserError = xml.querySelector('parsererror');
-            if(parserError) {
-                console.error("Error parsing XML:", parserError.textContent);
-                showM("❌ Error", "Archivo GPX inválido");
-                return;
-            }
+        wpts.forEach((wpt, idx) => {
+          const lat = parseFloat(wpt.getAttribute('lat'));
+          const lon = parseFloat(wpt.getAttribute('lon'));
+          const nameEl = wpt.querySelector('name');
+          const descEl = wpt.querySelector('desc');
+          const typeEl = wpt.querySelector('type');
 
-            const trkpts = xml.querySelectorAll('trkpt');
-            console.log("Puntos encontrados:", trkpts.length);
+          const name = nameEl?.textContent || descEl?.textContent || `Punto ${idx + 1}`;
+          const type = typeEl?.textContent || '';
 
-            if(trkpts.length === 0) {
-                showM("⚠️ Aviso", "El archivo no contiene puntos de ruta");
-                return;
-            }
+          console.log(`Waypoint ${idx}: ${name} [${type}]`);
 
-            const pts = Array.from(trkpts).map(function(p) {
-                return [
-                    parseFloat(p.getAttribute('lat')),
-                    parseFloat(p.getAttribute('lon'))
-                ];
+          // Identificar tipo de waypoint
+          if (type === 'START' || name.includes('ORIGEN') || idx === 0) {
+            o = [lon, lat];
+            document.getElementById('ori').value = descEl?.textContent || name;
+            console.log('  → Asignado como ORIGEN');
+          } else if (type === 'END' || name.includes('DESTINO') || idx === wpts.length - 1) {
+            d = [lon, lat];
+            document.getElementById('des').value = descEl?.textContent || name;
+            console.log('  → Asignado como DESTINO');
+          } else {
+            // Parada intermedia
+            stops.push({
+              c: [lon, lat],
+              name: descEl?.textContent || name
             });
+            console.log('  → Añadido como PARADA');
+          }
+        });
+      }
 
-            console.log("Dibujando en mapa...");
-            L.polyline(pts, {color: '#fff', weight: 4, dashArray: '10,10'}).addTo(rLines);
-            map.fitBounds(L.polyline(pts).getBounds());
+      // Procesar trackpoints (dibujar línea en mapa)
+      const pts = Array.from(trkpts).map(function(p) {
+        return [parseFloat(p.getAttribute('lat')), parseFloat(p.getAttribute('lon'))];
+      });
 
-            o = [pts[0][1], pts[0][0]];
-            d = [pts[pts.length-1][1], pts[pts.length-1][0]];
-            stops = [];
+      console.log('Dibujando', pts.length, 'puntos en mapa...');
 
-            document.getElementById('ori').value = o[1].toFixed(4) + ', ' + o[0].toFixed(4);
-            document.getElementById('des').value = d[1].toFixed(4) + ', ' + d[0].toFixed(4);
-            renderStops();
+      // Dibujar traza en mapa
+      L.polyline(pts, {
+        color: '#fff',
+        weight: 4,
+        dashArray: '10,10'
+      }).addTo(rLines);
 
-            closeS();
-            showM("✅ GPX Cargado", pts.length + " puntos importados correctamente");
-            console.log("GPX importado exitosamente");
+      map.fitBounds(L.polyline(pts).getBounds());
 
-        } catch(err) {
-            console.error("Error procesando GPX:", err);
-            showM("❌ Error", "No se pudo procesar el archivo GPX");
-        }
-    };
+      // Si NO había waypoints, usar primer y último trackpoint
+      if (!hasWaypoints) {
+        console.log('Sin waypoints, usando extremos del track');
+        o = [pts[0][1], pts[0][0]];
+        d = [pts[pts.length - 1][1], pts[pts.length - 1][0]];
 
-    console.log("Leyendo archivo...");
-    r.readAsText(input.files[0]);
-    input.value = '';
-}async function showLocationAtKm() {
-  if (!activeRoute || !activeRoute.geo) return;
+        document.getElementById('ori').value = `${o[1].toFixed(4)}, ${o[0].toFixed(4)}`;
+        document.getElementById('des').value = `${d[1].toFixed(4)}, ${d[0].toFixed(4)}`;
+      }
 
-  const kmInput = document.getElementById('km-input');
-  const targetKm = parseFloat(kmInput.value) * 1000;
-  const coords = activeRoute.geo.geometry.coordinates;
+      renderStops();
+      closeS();
 
-  let targetPoint = null;
-  let accumDist = 0;
+      // Mensaje de éxito con detalles
+      let msg = `<b>✅ GPX Importado</b><br><br>`;
+      msg += `📍 Puntos de ruta: ${pts.length}<br>`;
+      if (wpts.length > 0) {
+        msg += `🚩 Waypoints: ${wpts.length}<br>`;
+        msg += `🛑 Paradas intermedias: ${stops.length}<br><br>`;
+      }
+      msg += `Pulsa <b>GENERAR RUTA</b> para calcular`;
 
-  for (let i = 1; i < coords.length; i++) {
-    const segDist = L.latLng(coords[i-1][1], coords[i-1][0]).distanceTo(L.latLng(coords[i][1], coords[i][0]));
-    accumDist += segDist;
-    if (accumDist >= targetKm) {
-      targetPoint = coords[i];
-      break;
+      showM('Importación Exitosa', msg);
+      console.log('=== GPX importado exitosamente ===');
+
+    } catch(err) {
+      console.error('Error procesando GPX:', err);
+      showM('Error', 'No se pudo procesar el archivo GPX: ' + err.message);
     }
-  }
+  };
 
-  if (!targetPoint) targetPoint = coords[Math.floor(coords.length / 2)];
-
-  // ✅ GUARDAR COORDENADAS GLOBALMENTE
-  savedTargetCoords = targetPoint;
-
-  const display = document.getElementById('location-display');
-  display.style.display = 'block';
-  display.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Buscando dirección...';
-
-  try {
-    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${targetPoint[1]}&lon=${targetPoint[0]}`);
-    const data = await res.json();
-
-    const city = data.address.city || data.address.town || data.address.village || '';
-    const road = data.address.road || '';
-    const country = data.address.country || '';
-
-    display.innerHTML = `
-      <div>
-        <b style="color:var(--accent);"><i class="fa fa-map-marker-alt"></i> Punto en KM ${kmInput.value}</b><br>
-        <span style="font-size:0.85rem;color:#fff;margin-top:5px;display:block;">${road ? road + ', ' : ''}${city}</span>
-        <span style="font-size:0.75rem;color:#888;">${country}</span><br>
-        <span style="font-size:0.7rem;color:#666;margin-top:3px;display:block;">📍 ${targetPoint[1].toFixed(5)}, ${targetPoint[0].toFixed(5)}</span>
-        <button class="popup-btn" style="margin-top:10px;font-size:0.8rem;padding:8px 16px;width:100%;background:#2b7cff;" onclick="copyLocationToClipboard('${targetPoint[1]}', '${targetPoint[0]}', 'km');">
-          <i class="fa fa-copy"></i> Copiar ubicación
-        </button>
-      </div>
-    `;
-  } catch (err) {
-    display.innerHTML = '<span style="color:#ff4b2b;"><i class="fa fa-exclamation-triangle"></i> Error al buscar dirección</span>';
-  }
+  console.log('Leyendo archivo...');
+  r.readAsText(input.files[0]);
+  input.value = ''; // Reset input para permitir re-importar mismo archivo
 }
+// FIN
+
 
 async function showLocationAtTime() {
   if (!activeRoute || !activeRoute.geo) return;
