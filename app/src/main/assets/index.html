@@ -120,7 +120,9 @@
         .in-wrap input, .in-wrap select { flex: 1; background: #1a1b26; border: 1px solid #414868; padding: 10px; color: white; border-radius: 4px; box-sizing: border-box; font-size: 0.8rem; appearance: none; }
         .clear-btn { position: absolute; right: 10px; color: #565f89; cursor: pointer; font-size: 18px; }
 
-        .add-stop-row { display: flex; justify-content: center; margin-bottom: 8px; }
+        .add-stop-row { display: flex; flex-direction: row; align-items: center; gap: 8px; margin-bottom: 8px; margin-left: 30px; }
+.swap-btn { padding: 4px 8px; background: rgba(91, 192, 222, 0.15); border: 1px dashed var(--accent); color: var(--accent); border-radius: 4px; cursor: pointer; font-size: 1rem; font-weight: bold; display: flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; transition: background 0.3s; }
+.swap-btn:hover { background: rgba(91, 192, 222, 0.3); }
         .add-stop-btn { padding: 4px 15px; background: rgba(91, 192, 222, 0.15); border: 1px dashed var(--accent); color: var(--accent); border-radius: 4px; cursor: pointer; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
 
         .stop-row { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; background: rgba(91, 192, 222, 0.1); border-radius: 4px; padding: 4px; }
@@ -467,9 +469,8 @@ input[id^="stop-input-"]:focus {
 
         <div id="stops-container"></div>
         <div class="add-stop-row">
-            <div class="add-stop-btn" onclick="addBlankStop()">
-                <i class="fa fa-map-marker-alt"></i> <span>+ Parada</span>
-            </div>
+            <div class="swap-btn" onclick="swapOriginDestino()" title="Intercambiar Origen y Destino">🔃</div>
+            <div class="add-stop-btn" onclick="addBlankStop()"><i class="fa fa-map-marker-alt"></i> <span>Parada</span></div>
         </div>
 
         <div class="in-wrap">
@@ -960,7 +961,73 @@ function closeSplash() {
     function closeM(){ document.getElementById('app-modal').style.display='none'; }
     window.onclick = function(e) { if(e.target == document.getElementById('app-modal')) closeM(); }
 
-    function addBlankStop() { stops.push({c: null, name: ''}); renderStops(); }
+    // INICIO-FIN BLOQUE SWAP ORIGEN/DESTINO
+function swapOriginDestino() {
+  const oriInput = document.getElementById('ori');
+  const desInput = document.getElementById('des');
+
+  const oriValue = oriInput.value.trim();
+  const desValue = desInput.value.trim();
+
+  // VALIDACIÓN: Verificar que ambos campos tengan algo escrito
+  if (!oriValue && !desValue) {
+    showM('⚠️ Campos vacíos', '<p>No hay nada para intercambiar.</p><p style="font-size:0.8rem; color:#aaa; margin-top:10px;"><b>Solución:</b><br>1. Escribe origen y destino<br>2. Luego podrás intercambiarlos</p>');
+    return;
+  }
+
+  if (!oriValue) {
+    showM('⚠️ Origen vacío', '<p>El campo <b>Origen</b> está vacío.</p><p style="font-size:0.8rem; color:#aaa; margin-top:10px;">Escribe una dirección de origen primero.</p>');
+    return;
+  }
+
+  if (!desValue) {
+    showM('⚠️ Destino vacío', '<p>El campo <b>Destino</b> está vacío.</p><p style="font-size:0.8rem; color:#aaa; margin-top:10px;">Escribe una dirección de destino primero.</p>');
+    return;
+  }
+
+  // VALIDACIÓN: Verificar que tengan coordenadas
+  if (!o || !o[0] || !o[1]) {
+    showM('⚠️ Origen sin validar', '<p>El origen no tiene coordenadas válidas.</p><p style="font-size:0.8rem; color:#aaa; margin-top:10px;"><b>Solución:</b><br>Selecciona una opción de las sugerencias al escribir.</p>');
+    return;
+  }
+
+  if (!d || !d[0] || !d[1]) {
+    showM('⚠️ Destino sin validar', '<p>El destino no tiene coordenadas válidas.</p><p style="font-size:0.8rem; color:#aaa; margin-top:10px;"><b>Solución:</b><br>Selecciona una opción de las sugerencias al escribir.</p>');
+    return;
+  }
+
+  // ✅ TODO CORRECTO - Intercambiar
+  // Guardar temporales
+  const tempValue = oriInput.value;
+  const tempCoords = [...o];
+
+  // Intercambiar TEXTOS
+  oriInput.value = desInput.value;
+  desInput.value = tempValue;
+
+  // Intercambiar COORDENADAS
+  o = [...d];
+  d = tempCoords;
+
+  // Intercambiar estilos de BORDE (validación verde)
+  const oriBorder = oriInput.style.borderColor;
+  const oriBorderWidth = oriInput.style.borderWidth;
+  const desBorder = desInput.style.borderColor;
+  const desBorderWidth = desInput.style.borderWidth;
+
+  oriInput.style.borderColor = desBorder || '#414868';
+  oriInput.style.borderWidth = desBorderWidth || '1px';
+  desInput.style.borderColor = oriBorder || '#414868';
+  desInput.style.borderWidth = oriBorderWidth || '1px';
+
+  // Marcar que hay cambios pendientes
+  markUpdate();
+
+  console.log('✅ Origen ⇄ Destino intercambiados correctamente');
+}
+// FIN BLOQUE
+
+function addBlankStop() { stops.push({c: null, name: ''}); renderStops(); }
 // INICIO - RENDERIZAR PARADAS CON BÚSQUEDA
 function renderStops() {
   const c = document.getElementById('stops-container');
@@ -1009,6 +1076,10 @@ function attachStopSearch(index) {
   input.oninput = async function() {
     stops[index].name = input.value;
 
+    // NUEVO: Resetear borde al escribir
+    input.style.borderColor = '#414868';
+    input.style.borderWidth = '1px';
+
     if (input.value.length < 3) {
       sugg.style.display = 'none';
       return;
@@ -1032,22 +1103,20 @@ function attachStopSearch(index) {
         data.forEach(x => {
           const dv = document.createElement('div');
           dv.className = 'sugg-i';
-          dv.textContent = x.display_name.split(',')[0];
+          dv.textContent = x.display_name.split(',').slice(0, 3).join(', ');
 
           dv.onmousedown = function() {
-  const coords = [parseFloat(x.lon), parseFloat(x.lat)];
-  stops[index].c = coords;
-  stops[index].name = x.display_name.split(',')[0];
-  input.value = stops[index].name;
-  sugg.style.display = 'none';
+            const coords = [parseFloat(x.lon), parseFloat(x.lat)];
+            stops[index].c = coords;
+            stops[index].name = x.display_name.split(',').slice(0, 2).join(',');
+            input.value = stops[index].name;
+            sugg.style.display = 'none';
 
-  // ✅ NUEVO: Cambiar borde a verde para indicar que está OK
-  input.style.borderColor = '#4caf50';
-  input.style.borderWidth = '2px';
-
-  markUpdate();
-};
-
+            // NUEVO: Borde verde al seleccionar
+            input.style.borderColor = '#4caf50';
+            input.style.borderWidth = '2px';
+            markUpdate();
+          };
 
           sugg.appendChild(dv);
         });
@@ -1058,7 +1127,15 @@ function attachStopSearch(index) {
   };
 
   input.onblur = function() {
-    setTimeout(() => { sugg.style.display = 'none'; }, 200);
+    setTimeout(() => {
+      sugg.style.display = 'none';
+
+      // NUEVO: Verificar si tiene coordenadas válidas al perder foco
+      if (stops[index].c && stops[index].c[0] && stops[index].c[1]) {
+        input.style.borderColor = '#4caf50';
+        input.style.borderWidth = '2px';
+      }
+    }, 200);
   };
 }
 
@@ -1161,14 +1238,14 @@ async function search(id, sid, type) {
         data.forEach(x => {
           const dv = document.createElement('div');
           dv.className = 'sugg-i';
-          dv.textContent = x.display_name.split(',')[0];
+          dv.textContent = x.display_name.split(',').slice(0, 3).join(', ');
 
           dv.onmousedown = () => {
   const coords = [parseFloat(x.lon), parseFloat(x.lat)];
   if (type === 'o') o = coords;
   else d = coords;
   s.style.display = 'none';
-  i.value = x.display_name.split(',')[0];
+  i.value = x.display_name.split(',').slice(0, 2).join(',');
 
   // ✅ NUEVO: Borde verde al seleccionar
   i.style.borderColor = '#4caf50';
