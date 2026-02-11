@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -101,15 +101,129 @@
         .brand-title { margin: 0; font-size: 1.1rem; font-weight: 900; line-height: 1; animation: titlePulse 4s infinite ease-in-out; }
         @keyframes titlePulse { 0% { color: #fff; } 50% { color: var(--r1); text-shadow: 0 0 10px var(--r1); } 100% { color: #fff; } }
         .brand-sub { font-family: 'Poppins', sans-serif; font-weight: 300; font-size: 0.75rem; color: var(--r1); display: block; margin-top: 2px; }
-        .brand-ver { font-size: 0.7rem; color: #555; }
+        .brand-ver {
+    font-size: 0.6rem;
+    color: #555;
+    white-space: nowrap;
+    line-height: 1;
+    margin: 0;
+    padding: 2px 4px;
+    text-align: right;
+    width: 100%;
+}
 
-        .lang-container { position: relative; text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
-        .lang-select-btn { background: #222; border: 1px solid #444; color: white; font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; cursor: pointer; margin-bottom: 2px; min-width: 30px; text-align: center; }
-        .lang-dropdown { display: none; position: absolute; top: 25px; right: 0; background: #1a1b26; border: 1px solid var(--accent); border-radius: 4px; z-index: 6000; min-width: 120px; max-height: 250px; overflow-y: auto; }
-        .lang-opt { padding: 8px; font-size: 0.75rem; border-bottom: 1px solid #333; cursor: pointer; color: #ccc; }
+
+        .lang-container {
+    position: relative;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: auto;
+    max-width: 130px;
+    gap: 3px;
+    box-sizing: border-box;
+}
+
+
+/* INICIO BLOQUE - BOTÓN IDIOMA COMPACTO v2.0.5 */
+.lang-select-btn {
+    background: #222;
+    border: 1px solid #444;
+    color: white;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 0;
+    width: auto;
+    max-width: 130px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.lang-select-btn:hover {
+    background: #333;
+    border-color: var(--accent);
+}
+
+.lang-select-btn img {
+    width: 16px;
+    height: 12px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.lang-select-btn span {
+    font-size: 0.7rem;
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* FIN BLOQUE */
+
+        .lang-dropdown {
+    display: none;
+    position: absolute;
+    top: 28px;
+    right: 0;
+    background: #1a1b26;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    z-index: 6000;
+    min-width: 180px;
+    max-width: 220px;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+}
+/* INICIO BLOQUE - OPCIONES DROPDOWN ALINEADAS v2.0.4 */
+.lang-opt {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    color: #ccc;
+    display: flex;           /* ← CLAVE: flex */
+    align-items: center;     /* ← CLAVE: centrar verticalmente */
+    gap: 8px;                /* ← Espacio uniforme entre bandera y texto */
+    min-height: 36px;        /* ← Altura mínima consistente */
+}
+
+.lang-opt:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.lang-opt img {
+    width: 20px;             /* ← Mismo tamaño que botón */
+    height: 15px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;          /* ← No reducir */
+}
+
+.lang-opt span:first-of-type {
+    font-size: 1rem;         /* ← Emojis */
+    line-height: 1;
+    flex-shrink: 0;
+}
+/* FIN BLOQUE */
         .lang-opt:hover { background: rgba(255,255,255,0.1); color: white; }
-        .lang-disabled { color: #555; pointer-events: none; font-style: italic; background: #111; }
-
+        .lang-disabled { color: #555; pointer-events: none; font-style: italic; background: #111; }/* BANDERAS SVG */
+.lang-select-btn img, .lang-opt img {
+    width: 22px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 2px;
+    margin-right: 6px;
+}
         .collapsible { background: none; border: none; color: var(--accent); width: 100%; text-align: left; padding: 12px 0; font-weight: 900; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; margin-top: 5px; }
         .coll-content { display: none; padding-top: 15px; }
         .coll-content.active { display: block; }
@@ -621,36 +735,402 @@ input[id^="stop-input-"]:focus {
     let abortController = null;
     let avgSpeed = 70;
     let savedTargetCoords = null;
-    let currentLang = 'Cast';
+    // INICIO BLOQUE - CONFIGURACIÓN PAÍSES E IDIOMAS v2.0.4 COMPLETA
+let currentLang = 'Castellano';
 
-    const LANGS = {
-        'España': { flag: '🇪🇸', def: 'Cast', options: ['Cast', 'Cat', 'Val', 'Gale', 'Eus', 'Ara', 'Inglés'] },
-        'France': { flag: '🇫🇷', def: 'Fr', options: ['Fr', 'Br', 'Occ', 'Inglés'] },
-        'Andorra': { flag: '🇦🇩', def: 'Cat', options: ['Cat', 'Cast', 'Fr', 'Pt', 'Inglés'] },
-        'Portugal': { flag: '🇵🇹', def: 'Pt', options: ['Pt', 'Inglés'] }
+    // Configuración de idiomas con banderas
+    const LANG_FLAGS = {
+        'Castellano': '🇪🇸',
+        'Català': 'flags/catalonia.png',
+        'Valencià': 'flags/valencia.png',
+        'Galego': 'flags/galicia.png',
+        'Euskera': 'flags/euskadi.png',
+        'Aranés': 'flags/aranes.png',
+        'Français': '🇫🇷',
+        'Brezhoneg': 'flags/brezhoneg.png',
+        'Occità': 'flags/occitania.png',
+        'Português': '🇵🇹',
+        'Italiano': '🇮🇹',
+        'English': '🇬🇧'
     };
-    const UNAVAILABLE = ['Val', 'Gale', 'Eus', 'Ara', 'Br', 'Occ'];
+
+    // Configuración de países
+    const COUNTRY_CONFIG = {
+        'España': {
+            flag: '🇪🇸',
+            defaultLang: 'Castellano',
+            languages: ['Castellano', 'Català', 'Valencià', 'Galego', 'Euskera', 'Aranés']
+        },
+        'France': {
+            flag: '🇫🇷',
+            defaultLang: 'Français',
+            languages: ['Français', 'Brezhoneg', 'Occità']
+        },
+        'Andorra': {
+            flag: '🇦🇩',
+            defaultLang: 'Català',
+            languages: ['Català', 'Castellano', 'Français', 'Português']
+        },
+        'Portugal': {
+            flag: '🇵🇹',
+            defaultLang: 'Português',
+            languages: ['Português']
+        },
+        'Italia': {
+            flag: '🇮🇹',
+            defaultLang: 'Italiano',
+            languages: ['Italiano']
+        }
+    };
+
+    // Idioma universal (siempre disponible)
+    const UNIVERSAL_LANG = 'English';
+
+
 
     const DICT = {
-        'Cast': { plan: 'PLANIFICACIÓN', conf: 'CONFIGURACIÓN RIDER', info: 'INFORMACIÓN EN RUTA', hist: 'HISTORIAL', cont: 'CONTACTO / LEGAL', inv: 'Invítame a gasolina' },
-        'Cat': { plan: 'PLANIFICACIÓ', conf: 'CONFIGURACIÓ RIDER', info: 'INFORMACIÓ EN RUTA', hist: 'HISTORIAL', cont: 'CONTACTE / LEGAL', inv: 'Convida\'m a benzina' },
-        'Fr': { plan: 'PLANIFICATION', conf: 'CONFIGURATION RIDER', info: 'INFOS SUR ROUTE', hist: 'HISTORIQUE', cont: 'CONTACT / LEGAL', inv: 'Offrez-moi du gaz' },
-        'Pt': { plan: 'PLANEAMENTO', conf: 'CONFIGURAÇÃO RIDER', info: 'INFORMAÇÃO ROTA', hist: 'HISTÓRICO', cont: 'CONTACTO / LEGAL', inv: 'Ofereça gasolina' },
-        'Inglés': { plan: 'PLANNING', conf: 'RIDER CONFIG', info: 'ROUTE INFO', hist: 'HISTORY', cont: 'CONTACT / LEGAL', inv: 'Buy me gas' }
-    };
+    'Castellano': {
+        plan: 'PLANIFICACIÓN',
+        conf: 'CONFIGURACIÓN RIDER',
+        info: 'INFORMACIÓN EN RUTA',
+        hist: 'HISTORIAL',
+        files: 'ARCHIVOS',
+        cont: 'CONTACTO LEGAL',
+        inv: 'Invítame a gasolina',
+        orig: 'Escribe tu Origen',
+        dest: 'Escribe tu Destino',
+        pstop: 'Parada intermedia',
+        curv: 'Revirado',
+        gas2: 'Gasolina x2',
+        toll: 'Evitar peajes',
+        radar: 'Escanear Radares',
+        poidet: 'Info Detalles POI',
+        wx50: 'Clima cada 50km',
+        gasst: 'Ver Gasolineras',
+        aspd: 'Vel. Media',
+        gen: 'GENERAR RUTA',
+        clean: 'Limpiar',
+        share: 'Compartir con...',
+        openm: 'Abrir App Maps',
+        readl: 'Lector Enlaces',
+        dlgpx: 'Descargar GPX',
+        impgpx: 'Importar GPX',
+        genpdf: 'GENERAR PDF',
+        leg_rad: 'Radares',
+        leg_gas: 'Gasol',
+        leg_toll: 'Peajes',
+                leg_stop: 'Paradas',
+        // Stats flotantes
+        lbl_km: 'KM',
+        lbl_trip: 'VIAJE',
+        lbl_toll_stat: 'PEAJES',
+        lbl_warn: 'AVISOS',
+        lbl_dest: 'DESTINO',
+        // Otros
+        total_gen: 'Total Generadas',
+        add_stop: 'Parada',
+                swap: 'Intercambiar Origen y Destino',
+
+        // Leyenda expandida
+        leg_route: 'Ruta',
+        leg_legend: '📌 Leyenda',
+
+        // Modal Legal/Ayuda
+        modal_legal_title: 'RutiWay - Tutorial, Legal y Ayuda',
+        modal_legal_privacy: '1. Privacidad',
+        modal_legal_privacy_txt: 'RutiWay no almacena su ubicación en ningún servidor. Todos los datos se procesan en tiempo real en su dispositivo para el cálculo de rutas. No compartimos información personal con terceros.',
+        modal_legal_data: '2. Datos y Servicios',
+        modal_legal_data_txt: 'Utilizamos servicios de OpenRouteService (rutas), OpenMeteo (clima) y OpenStreetMap (mapas). Estos servicios pueden recopilar datos de uso según sus propias políticas de privacidad.',
+        modal_legal_files: '3. Archivos Generados',
+        modal_legal_files_txt: 'Los archivos GPX y PDF se generan y guardan localmente en su dispositivo en la carpeta /Descargas/RutiWay/. RutiWay no tiene acceso a otros archivos de su dispositivo.',
+        modal_legal_perms: '4. Permisos',
+        modal_legal_perms_txt: '- Ubicación: Necesario para centrar el mapa y calcular rutas desde tu posición\n- Almacenamiento: Para guardar archivos GPX y PDF en tu dispositivo\n- Internet: Para cargar mapas, calcular rutas y obtener información del clima',
+        modal_legal_resp: '5. Responsabilidad',
+        modal_legal_resp_txt: 'RutiWay es una herramienta de planificación. El usuario es responsable de conducir de forma segura y cumplir las normas de tráfico. La información de radares y peajes es aproximada.',
+        modal_panel_title: 'INSTRUCCIONES PANEL',
+        modal_map_title: 'INSTRUCCIONES MAPA',
+
+        // Botones modales
+        btn_instructions: 'Instrucciones de Uso',
+        btn_legal: 'RutiWay - Legal / Ayuda',
+
+        // Mensajes popup
+        popup_support: 'Soporte RutiWay',
+        popup_routes_count: '¡Llevas {count} rutas legendarias!',
+        popup_invite: 'Invítame a un depósito para seguir rodando.',
+        popup_gas_btn: '¡Gas a fondo!',
+
+        // Confirmaciones
+        confirm_clear: '¿Limpiar todo el mapa e historial?',
+        confirm_delete_route: '¿Eliminar esta ruta del historial?'
+
+
+    },
+    'Català': {
+        plan: 'PLANIFICACIÓ',
+        conf: 'CONFIGURACIÓ RIDER',
+        info: 'INFORMACIÓ EN RUTA',
+        hist: 'HISTORIAL',
+        files: 'ARXIUS',
+        cont: 'CONTACTE LEGAL',
+        inv: 'Convida\'m a benzina',
+        orig: 'Escriu el teu Origen',
+        dest: 'Escriu la teva Destinació',
+        pstop: 'Parada intermèdia',
+        curv: 'Corbes',
+        gas2: 'Benzina x2',
+        toll: 'Evitar peatges',
+        radar: 'Escanejar Radars',
+        poidet: 'Info Detalls POI',
+        wx50: 'Clima cada 50km',
+        gasst: 'Veure Benzineres',
+        aspd: 'Vel. Mitjana',
+        gen: 'GENERAR RUTA',
+        clean: 'Netejar',
+        share: 'Compartir amb...',
+        openm: 'Obrir App Maps',
+        readl: 'Lector Enllaços',
+        dlgpx: 'Descarregar GPX',
+        impgpx: 'Importar GPX',
+        genpdf: 'GENERAR PDF',
+        leg_rad: 'Radars',
+        leg_gas: 'Benzin',
+        leg_toll: 'Peatges',
+                leg_stop: 'Parades',
+        // Stats flotantes
+        lbl_km: 'KM',
+        lbl_trip: 'VIATGE',
+        lbl_toll_stat: 'PEATGES',
+        lbl_warn: 'AVISOS',
+        lbl_dest: 'DESTINACIÓ',
+        // Otros
+        total_gen: 'Total Generades',
+        add_stop: 'Parada',
+                swap: 'Intercanviar Origen i Destinació',
+
+        // Leyenda expandida
+        leg_route: 'Ruta',
+        leg_legend: '📌 Llegenda',
+
+        // Modal Legal/Ayuda
+        modal_legal_title: 'RutiWay - Tutorial, Legal i Ajuda',
+        modal_legal_privacy: '1. Privacitat',
+        modal_legal_privacy_txt: 'RutiWay no emmagatzema la teva ubicació en cap servidor. Totes les dades es processen en temps real al teu dispositiu per al càlcul de rutes. No compartim informació personal amb tercers.',
+        modal_legal_data: '2. Dades i Serveis',
+        modal_legal_data_txt: 'Utilitzem serveis d\'OpenRouteService (rutes), OpenMeteo (clima) i OpenStreetMap (mapes). Aquests serveis poden recollir dades d\'ús segons les seves pròpies polítiques de privacitat.',
+        modal_legal_files: '3. Arxius Generats',
+        modal_legal_files_txt: 'Els arxius GPX i PDF es generen i guarden localment al teu dispositiu a la carpeta /Descàrregues/RutiWay/. RutiWay no té accés a altres arxius del teu dispositiu.',
+        modal_legal_perms: '4. Permisos',
+        modal_legal_perms_txt: '- Ubicació: Necessari per centrar el mapa i calcular rutes des de la teva posició\n- Emmagatzematge: Per guardar arxius GPX i PDF al teu dispositiu\n- Internet: Per carregar mapes, calcular rutes i obtenir informació del clima',
+        modal_legal_resp: '5. Responsabilitat',
+        modal_legal_resp_txt: 'RutiWay és una eina de planificació. L\'usuari és responsable de conduir de forma segura i complir les normes de trànsit. La informació de radars i peatges és aproximada.',
+        modal_panel_title: 'INSTRUCCIONS PANELL',
+        modal_map_title: 'INSTRUCCIONS MAPA',
+
+        // Botones modales
+        btn_instructions: 'Instruccions d\'Ús',
+        btn_legal: 'RutiWay - Legal / Ajuda',
+
+        // Mensajes popup
+        popup_support: 'Suport RutiWay',
+        popup_routes_count: 'Portes {count} rutes llegendàries!',
+        popup_invite: 'Convida\'m a un dipòsit per continuar rodant.',
+        popup_gas_btn: 'Gas a fons!',
+
+        // Confirmaciones
+        confirm_clear: 'Netejar tot el mapa i historial?',
+        confirm_delete_route: 'Eliminar aquesta ruta de l\'historial?'
+
+
+    },
+    'Français': {
+        plan: 'PLANIFICATION',
+        conf: 'CONFIGURATION RIDER',
+        info: 'INFOS SUR ROUTE',
+        hist: 'HISTORIQUE',
+        files: 'FICHIERS',
+        cont: 'CONTACT LEGAL',
+        inv: 'Offrez-moi du gaz',
+        orig: 'Écrivez votre Origine',
+        dest: 'Écrivez votre Destination',
+        pstop: 'Arrêt intermédiaire',
+        curv: 'Virages',
+        gas2: 'Essence x2',
+        toll: 'Éviter péages',
+        radar: 'Scanner Radars',
+        poidet: 'Info Détails POI',
+        wx50: 'Météo tous 50km',
+        gasst: 'Voir Stations',
+        aspd: 'Vitesse Moy.',
+        gen: 'GÉNÉRER ROUTE',
+        clean: 'Nettoyer',
+        share: 'Partager avec...',
+        openm: 'Ouvrir App Maps',
+        readl: 'Lecteur Liens',
+        dlgpx: 'Télécharger GPX',
+        impgpx: 'Importer GPX',
+        genpdf: 'GÉNÉRER PDF',
+        leg_rad: 'Radars',
+        leg_gas: 'Essence',
+        leg_toll: 'Péages',
+                leg_stop: 'Arrêts',
+        lbl_km: 'KM', lbl_trip: 'VOYAGE', lbl_toll_stat: 'PÉAGES', lbl_warn: 'AVIS',
+        lbl_dest: 'DESTINATION', total_gen: 'Total', add_stop: 'Arrêt', swap: 'Échanger'
+
+    },
+    'Português': {
+        plan: 'PLANEAMENTO',
+        conf: 'CONFIGURAÇÃO RIDER',
+        info: 'INFORMAÇÃO ROTA',
+        hist: 'HISTÓRICO',
+        files: 'ARQUIVOS',
+        cont: 'CONTACTO LEGAL',
+        inv: 'Ofereça gasolina',
+        orig: 'Escreva sua Origem',
+        dest: 'Escreva seu Destino',
+        pstop: 'Parada intermediária',
+        curv: 'Curvas',
+        gas2: 'Gasolina x2',
+        toll: 'Evitar portagens',
+        radar: 'Escanear Radares',
+        poidet: 'Info Detalhes POI',
+        wx50: 'Clima cada 50km',
+        gasst: 'Ver Postos',
+        aspd: 'Vel. Média',
+        gen: 'GERAR ROTA',
+        clean: 'Limpar',
+        share: 'Partilhar com...',
+        openm: 'Abrir App Maps',
+        readl: 'Leitor Links',
+        dlgpx: 'Baixar GPX',
+        impgpx: 'Importar GPX',
+        genpdf: 'GERAR PDF',
+        leg_rad: 'Radares',
+        leg_gas: 'Gasolina',
+        leg_toll: 'Portagens',
+                leg_stop: 'Paradas',
+        lbl_km: 'KM', lbl_trip: 'VIAGEM', lbl_toll_stat: 'PORTAGENS', lbl_warn: 'AVISOS',
+        lbl_dest: 'DESTINO', total_gen: 'Total', add_stop: 'Parada', swap: 'Trocar'
+
+    },
+    'Italiano': {
+        plan: 'PIANIFICAZIONE',
+        conf: 'CONFIGURAZIONE RIDER',
+        info: 'INFO PERCORSO',
+        hist: 'STORICO',
+        files: 'FILE',
+        cont: 'CONTATTO LEGALE',
+        inv: 'Offrimi benzina',
+        orig: 'Scrivi la tua Origine',
+        dest: 'Scrivi la tua Destinazione',
+        pstop: 'Fermata intermedia',
+        curv: 'Curve',
+        gas2: 'Benzina x2',
+        toll: 'Evita pedaggi',
+        radar: 'Scansiona Autovelox',
+        poidet: 'Info Dettagli POI',
+        wx50: 'Meteo ogni 50km',
+        gasst: 'Vedi Stazioni',
+        aspd: 'Vel. Media',
+        gen: 'GENERA PERCORSO',
+        clean: 'Pulisci',
+        share: 'Condividi con...',
+        openm: 'Apri App Maps',
+        readl: 'Lettore Link',
+        dlgpx: 'Scarica GPX',
+        impgpx: 'Importa GPX',
+        genpdf: 'GENERA PDF',
+        leg_rad: 'Autovelox',
+        leg_gas: 'Benzina',
+        leg_toll: 'Pedaggi',
+                leg_stop: 'Fermate',
+        lbl_km: 'KM', lbl_trip: 'VIAGGIO', lbl_toll_stat: 'PEDAGGI', lbl_warn: 'AVVISI',
+        lbl_dest: 'DESTINAZIONE', total_gen: 'Totale', add_stop: 'Fermata', swap: 'Scambia'
+
+    },
+    'English': {
+        plan: 'PLANNING',
+        conf: 'RIDER CONFIG',
+        info: 'ROUTE INFO',
+        hist: 'HISTORY',
+        files: 'FILES',
+        cont: 'CONTACT LEGAL',
+        inv: 'Buy me gas',
+        orig: 'Enter your Origin',
+        dest: 'Enter your Destination',
+        pstop: 'Intermediate stop',
+        curv: 'Curves',
+        gas2: 'Fuel x2',
+        toll: 'Avoid tolls',
+        radar: 'Scan Radars',
+        poidet: 'POI Details Info',
+        wx50: 'Weather every 50km',
+        gasst: 'Show Gas Stations',
+        aspd: 'Avg. Speed',
+        gen: 'GENERATE ROUTE',
+        clean: 'Clean',
+        share: 'Share with...',
+        openm: 'Open Maps App',
+        readl: 'Link Reader',
+        dlgpx: 'Download GPX',
+        impgpx: 'Import GPX',
+        genpdf: 'GENERATE PDF',
+        leg_rad: 'Radars',
+        leg_gas: 'Gas',
+        leg_toll: 'Tolls',
+                leg_stop: 'Stops',
+        lbl_km: 'KM', lbl_trip: 'TRIP', lbl_toll_stat: 'TOLLS', lbl_warn: 'WARNINGS',
+        lbl_dest: 'DESTINATION', total_gen: 'Total', add_stop: 'Stop', swap: 'Swap'
+
+    }
+
+};
+
+
+    // FIN BLOQUE
+// INICIO BLOQUE - COMPATIBILIDAD TEMPORAL (BORRAR DESPUÉS)
+const LANGS = {
+    'España': {
+        flag: '🇪🇸',
+        def: 'Castellano',
+        options: ['Castellano', 'Català', 'Valencià', 'Galego', 'Euskera', 'Aranés', 'English']
+    },
+    'France': {
+        flag: '🇫🇷',
+        def: 'Français',
+        options: ['Français', 'Brezhoneg', 'Occità', 'English']
+    },
+    'Andorra': {
+        flag: '🇦🇩',
+        def: 'Català',
+        options: ['Català', 'Castellano', 'Français', 'Português', 'English']
+    },
+    'Portugal': {
+        flag: '🇵🇹',
+        def: 'Português',
+        options: ['Português', 'English']
+    },
+    'Italia': {
+        flag: '🇮🇹',
+        def: 'Italiano',
+        options: ['Italiano', 'English']
+    }
+};
+// FIN BLOQUE COMPATIBILIDAD
+
 
     // INICIO - WINDOW ONLOAD CON SPLASH
-window.onload = function() {
-    updateCountry();
-    setTimeout(loadConfig, 100);
-    updateBtnStyle();
-    updateRouteCountUI();
+    window.onload = function() {
+        updateCountry();
+        setTimeout(loadConfig, 100);
+        updateBtnStyle();
+        updateRouteCountUI();
 
-    // SPLASH: Cerrar al hacer clic en cualquier parte
-    document.getElementById('splash-screen').addEventListener('click', closeSplash);
+        // SPLASH: Cerrar al hacer clic en cualquier parte
+        document.getElementById('splash-screen').addEventListener('click', closeSplash);
 
-    // NO abrir menú automáticamente (esperar splash)
-}
+        // NO abrir menú automáticamente (esperar splash)
+    }
 
 function closeSplash() {
     const splash = document.getElementById('splash-screen');
@@ -677,40 +1157,197 @@ function closeSplash() {
         const el = document.getElementById('lang-list');
         el.style.display = el.style.display === 'block' ? 'none' : 'block';
     }
+// Idiomas no disponibles todavía (mostrar como deshabilitados)
+const UNAVAILABLE = ['Valencià', 'Galego', 'Euskera', 'Aranés', 'Brezhoneg', 'Occità'];
 
     function updateLangDropdown() {
-        const country = document.getElementById('s-country').value;
-        const opts = LANGS[country].options;
-        const list = document.getElementById('lang-list');
-        list.innerHTML = '';
-        opts.forEach(l => {
-            const isUnavail = UNAVAILABLE.includes(l);
-            const div = document.createElement('div');
-            div.className = 'lang-opt' + (isUnavail ? ' lang-disabled' : '');
-            div.innerText = l + (isUnavail ? ' (No disponible)' : '');
-            if(!isUnavail) {
-                div.onclick = () => {
-                    currentLang = l;
-                    document.getElementById('lang-btn').innerText = l;
-                    toggleLangDropdown();
-                    translateUI();
-                };
-            }
-            list.appendChild(div);
-        });
+    const country = document.getElementById('s-country').value;
+    const opts = LANGS[country].options;
+    const list = document.getElementById('lang-list');
+    list.innerHTML = '';
+
+    opts.forEach(l => {
+        const isUnavail = UNAVAILABLE.includes(l);
+        const flag = LANG_FLAGS[l]; // Usar LANG_FLAGS global
+        const div = document.createElement('div');
+
+        div.className = 'lang-opt' + (isUnavail ? ' lang-disabled' : '');
+
+        // Construir HTML con banderas
+        let optHTML = '';
+
+        if (flag && flag.startsWith('flags/')) {
+            // Es imagen PNG
+            optHTML = `<img src="${flag}" style="width:22px;height:16px;object-fit:cover;margin-right:8px;border-radius:2px;" onerror="this.style.display='none'"> ${l}`;
+        } else if (flag) {
+            // Es emoji
+            optHTML = `<span style="font-size:1.1rem;margin-right:8px;">${flag}</span> ${l}`;
+        } else {
+            // Sin bandera
+            optHTML = l;
+        }
+
+        if (isUnavail) {
+            optHTML += ' <span style="color:#666;font-size:0.7rem;">(Próximamente)</span>';
+        }
+
+        div.innerHTML = optHTML;
+
+        // Evento click solo si está disponible
+        if (!isUnavail) {
+            div.onclick = () => {
+                currentLang = l;
+                const btn = document.getElementById('lang-btn');
+
+                // Actualizar botón con bandera
+                if (flag && flag.startsWith('flags/')) {
+                    btn.innerHTML = `<img src="${flag}" style="width:22px;height:16px;object-fit:cover;margin-right:6px;vertical-align:middle;border-radius:2px;" onerror="this.innerHTML='${l}'"> <span>${l}</span>`;
+                } else if (flag) {
+                    btn.innerHTML = `<span style="font-size:1.2rem;margin-right:6px;">${flag}</span> <span>${l}</span>`;
+                } else {
+                    btn.innerText = l;
+                }
+
+                toggleLangDropdown();
+                translateUI();
+                saveConfig();
+            };
+        }
+
+        list.appendChild(div);
+    });
+}
+
+
+
+// INICIO BLOQUE - FUNCIÓN translateUI COMPLETA v2.0.4 CORREGIDA
+function translateUI() {
+    const t = DICT[currentLang];
+    if(!t) return;
+
+    // === MENÚ LATERAL ===
+    document.querySelector('.t-plan').innerText = t.plan;
+    document.querySelector('.t-conf').innerText = t.conf;
+    document.querySelector('.t-info').innerText = t.info;
+    document.querySelector('.t-hist').innerText = t.hist;
+    document.querySelector('.t-contact').innerText = t.cont;
+    document.getElementById('t-invite').innerText = t.inv;
+    document.getElementById('t-invite-2').innerText = t.inv;
+
+    // === PLACEHOLDERS ===
+    document.getElementById('ori').placeholder = t.orig;
+    document.getElementById('des').placeholder = t.dest;
+    document.querySelectorAll('.waypoint-input').forEach(input => {
+        input.placeholder = t.pstop;
+    });
+
+    // === CHECKBOXES ===
+    const reviradoDiv = document.getElementById('c-curvy')?.closest('.conf-item');
+    if(reviradoDiv) reviradoDiv.querySelector('div').innerHTML = `<i class="fa fa-route"></i> ${t.curv}`;
+
+    const gasDiv = document.getElementById('c-gas-x2')?.closest('.conf-item');
+    if(gasDiv) gasDiv.querySelector('div').innerHTML = `<span style="font-size:1.2em">⛽</span> ${t.gas2}`;
+
+    const tollDiv = document.getElementById('c-toll')?.closest('.row-s');
+    if(tollDiv) tollDiv.querySelector('div').innerHTML = `<i class="fa fa-money-bill-wave"></i> ${t.toll}`;
+
+    const radarDiv = document.getElementById('c-r')?.closest('.row-s');
+    if(radarDiv) radarDiv.querySelector('div').innerHTML = `<i class="fa fa-camera"></i> ${t.radar}`;
+
+    const poiDiv = document.getElementById('c-info')?.closest('.row-s');
+    if(poiDiv) poiDiv.querySelector('div').innerHTML = `<i class="fa fa-info-circle"></i> ${t.poidet}`;
+
+    const weatDiv = document.getElementById('c-weat')?.closest('.row-s');
+    if(weatDiv) weatDiv.querySelector('div').innerHTML = `<i class="fa fa-cloud-sun"></i> ${t.wx50}`;
+
+    const gasStDiv = document.getElementById('c-gas-vis')?.closest('.row-s');
+    if(gasStDiv) gasStDiv.querySelector('div:first-child').innerHTML = `<i class="fa fa-gas-pump" style="color:#ff9800;margin-right:5px;"></i> ${t.gasst}`;
+
+    const speedDiv = document.getElementById('avg-speed')?.closest('.row-s');
+    if(speedDiv) speedDiv.querySelector('div:first-child').innerHTML = `<i class="fa fa-tachometer-alt" style="color:#5bc0de;margin-right:5px;"></i> ${t.aspd} (Km/h)`;
+
+    // === BOTONES ARCHIVOS ===
+    const saveGpxBtn = document.querySelector('button[onclick="saveGPX()"]');
+    if(saveGpxBtn) saveGpxBtn.innerText = `💾 ${t.dlgpx}`;
+
+    const importLabel = document.querySelector('label.file-sub-btn');
+    if(importLabel && importLabel.childNodes[0]) importLabel.childNodes[0].nodeValue = `📥 ${t.impgpx} `;
+
+    const shareBtn = document.querySelector('button[onclick="shareRoute()"]');
+    if(shareBtn) shareBtn.innerText = `📤 ${t.share}`;
+
+    const mapsBtn = document.querySelector('button[onclick="openInMaps()"]');
+    if(mapsBtn) mapsBtn.innerText = `🗺️ ${t.openm}`;
+
+    const readerBtn = document.querySelector('button[onclick="impMaps()"]');
+    if(readerBtn) readerBtn.innerText = `🔗 ${t.readl}`;
+
+    const pdfBtn = document.querySelector('button[onclick="prePrintCheck()"]');
+    if(pdfBtn) pdfBtn.innerHTML = `<i class="fa fa-file-pdf"></i> ${t.genpdf}`;
+
+    // === BOTÓN SECCIÓN ARCHIVOS ===
+    const filesBtn = document.querySelector('button[onclick*="p-files"]');
+    if(filesBtn) filesBtn.innerHTML = `${t.files} <i class="fa fa-caret-down"></i>`;
+
+    // === BOTONES FLOTANTES STATS ===
+    const lblKm = document.getElementById('lbl-km');
+    if(lblKm) lblKm.innerText = t.lbl_km;
+
+    const lblTrip = document.getElementById('lbl-trip');
+    if(lblTrip) lblTrip.innerText = t.lbl_trip;
+
+    const lblToll = document.getElementById('lbl-toll');
+    if(lblToll) lblToll.innerText = t.lbl_toll_stat;
+
+    const lblWarn = document.getElementById('lbl-warn');
+    if(lblWarn) lblWarn.innerText = t.lbl_warn;
+
+    const lblDest = document.getElementById('lbl-dest');
+    if(lblDest) lblDest.innerText = t.lbl_dest;
+
+    // === BOTÓN GENERAR RUTA ===
+    const genBtn = document.getElementById('m-btn');
+    if(genBtn && !genBtn.classList.contains('generating')) {
+        const routeNum = genBtn.innerText.match(/#(\d+)/);
+        if(routeNum) {
+            genBtn.innerText = `${t.gen} #${routeNum[1]}`;
+        } else {
+            genBtn.innerText = `${t.gen} #1`;
+        }
     }
 
-    function translateUI() {
-        const t = DICT[currentLang];
-        if(!t) return;
-        document.querySelector('.t-plan').innerText = t.plan;
-        document.querySelector('.t-conf').innerText = t.conf;
-        document.querySelector('.t-info').innerText = t.info;
-        document.querySelector('.t-hist').innerText = t.hist;
-        document.querySelector('.t-contact').innerText = t.cont;
-        document.getElementById('t-invite').innerText = t.inv;
-        document.getElementById('t-invite-2').innerText = t.inv;
+    // === HISTORIAL BADGE ===
+    const badge = document.getElementById('total-routes-badge');
+    if(badge && routeGenCount > 0) {
+        badge.innerText = `${t.total_gen}: ${routeGenCount}`;
     }
+
+    // === BOTÓN AÑADIR PARADA ===
+    const addStopBtn = document.querySelector('.add-stop-btn');
+    if(addStopBtn) addStopBtn.innerHTML = `<i class="fa fa-map-marker-alt"></i> ${t.add_stop}`;
+
+       // === BOTÓN INTERCAMBIAR ===
+    const swapBtn = document.querySelector('.swap-btn');
+    if(swapBtn) swapBtn.setAttribute('title', t.swap);
+
+    // === ACTUALIZAR LEYENDA ===
+    if(typeof updateLegend === 'function') updateLegend();
+
+    // === BOTONES MODAL CONTACTO ===
+    const legalBtn = document.querySelector('button[onclick="openFullMenu()"]');
+    if(legalBtn) legalBtn.innerHTML = `<i class="fa fa-balance-scale"></i> ${t.btn_legal}`;
+
+    const instructBtn = document.querySelector('button[onclick="openInstructions()"]');
+    if(instructBtn) instructBtn.innerHTML = `<i class="fa fa-lightbulb"></i> ${t.btn_instructions}`;
+}
+// FIN BLOQUE
+
+
+
+// FIN BLOQUE
+
+
+
 
     function updateRegions() {
     const country = document.getElementById('s-country').value;
@@ -830,60 +1467,161 @@ function closeSplash() {
         setTimeout(() => { layer.style.display = 'none'; }, 3500);
     }
 
-    function openFullMenu() {
-        const legalTxt = `<b>1. Privacidad:</b> RutiWay no almacena su ubicación. Se usa en tiempo real para el cálculo de rutas.<br><b>2. Datos:</b> Utilizamos servicios de OpenRouteService y OpenMeteo. No compartimos datos personales.<br><b>3. Archivos:</b> Los GPX y PDF se generan y guardan localmente en su dispositivo.`;
-        const pIns = `
-            <b>1. Logo RutiWay:</b> Pulsa para abrir esta pantalla de Ayuda.<br>
-            <b>2. Idioma (Ver.X.X):</b> Pulsa para cambiar el idioma de la app.<br>
-            <b>3. Bandera/País:</b> Selecciona el país para cargar sus idiomas y regiones.<br>
-            <b>4. Círculo Verde (Origen):</b> Escribe dirección o mantén pulsado en el mapa.<br>
-            <b>5. + Parada:</b> Añade puntos intermedios. Copia aquí direcciones de Maps.<br>
-            <b>6. Bandera Cuadros (Destino):</b> Escribe dirección o mantén pulsado en el mapa.<br>
-            <b>7. Invítame a gasolina:</b> Botón para donaciones vía PayPal.<br>
-            <b>CONFIGURACIÓN RIDER:</b><br>
-            - <b>Revirado:</b> Prioriza carreteras con curvas.<br>
-            - <b>Gasolina x2:</b> Divide la ruta en tramos más cortos (más paradas).<br>
-            - <b>Evitar peaje:</b> Intenta no usar carreteras de pago (precios aprox).<br>
-            <b>INFORMACIÓN EN RUTA:</b> Activa/desactiva la visualización de Radares, POIs, Clima y Gasolineras en el mapa.<br>
-            <b>HISTORIAL:</b> Muestra las rutas generadas. Indica el total. Pulsa para ver en mapa.<br>
-            <b>ARCHIVOS:</b><br>
-            - <b>Gestión GPX:</b> Importar y Exportar trazas GPX.<br>
-            - <b>MAPS:</b> Compartir ruta o abrirla en apps externas.<br>
-            - <b>GENERAR PDF:</b> Crea un informe de ruta para imprimir/guardar.<br>
-            <b>GENERAR RUTA:</b> Calcula y muestra la ruta en el mapa. Parpadea si hay cambios.
-        `;
-        const mIns = `
-            <b>Pulsación Larga en Mapa:</b> Añade una parada en ese punto exacto.<br>
-            <b>Botón KM:</b> Muestra la distancia total. Pulsa para buscar POIs por KM.<br>
-            <b>Botón VIAJE:</b> Muestra tiempo estimado. Pulsa para ver tiempo y ajustar Velocidad Media.<br>
-            <b>Botón PEAJES:</b> Coste estimado. Pulsa para ver lista de peajes.<br>
-            <b>Botón AVISOS:</b> Número de incidencias. Pulsa para ver lista (radares, peajes).<br>
-            <b>Botón DESTINO (Clima):</b> Pulsa para ver el pronóstico del tiempo en el destino.<br>
-            <b>Iconos Clima en Ruta:</b> Tócalos para ver temperatura y localidad.<br>
-            <b>Botón MAPA/MENU (Derecha):</b> Alterna entre ver el mapa completo o abrir el panel lateral.<br>
-            <b>Botón MENU (Izquierda):</b> Abre el panel lateral (solo visible en modo mapa).<br>
-            <b>Botón Centrar (Mira):</b> Centra el mapa en la ruta activa.<br>
-            <b>Botón Escoba:</b> Limpia el mapa y el historial.<br>
-            <b>Botón Luna/Sol:</b> Cambia el estilo del mapa (satélite, oscuro, etc.).<br>
-            <b>Botón Bandera (Sitios):</b> Muestra/oculta tus sitios guardados.<br>
-            <b>Botón Leyenda (Abajo Izq):</b> Muestra qué significa cada color e icono del mapa.
-        `;
-        const html = `
-            <div style="text-align:center; margin-bottom:15px;">
-                <img src="rutiway_logo.png" style="width:200px; border-radius:16px; border:2px solid #5bc0de"> <h3>RutiWay Legal y Ayuda</h3>
+    // INICIO BLOQUE - FUNCIÓN openFullMenu MEJORADA v2.0.4
+// INICIO BLOQUE - FUNCIÓN openFullMenu TRADUCIBLE v2.0.4
+function openFullMenu() {
+    const t = DICT[currentLang] || DICT['Castellano'];
+
+    const legalTxt = `
+        <b>${t.modal_legal_privacy}</b><br>
+        ${t.modal_legal_privacy_txt}<br><br>
+
+        <b>${t.modal_legal_data}</b><br>
+        ${t.modal_legal_data_txt}<br><br>
+
+        <b>${t.modal_legal_files}</b><br>
+        ${t.modal_legal_files_txt}<br><br>
+
+        <b>${t.modal_legal_perms}</b><br>
+        ${t.modal_legal_perms_txt.replace(/\n/g, '<br>')}<br><br>
+
+        <b>${t.modal_legal_resp}</b><br>
+        ${t.modal_legal_resp_txt}
+    `;
+
+    const pIns = `
+        <div style="line-height: 1.8;">
+        <b style="color: var(--accent); font-size: 1.1rem;">🎯 ELEMENTOS DEL PANEL</b><br><br>
+
+        <b>📍 SECCIÓN: CABECERA</b><br>
+        • <b>Logo RutiWay:</b> Pulsa para abrir esta pantalla de Ayuda completa<br>
+        • <b>Bandera + País:</b> Selecciona el país (España, Francia, Italia, Portugal, Andorra).
+          Esto carga las regiones disponibles y actualiza los idiomas compatibles<br>
+        • <b>Botón Idioma:</b> Pulsa para cambiar el idioma de la interfaz<br><br>
+
+        <b>🗺️ SECCIÓN: PLANIFICACIÓN</b><br>
+        • <b>Input Origen:</b> Escribe la dirección de origen o mantén pulsado en el mapa<br>
+        • <b>Botón "+ Parada":</b> Añade puntos intermedios (hasta 23 paradas)<br>
+        • <b>Input Destino:</b> Escribe la dirección de destino<br>
+        • <b>Botón 🔃:</b> Intercambia origen y destino<br><br>
+
+        <b>🏍️ CONFIGURACIÓN RIDER</b><br>
+        • <b>Revirado:</b> Prioriza carreteras con curvas<br>
+        • <b>Gasolina x2:</b> Más paradas de gasolina<br>
+        • <b>Evitar Peajes:</b> Evita autopistas de pago<br><br>
+
+        <b>ℹ️ INFORMACIÓN EN RUTA</b><br>
+        • <b>Radares:</b> Muestra radares fijos (📷)<br>
+        • <b>Clima:</b> Iconos de clima cada 50km<br>
+        • <b>Gasolineras:</b> Estaciones cercanas (⛽)<br><br>
+
+        <b>📜 HISTORIAL</b><br>
+        • Guarda todas las rutas generadas<br>
+        • Pulsa sobre una ruta para recargarla<br><br>
+
+        <b>📁 ARCHIVOS</b><br>
+        • <b>Descargar GPX:</b> Guarda en /Descargas/RutiWay/<br>
+        • <b>Importar GPX:</b> Carga archivos externos<br>
+        • <b>Compartir:</b> Envía por WhatsApp, email, etc.<br>
+        • <b>App Maps:</b> Abre en Google Maps<br>
+        • <b>Generar PDF:</b> Crea informe detallado
+        </div>
+    `;
+
+    const mIns = `
+        <div style="line-height: 1.8;">
+        <b style="color: var(--accent); font-size: 1.1rem;">🗺️ CONTROLES DEL MAPA</b><br><br>
+
+        <b>👆 INTERACCIONES</b><br>
+        • <b>Pulsación Larga:</b> Añade parada en ese punto<br>
+        • <b>Zoom:</b> Pellizco con dos dedos<br>
+        • <b>Tocar Iconos:</b> Ver información detallada<br><br>
+
+        <b>🎛️ BOTONES ESTADÍSTICAS</b><br>
+        • <b>KM:</b> Distancia total<br>
+        • <b>VIAJE:</b> Tiempo estimado<br>
+        • <b>PEAJES:</b> Coste aproximado<br>
+        • <b>AVISOS:</b> Total de incidencias<br><br>
+
+        <b>🎯 BOTONES ACCIÓN</b><br>
+        • <b>🎯 Centro:</b> Ajusta el mapa a la ruta<br>
+        • <b>🧹 Escoba:</b> Limpia todo<br>
+        • <b>🌙 Luna:</b> Cambia estilo del mapa<br>
+        • <b>🚩 Bandera:</b> Sitios guardados<br><br>
+
+        <b>📍 ICONOS EN EL MAPA</b><br>
+        • 🔴 Radares fijos<br>
+        • 🟠 Gasolineras<br>
+        • 🟢 Peajes<br>
+        • 🚩 Paradas<br>
+        • ☀️🌤️☁️ Clima
+        </div>
+    `;
+
+    const html = `
+        <div style="text-align:center; margin-bottom:15px;">
+            <img src="rutiway_logo.png" style="width:200px; border-radius:16px; border:2px solid #5bc0de;"
+                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/3082/3082383.png';">
+            <h3>${t.modal_legal_title}</h3>
+        </div>
+
+        <button class="acc-btn" onclick="toggleAcc('acc-panel')">
+            📱 ${t.modal_panel_title} <i class="fa fa-caret-down"></i>
+        </button>
+        <div id="acc-panel" class="acc-panel" style="font-size:0.75rem;">${pIns}</div>
+
+        <button class="acc-btn" onclick="toggleAcc('acc-map')">
+            🗺️ ${t.modal_map_title} <i class="fa fa-caret-down"></i>
+        </button>
+        <div id="acc-map" class="acc-panel" style="font-size:0.75rem;">${mIns}</div>
+
+        <button class="acc-btn" onclick="toggleAcc('acc-legal')">
+            ⚖️ LEGAL Y PRIVACIDAD <i class="fa fa-caret-down"></i>
+        </button>
+        <div id="acc-legal" class="acc-panel">${legalTxt}</div>
+
+        <div class="donate-sidebar" style="margin-top:20px;" onclick="openNative('https://paypal.me/leydenruben')">
+            <div class="mini-moto">🏍️</div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:5px; z-index:2; width:100%;">
+                <i class="fab fa-paypal"></i> ${t.inv} <i class="fa fa-gas-pump"></i>
             </div>
-            <button class="acc-btn" onclick="toggleAcc('acc-legal')">⚖️ LEGAL / PRIVACIDAD <i class="fa fa-caret-down"></i></button>
-            <div id="acc-legal" class="acc-panel">${legalTxt}</div>
-            <button class="acc-btn" onclick="toggleAcc('acc-panel')">📱 INSTRUCCIONES PANEL <i class="fa fa-caret-down"></i></button>
-            <div id="acc-panel" class="acc-panel" style="font-size:0.75rem">${pIns}</div>
-            <button class="acc-btn" onclick="toggleAcc('acc-map')">🗺️ INSTRUCCIONES MAPA <i class="fa fa-caret-down"></i></button>
-            <div id="acc-map" class="acc-panel" style="font-size:0.75rem">${mIns}</div>
-            <div class="donate-sidebar" style="margin-top:20px;" onclick="openNative('https://paypal.me/leydenruben')"><div class="mini-moto">🛵</div><div style="display:flex; align-items:center; justify-content:center; gap:5px; z-index:2; width:100%"><i class="fab fa-paypal"></i> Invítame a gasolina <i class="fa fa-gas-pump"></i></div></div>
-        `;
-        showM("", html);
-    }
+        </div>
+    `;
+
+    showM('', html);
+}
+// FIN BLOQUE
+
+
     function toggleAcc(id) { const el = document.getElementById(id); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
-    function openInstructions() { openFullMenu(); }
+// INICIO BLOQUE - FUNCIÓN openInstructions TRADUCIBLE v2.0.4
+function openInstructions() {
+    const t = DICT[currentLang] || DICT['Castellano'];
+
+    const html = `
+        <div style="text-align:center; margin-bottom:15px;">
+            <h3>📖 ${t.btn_instructions}</h3>
+        </div>
+        <p style="line-height:1.6; text-align:left;">
+            <b>🏍️ Cómo usar RutiWay:</b><br><br>
+            1️⃣ Selecciona país e idioma<br>
+            2️⃣ Escribe origen y destino<br>
+            3️⃣ Añade paradas si quieres (opcional)<br>
+            4️⃣ Configura opciones (Revirado, Gasolina, Peajes)<br>
+            5️⃣ Pulsa GENERAR RUTA<br>
+            6️⃣ Descarga GPX, comparte o genera PDF<br><br>
+
+            <b>💡 Consejos:</b><br>
+            • Pulsación larga en el mapa añade paradas<br>
+            • Toca los iconos para ver detalles<br>
+            • Revisa el historial para recargar rutas<br>
+        </p>
+    `;
+
+    showM('', html);
+}
+// FIN BLOQUE
+
 
     map.on('contextmenu', async (e)=>{
         const coords = [e.latlng.lng, e.latlng.lat];
@@ -1198,7 +1936,35 @@ function togSubExcl(id) {
     function markUpdate(){ document.getElementById('m-btn').classList.add('blink'); }
     function wipeMap(){ pL.clearLayers(); wL.clearLayers(); rLines.clearLayers(); history=[]; warningsLog=[]; document.getElementById('v-k').innerText='0.0'; document.getElementById('v-time').innerText='0h 0m'; document.getElementById('v-t').innerText='0.00€'; document.getElementById('v-p').innerText='0'; document.getElementById('h-list').innerHTML=''; stops=[]; renderStops(); updateLegendRoutes(); updateBtnStyle(); saveConfig(); }
     function updateBtnStyle() { const idx = history.length; const color = COLS[idx % COLS.length]; const btn = document.getElementById('m-btn'); btn.innerText = `GENERAR RUTA #${idx + 1}`; btn.style.color = color; btn.style.borderColor = color; btn.classList.remove('blink'); }
-    function updateLegendRoutes() { const c = document.getElementById('l-routes'); c.innerHTML = history.slice(0, 3).map(h => { const icons = []; if(h.cfg && h.cfg.curvy) icons.push('<i class="fa fa-route" title="Revirado"></i>'); if(h.cfg && h.cfg.gasX2) icons.push('🤯'); if(h.cfg && !h.cfg.toll) icons.push('<i class="fa fa-money-bill-wave" title="Peajes"></i>'); else if(h.cfg) icons.push('<span style="font-size:7px; color:#4caf50">NO €</span>'); return `<div class="leg-i"><span class="leg-left"><span class="dot" style="background:${h.color}"></span> Ruta #${h.num}</span> <span class="route-icons">${icons.join(' ')}</span></div>`; }).join(''); }
+// INICIO BLOQUE - FUNCIÓN updateLegend TRADUCIBLE v2.0.4
+function updateLegend() {
+    const t = DICT[currentLang] || DICT['Castellano'];
+    let html = `<div style="font-weight:bold; margin-bottom:5px;">${t.leg_legend}</div>`;
+
+    routeHistory.forEach((r, i) => {
+        const curv = r.config.revirado ? '🔄' : '';
+        const gas = r.config.gas ? '⛽' : '';
+        const toll = r.config.tolls ? '💰' : '';
+        html += `<div><span style="color:${r.color};">━━</span> ${t.leg_route} ${i+1} ${curv}${gas}${toll}</div>`;
+    });
+
+    if(document.getElementById('c-r')?.checked) {
+        html += `<div>🔴 ${t.leg_rad}</div>`;
+    }
+    if(document.getElementById('c-gas-vis')?.checked) {
+        html += `<div>🟠 ${t.leg_gas}</div>`;
+    }
+    if(currentRoute && currentRoute.tolls && currentRoute.tolls.length > 0) {
+        html += `<div>🟢 ${t.leg_toll}</div>`;
+    }
+    if(waypointMarkers.length > 0) {
+        html += `<div>🚩 ${t.leg_stop}: ${waypointMarkers.length}</div>`;
+    }
+
+    document.getElementById('map-legend').innerHTML = html;
+}
+// FIN BLOQUE
+
     function clr(id){ document.getElementById(id).value=''; if(id==='ori') o=null; if(id==='des') d=null; markUpdate(); }
 
 // INICIO - BÚSQUEDA CON DEBOUNCE
