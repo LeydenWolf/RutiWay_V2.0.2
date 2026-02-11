@@ -1,0 +1,182 @@
+[1mdiff --git a/app/src/main/assets/index.html b/app/src/main/assets/index.html[m
+[1mindex 40ce85b..d78ae33 100644[m
+[1m--- a/app/src/main/assets/index.html[m
+[1m+++ b/app/src/main/assets/index.html[m
+[36m@@ -120,7 +120,9 @@[m
+         .in-wrap input, .in-wrap select { flex: 1; background: #1a1b26; border: 1px solid #414868; padding: 10px; color: white; border-radius: 4px; box-sizing: border-box; font-size: 0.8rem; appearance: none; }[m
+         .clear-btn { position: absolute; right: 10px; color: #565f89; cursor: pointer; font-size: 18px; }[m
+ [m
+[31m-        .add-stop-row { display: flex; justify-content: center; margin-bottom: 8px; }[m
+[32m+[m[32m        .add-stop-row { display: flex; flex-direction: row; align-items: center; gap: 8px; margin-bottom: 8px; margin-left: 30px; }[m
+[32m+[m[32m.swap-btn { padding: 4px 8px; background: rgba(91, 192, 222, 0.15); border: 1px dashed var(--accent); color: var(--accent); border-radius: 4px; cursor: pointer; font-size: 1rem; font-weight: bold; display: flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; transition: background 0.3s; }[m
+[32m+[m[32m.swap-btn:hover { background: rgba(91, 192, 222, 0.3); }[m
+         .add-stop-btn { padding: 4px 15px; background: rgba(91, 192, 222, 0.15); border: 1px dashed var(--accent); color: var(--accent); border-radius: 4px; cursor: pointer; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }[m
+ [m
+         .stop-row { display: flex; align-items: center; gap: 5px; margin-bottom: 8px; background: rgba(91, 192, 222, 0.1); border-radius: 4px; padding: 4px; }[m
+[36m@@ -467,9 +469,8 @@[m [minput[id^="stop-input-"]:focus {[m
+ [m
+         <div id="stops-container"></div>[m
+         <div class="add-stop-row">[m
+[31m-            <div class="add-stop-btn" onclick="addBlankStop()">[m
+[31m-                <i class="fa fa-map-marker-alt"></i> <span>+ Parada</span>[m
+[31m-            </div>[m
+[32m+[m[32m            <div class="swap-btn" onclick="swapOriginDestino()" title="Intercambiar Origen y Destino">🔃</div>[m
+[32m+[m[32m            <div class="add-stop-btn" onclick="addBlankStop()"><i class="fa fa-map-marker-alt"></i> <span>Parada</span></div>[m
+         </div>[m
+ [m
+         <div class="in-wrap">[m
+[36m@@ -960,7 +961,73 @@[m [mfunction closeSplash() {[m
+     function closeM(){ document.getElementById('app-modal').style.display='none'; }[m
+     window.onclick = function(e) { if(e.target == document.getElementById('app-modal')) closeM(); }[m
+ [m
+[31m-    function addBlankStop() { stops.push({c: null, name: ''}); renderStops(); }[m
+[32m+[m[32m    // INICIO-FIN BLOQUE SWAP ORIGEN/DESTINO[m
+[32m+[m[32mfunction swapOriginDestino() {[m
+[32m+[m[32m  const oriInput = document.getElementById('ori');[m
+[32m+[m[32m  const desInput = document.getElementById('des');[m
+[32m+[m
+[32m+[m[32m  const oriValue = oriInput.value.trim();[m
+[32m+[m[32m  const desValue = desInput.value.trim();[m
+[32m+[m
+[32m+[m[32m  // VALIDACIÓN: Verificar que ambos campos tengan algo escrito[m
+[32m+[m[32m  if (!oriValue && !desValue) {[m
+[32m+[m[32m    showM('⚠️ Campos vacíos', '<p>No hay nada para intercambiar.</p><p style="font-size:0.8rem; color:#aaa; margin-top:10px;"><b>Solución:</b><br>1. Escribe origen y destino<br>2. Luego podrás intercambiarlos</p>');[m
+[32m+[m[32m    return;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  if (!oriValue) {[m
+[32m+[m[32m    showM('⚠️ Origen vacío', '<p>El campo <b>Origen</b> está vacío.</p><p style="font-size:0.8rem; color:#aaa; margin-top:10px;">Escribe una dirección de origen primero.</p>');[m
+[32m+[m[32m    return;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  if (!desValue) {[m
+[32m+[m[32m    showM('⚠️ Destino vacío', '<p>El campo <b>Destino</b> está vacío.</p><p style="font-size:0.8rem; color:#aaa; margin-top:10px;">Escribe una dirección de destino primero.</p>');[m
+[32m+[m[32m    return;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  // VALIDACIÓN: Verificar que tengan coordenadas[m
+[32m+[m[32m  if (!o || !o[0] || !o[1]) {[m
+[32m+[m[32m    showM('⚠️ Origen sin validar', '<p>El origen no tiene coordenadas válidas.</p><p style="font-size:0.8rem; color:#aaa; margin-top:10px;"><b>Solución:</b><br>Selecciona una opción de las sugerencias al escribir.</p>');[m
+[32m+[m[32m    return;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  if (!d || !d[0] || !d[1]) {[m
+[32m+[m[32m    showM('⚠️ Destino sin validar', '<p>El destino no tiene coordenadas válidas.</p><p style="font-size:0.8rem; color:#aaa; margin-top:10px;"><b>Solución:</b><br>Selecciona una opción de las sugerencias al escribir.</p>');[m
+[32m+[m[32m    return;[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  // ✅ TODO CORRECTO - Intercambiar[m
+[32m+[m[32m  // Guardar temporales[m
+[32m+[m[32m  const tempValue = oriInput.value;[m
+[32m+[m[32m  const tempCoords = [...o];[m
+[32m+[m
+[32m+[m[32m  // Intercambiar TEXTOS[m
+[32m+[m[32m  oriInput.value = desInput.value;[m
+[32m+[m[32m  desInput.value = tempValue;[m
+[32m+[m
+[32m+[m[32m  // Intercambiar COORDENADAS[m
+[32m+[m[32m  o = [...d];[m
+[32m+[m[32m  d = tempCoords;[m
+[32m+[m
+[32m+[m[32m  // Intercambiar estilos de BORDE (validación verde)[m
+[32m+[m[32m  const oriBorder = oriInput.style.borderColor;[m
+[32m+[m[32m  const oriBorderWidth = oriInput.style.borderWidth;[m
+[32m+[m[32m  const desBorder = desInput.style.borderColor;[m
+[32m+[m[32m  const desBorderWidth = desInput.style.borderWidth;[m
+[32m+[m
+[32m+[m[32m  oriInput.style.borderColor = desBorder || '#414868';[m
+[32m+[m[32m  oriInput.style.borderWidth = desBorderWidth || '1px';[m
+[32m+[m[32m  desInput.style.borderColor = oriBorder || '#414868';[m
+[32m+[m[32m  desInput.style.borderWidth = oriBorderWidth || '1px';[m
+[32m+[m
+[32m+[m[32m  // Marcar que hay cambios pendientes[m
+[32m+[m[32m  markUpdate();[m
+[32m+[m
+[32m+[m[32m  console.log('✅ Origen ⇄ Destino intercambiados correctamente');[m
+[32m+[m[32m}[m
+[32m+[m[32m// FIN BLOQUE[m
+[32m+[m
+[32m+[m[32mfunction addBlankStop() { stops.push({c: null, name: ''}); renderStops(); }[m
+ // INICIO - RENDERIZAR PARADAS CON BÚSQUEDA[m
+ function renderStops() {[m
+   const c = document.getElementById('stops-container');[m
+[36m@@ -1009,6 +1076,10 @@[m [mfunction attachStopSearch(index) {[m
+   input.oninput = async function() {[m
+     stops[index].name = input.value;[m
+ [m
+[32m+[m[32m    // NUEVO: Resetear borde al escribir[m
+[32m+[m[32m    input.style.borderColor = '#414868';[m
+[32m+[m[32m    input.style.borderWidth = '1px';[m
+[32m+[m
+     if (input.value.length < 3) {[m
+       sugg.style.display = 'none';[m
+       return;[m
+[36m@@ -1032,22 +1103,20 @@[m [mfunction attachStopSearch(index) {[m
+         data.forEach(x => {[m
+           const dv = document.createElement('div');[m
+           dv.className = 'sugg-i';[m
+[31m-          dv.textContent = x.display_name.split(',')[0];[m
+[32m+[m[32m          dv.textContent = x.display_name.split(',').slice(0, 3).join(', ');[m
+ [m
+           dv.onmousedown = function() {[m
+[31m-  const coords = [parseFloat(x.lon), parseFloat(x.lat)];[m
+[31m-  stops[index].c = coords;[m
+[31m-  stops[index].name = x.display_name.split(',')[0];[m
+[31m-  input.value = stops[index].name;[m
+[31m-  sugg.style.display = 'none';[m
+[31m-[m
+[31m-  // ✅ NUEVO: Cambiar borde a verde para indicar que está OK[m
+[31m-  input.style.borderColor = '#4caf50';[m
+[31m-  input.style.borderWidth = '2px';[m
+[31m-[m
+[31m-  markUpdate();[m
+[31m-};[m
+[31m-[m
+[32m+[m[32m            const coords = [parseFloat(x.lon), parseFloat(x.lat)];[m
+[32m+[m[32m            stops[index].c = coords;[m
+[32m+[m[32m            stops[index].name = x.display_name.split(',').slice(0, 2).join(',');[m
+[32m+[m[32m            input.value = stops[index].name;[m
+[32m+[m[32m            sugg.style.display = 'none';[m
+[32m+[m
+[32m+[m[32m            // NUEVO: Borde verde al seleccionar[m
+[32m+[m[32m            input.style.borderColor = '#4caf50';[m
+[32m+[m[32m            input.style.borderWidth = '2px';[m
+[32m+[m[32m            markUpdate();[m
+[32m+[m[32m          };[m
+ [m
+           sugg.appendChild(dv);[m
+         });[m
+[36m@@ -1058,7 +1127,15 @@[m [mfunction attachStopSearch(index) {[m
+   };[m
+ [m
+   input.onblur = function() {[m
+[31m-    setTimeout(() => { sugg.style.display = 'none'; }, 200);[m
+[32m+[m[32m    setTimeout(() => {[m
+[32m+[m[32m      sugg.style.display = 'none';[m
+[32m+[m
+[32m+[m[32m      // NUEVO: Verificar si tiene coordenadas válidas al perder foco[m
+[32m+[m[32m      if (stops[index].c && stops[index].c[0] && stops[index].c[1]) {[m
+[32m+[m[32m        input.style.borderColor = '#4caf50';[m
+[32m+[m[32m        input.style.borderWidth = '2px';[m
+[32m+[m[32m      }[m
+[32m+[m[32m    }, 200);[m
+   };[m
+ }[m
+ [m
+[36m@@ -1161,14 +1238,14 @@[m [masync function search(id, sid, type) {[m
+         data.forEach(x => {[m
+           const dv = document.createElement('div');[m
+           dv.className = 'sugg-i';[m
+[31m-          dv.textContent = x.display_name.split(',')[0];[m
+[32m+[m[32m          dv.textContent = x.display_name.split(',').slice(0, 3).join(', ');[m
+ [m
+           dv.onmousedown = () => {[m
+   const coords = [parseFloat(x.lon), parseFloat(x.lat)];[m
+   if (type === 'o') o = coords;[m
+   else d = coords;[m
+   s.style.display = 'none';[m
+[31m-  i.value = x.display_name.split(',')[0];[m
+[32m+[m[32m  i.value = x.display_name.split(',').slice(0, 2).join(',');[m
+ [m
+   // ✅ NUEVO: Borde verde al seleccionar[m
+   i.style.borderColor = '#4caf50';[m
