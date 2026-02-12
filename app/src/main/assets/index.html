@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>RUTIWAY Ver. 2.0.2</title>
+    <title>RUTIWAY Ver. 2.0.4/title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -101,17 +101,7 @@
         .brand-title { margin: 0; font-size: 1.1rem; font-weight: 900; line-height: 1; animation: titlePulse 4s infinite ease-in-out; }
         @keyframes titlePulse { 0% { color: #fff; } 50% { color: var(--r1); text-shadow: 0 0 10px var(--r1); } 100% { color: #fff; } }
         .brand-sub { font-family: 'Poppins', sans-serif; font-weight: 300; font-size: 0.75rem; color: var(--r1); display: block; margin-top: 2px; }
-        .brand-ver {
-    font-size: 0.6rem;
-    color: #555;
-    white-space: nowrap;
-    line-height: 1;
-    margin: 0;
-    padding: 2px 4px;
-    text-align: right;
-    width: 100%;
-}
-
+        .brand-ver { font-size: 0.7rem; color: #555; }
 
         .lang-container {
     position: relative;
@@ -119,25 +109,21 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    width: auto;
-    max-width: 130px;
-    gap: 3px;
-    box-sizing: border-box;
+    max-width: 105px;
+    gap: 2px;
 }
-
-
-/* INICIO BLOQUE - BOTÓN IDIOMA COMPACTO v2.0.5 */
+/* INICIO BLOQUE - BOTÓN IDIOMA COMPACTO v2.0.6 */
 .lang-select-btn {
     background: #222;
     border: 1px solid #444;
     color: white;
-    font-size: 0.7rem;
-    padding: 4px 8px;
+    font-size: 0.65rem;
+    padding: 4px 7px;
     border-radius: 4px;
     cursor: pointer;
-    margin-bottom: 0;
-    width: auto;
-    max-width: 130px;
+    margin-bottom: 2px;
+    min-width: 90px;
+    max-width: 105px;
     text-align: left;
     display: flex;
     align-items: center;
@@ -161,28 +147,14 @@
 }
 
 .lang-select-btn span {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     line-height: 1;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 /* FIN BLOQUE */
 
-        .lang-dropdown {
-    display: none;
-    position: absolute;
-    top: 28px;
-    right: 0;
-    background: #1a1b26;
-    border: 1px solid var(--accent);
-    border-radius: 6px;
-    z-index: 6000;
-    min-width: 180px;
-    max-width: 220px;
-    max-height: 300px;
-    overflow-y: auto;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.7);
-}
+        .lang-dropdown { display: none; position: absolute; top: 25px; right: 0; background: #1a1b26; border: 1px solid var(--accent); border-radius: 4px; z-index: 6000; min-width: 120px; max-height: 250px; overflow-y: auto; }
 /* INICIO BLOQUE - OPCIONES DROPDOWN ALINEADAS v2.0.4 */
 .lang-opt {
     padding: 10px 12px;
@@ -484,9 +456,10 @@ input[id^="stop-input-"]:focus {
     <div class="splash-content">
         <h1 class="splash-title">RutiWay</h1>
         <p class="splash-subtitle">La app de crear rutas</p>
-        <img src="assets/rutiwaylogo.png" class="splash-logo"
-             onerror="this.src='rutiwaylogo.png'" alt="RutiWay Logo">
-        <p class="splash-by">By Leyden <span class="splash-ver">Ver. 2.0.2</span></p>
+        <img src="rutiwaylogo.png" class="splash-logo"
+             onerror="this.style.display='none'" alt="RutiWay Logo">
+
+        <p class="splash-by">By Leyden <span class="splash-ver">Ver. 2.0.4</span></p>
         <button class="splash-btn" onclick="closeSplash()">
             🏍️ ¡Comenzamos!
         </button>
@@ -554,7 +527,7 @@ input[id^="stop-input-"]:focus {
         <div class="lang-container">
             <div class="lang-select-btn" id="lang-btn" onclick="toggleLangDropdown()">Cast</div>
             <div id="lang-list" class="lang-dropdown"></div>
-            <div class="brand-ver">Ver. 2.0.2</div>
+            <div class="brand-ver">Ver. 2.0.4</div>
         </div>
     </div>
 
@@ -634,7 +607,7 @@ input[id^="stop-input-"]:focus {
     <button class="collapsible" onclick="togExcl('p-hist')"><span class="t-hist">HISTORIAL</span> <span id="total-routes-badge" style="font-size:0.6rem; margin-left:5px; color:#aaa"></span><i class="fa fa-caret-down"></i></button>
     <div id="p-hist" class="coll-content excl-group"><div id="h-list" style="font-size:0.7rem; color:#aaa; margin-bottom: 10px;"></div></div>
 
-    <button class="collapsible" onclick="togExcl('p-files')">ARCHIVOS <i class="fa fa-caret-down"></i></button>
+    <button class="collapsible" onclick="togExcl('p-files')"><span class="t-files">ARCHIVOS</span> <i class="fa fa-caret-down"></i></button>
     <div id="p-files" class="coll-content excl-group">
         <div class="files-grid-2x2">
             <div class="file-col-btn" onclick="togSubExcl('gpx-box')">
@@ -738,357 +711,27 @@ input[id^="stop-input-"]:focus {
     // INICIO BLOQUE - CONFIGURACIÓN PAÍSES E IDIOMAS v2.0.4 COMPLETA
 let currentLang = 'Castellano';
 
-    // Configuración de idiomas con banderas
-    const LANG_FLAGS = {
-        'Castellano': '🇪🇸',
-        'Català': 'flags/catalonia.png',
-        'Valencià': 'flags/valencia.png',
-        'Galego': 'flags/galicia.png',
-        'Euskera': 'flags/euskadi.png',
-        'Aranés': 'flags/aranes.png',
-        'Français': '🇫🇷',
-        'Brezhoneg': 'flags/brezhoneg.png',
-        'Occità': 'flags/occitania.png',
-        'Português': '🇵🇹',
-        'Italiano': '🇮🇹',
-        'English': '🇬🇧'
-    };
+    // =============================================
+// CONFIGURACIÓN IDIOMAS Y PAÍSES v2.0.6 FINAL
+// =============================================
 
-    // Configuración de países
-    const COUNTRY_CONFIG = {
-        'España': {
-            flag: '🇪🇸',
-            defaultLang: 'Castellano',
-            languages: ['Castellano', 'Català', 'Valencià', 'Galego', 'Euskera', 'Aranés']
-        },
-        'France': {
-            flag: '🇫🇷',
-            defaultLang: 'Français',
-            languages: ['Français', 'Brezhoneg', 'Occità']
-        },
-        'Andorra': {
-            flag: '🇦🇩',
-            defaultLang: 'Català',
-            languages: ['Català', 'Castellano', 'Français', 'Português']
-        },
-        'Portugal': {
-            flag: '🇵🇹',
-            defaultLang: 'Português',
-            languages: ['Português']
-        },
-        'Italia': {
-            flag: '🇮🇹',
-            defaultLang: 'Italiano',
-            languages: ['Italiano']
-        }
-    };
-
-    // Idioma universal (siempre disponible)
-    const UNIVERSAL_LANG = 'English';
-
-
-
-    const DICT = {
-    'Castellano': {
-        plan: 'PLANIFICACIÓN',
-        conf: 'CONFIGURACIÓN RIDER',
-        info: 'INFORMACIÓN EN RUTA',
-        hist: 'HISTORIAL',
-        files: 'ARCHIVOS',
-        cont: 'CONTACTO LEGAL',
-        inv: 'Invítame a gasolina',
-        orig: 'Escribe tu Origen',
-        dest: 'Escribe tu Destino',
-        pstop: 'Parada intermedia',
-        curv: 'Revirado',
-        gas2: 'Gasolina x2',
-        toll: 'Evitar peajes',
-        radar: 'Escanear Radares',
-        poidet: 'Info Detalles POI',
-        wx50: 'Clima cada 50km',
-        gasst: 'Ver Gasolineras',
-        aspd: 'Vel. Media',
-        gen: 'GENERAR RUTA',
-        clean: 'Limpiar',
-        share: 'Compartir con...',
-        openm: 'Abrir App Maps',
-        readl: 'Lector Enlaces',
-        dlgpx: 'Descargar GPX',
-        impgpx: 'Importar GPX',
-        genpdf: 'GENERAR PDF',
-        leg_rad: 'Radares',
-        leg_gas: 'Gasol',
-        leg_toll: 'Peajes',
-                leg_stop: 'Paradas',
-        // Stats flotantes
-        lbl_km: 'KM',
-        lbl_trip: 'VIAJE',
-        lbl_toll_stat: 'PEAJES',
-        lbl_warn: 'AVISOS',
-        lbl_dest: 'DESTINO',
-        // Otros
-        total_gen: 'Total Generadas',
-        add_stop: 'Parada',
-                swap: 'Intercambiar Origen y Destino',
-
-        // Leyenda expandida
-        leg_route: 'Ruta',
-        leg_legend: '📌 Leyenda',
-
-        // Modal Legal/Ayuda
-        modal_legal_title: 'RutiWay - Tutorial, Legal y Ayuda',
-        modal_legal_privacy: '1. Privacidad',
-        modal_legal_privacy_txt: 'RutiWay no almacena su ubicación en ningún servidor. Todos los datos se procesan en tiempo real en su dispositivo para el cálculo de rutas. No compartimos información personal con terceros.',
-        modal_legal_data: '2. Datos y Servicios',
-        modal_legal_data_txt: 'Utilizamos servicios de OpenRouteService (rutas), OpenMeteo (clima) y OpenStreetMap (mapas). Estos servicios pueden recopilar datos de uso según sus propias políticas de privacidad.',
-        modal_legal_files: '3. Archivos Generados',
-        modal_legal_files_txt: 'Los archivos GPX y PDF se generan y guardan localmente en su dispositivo en la carpeta /Descargas/RutiWay/. RutiWay no tiene acceso a otros archivos de su dispositivo.',
-        modal_legal_perms: '4. Permisos',
-        modal_legal_perms_txt: '- Ubicación: Necesario para centrar el mapa y calcular rutas desde tu posición\n- Almacenamiento: Para guardar archivos GPX y PDF en tu dispositivo\n- Internet: Para cargar mapas, calcular rutas y obtener información del clima',
-        modal_legal_resp: '5. Responsabilidad',
-        modal_legal_resp_txt: 'RutiWay es una herramienta de planificación. El usuario es responsable de conducir de forma segura y cumplir las normas de tráfico. La información de radares y peajes es aproximada.',
-        modal_panel_title: 'INSTRUCCIONES PANEL',
-        modal_map_title: 'INSTRUCCIONES MAPA',
-
-        // Botones modales
-        btn_instructions: 'Instrucciones de Uso',
-        btn_legal: 'RutiWay - Legal / Ayuda',
-
-        // Mensajes popup
-        popup_support: 'Soporte RutiWay',
-        popup_routes_count: '¡Llevas {count} rutas legendarias!',
-        popup_invite: 'Invítame a un depósito para seguir rodando.',
-        popup_gas_btn: '¡Gas a fondo!',
-
-        // Confirmaciones
-        confirm_clear: '¿Limpiar todo el mapa e historial?',
-        confirm_delete_route: '¿Eliminar esta ruta del historial?'
-
-
-    },
-    'Català': {
-        plan: 'PLANIFICACIÓ',
-        conf: 'CONFIGURACIÓ RIDER',
-        info: 'INFORMACIÓ EN RUTA',
-        hist: 'HISTORIAL',
-        files: 'ARXIUS',
-        cont: 'CONTACTE LEGAL',
-        inv: 'Convida\'m a benzina',
-        orig: 'Escriu el teu Origen',
-        dest: 'Escriu la teva Destinació',
-        pstop: 'Parada intermèdia',
-        curv: 'Corbes',
-        gas2: 'Benzina x2',
-        toll: 'Evitar peatges',
-        radar: 'Escanejar Radars',
-        poidet: 'Info Detalls POI',
-        wx50: 'Clima cada 50km',
-        gasst: 'Veure Benzineres',
-        aspd: 'Vel. Mitjana',
-        gen: 'GENERAR RUTA',
-        clean: 'Netejar',
-        share: 'Compartir amb...',
-        openm: 'Obrir App Maps',
-        readl: 'Lector Enllaços',
-        dlgpx: 'Descarregar GPX',
-        impgpx: 'Importar GPX',
-        genpdf: 'GENERAR PDF',
-        leg_rad: 'Radars',
-        leg_gas: 'Benzin',
-        leg_toll: 'Peatges',
-                leg_stop: 'Parades',
-        // Stats flotantes
-        lbl_km: 'KM',
-        lbl_trip: 'VIATGE',
-        lbl_toll_stat: 'PEATGES',
-        lbl_warn: 'AVISOS',
-        lbl_dest: 'DESTINACIÓ',
-        // Otros
-        total_gen: 'Total Generades',
-        add_stop: 'Parada',
-                swap: 'Intercanviar Origen i Destinació',
-
-        // Leyenda expandida
-        leg_route: 'Ruta',
-        leg_legend: '📌 Llegenda',
-
-        // Modal Legal/Ayuda
-        modal_legal_title: 'RutiWay - Tutorial, Legal i Ajuda',
-        modal_legal_privacy: '1. Privacitat',
-        modal_legal_privacy_txt: 'RutiWay no emmagatzema la teva ubicació en cap servidor. Totes les dades es processen en temps real al teu dispositiu per al càlcul de rutes. No compartim informació personal amb tercers.',
-        modal_legal_data: '2. Dades i Serveis',
-        modal_legal_data_txt: 'Utilitzem serveis d\'OpenRouteService (rutes), OpenMeteo (clima) i OpenStreetMap (mapes). Aquests serveis poden recollir dades d\'ús segons les seves pròpies polítiques de privacitat.',
-        modal_legal_files: '3. Arxius Generats',
-        modal_legal_files_txt: 'Els arxius GPX i PDF es generen i guarden localment al teu dispositiu a la carpeta /Descàrregues/RutiWay/. RutiWay no té accés a altres arxius del teu dispositiu.',
-        modal_legal_perms: '4. Permisos',
-        modal_legal_perms_txt: '- Ubicació: Necessari per centrar el mapa i calcular rutes des de la teva posició\n- Emmagatzematge: Per guardar arxius GPX i PDF al teu dispositiu\n- Internet: Per carregar mapes, calcular rutes i obtenir informació del clima',
-        modal_legal_resp: '5. Responsabilitat',
-        modal_legal_resp_txt: 'RutiWay és una eina de planificació. L\'usuari és responsable de conduir de forma segura i complir les normes de trànsit. La informació de radars i peatges és aproximada.',
-        modal_panel_title: 'INSTRUCCIONS PANELL',
-        modal_map_title: 'INSTRUCCIONS MAPA',
-
-        // Botones modales
-        btn_instructions: 'Instruccions d\'Ús',
-        btn_legal: 'RutiWay - Legal / Ajuda',
-
-        // Mensajes popup
-        popup_support: 'Suport RutiWay',
-        popup_routes_count: 'Portes {count} rutes llegendàries!',
-        popup_invite: 'Convida\'m a un dipòsit per continuar rodant.',
-        popup_gas_btn: 'Gas a fons!',
-
-        // Confirmaciones
-        confirm_clear: 'Netejar tot el mapa i historial?',
-        confirm_delete_route: 'Eliminar aquesta ruta de l\'historial?'
-
-
-    },
-    'Français': {
-        plan: 'PLANIFICATION',
-        conf: 'CONFIGURATION RIDER',
-        info: 'INFOS SUR ROUTE',
-        hist: 'HISTORIQUE',
-        files: 'FICHIERS',
-        cont: 'CONTACT LEGAL',
-        inv: 'Offrez-moi du gaz',
-        orig: 'Écrivez votre Origine',
-        dest: 'Écrivez votre Destination',
-        pstop: 'Arrêt intermédiaire',
-        curv: 'Virages',
-        gas2: 'Essence x2',
-        toll: 'Éviter péages',
-        radar: 'Scanner Radars',
-        poidet: 'Info Détails POI',
-        wx50: 'Météo tous 50km',
-        gasst: 'Voir Stations',
-        aspd: 'Vitesse Moy.',
-        gen: 'GÉNÉRER ROUTE',
-        clean: 'Nettoyer',
-        share: 'Partager avec...',
-        openm: 'Ouvrir App Maps',
-        readl: 'Lecteur Liens',
-        dlgpx: 'Télécharger GPX',
-        impgpx: 'Importer GPX',
-        genpdf: 'GÉNÉRER PDF',
-        leg_rad: 'Radars',
-        leg_gas: 'Essence',
-        leg_toll: 'Péages',
-                leg_stop: 'Arrêts',
-        lbl_km: 'KM', lbl_trip: 'VOYAGE', lbl_toll_stat: 'PÉAGES', lbl_warn: 'AVIS',
-        lbl_dest: 'DESTINATION', total_gen: 'Total', add_stop: 'Arrêt', swap: 'Échanger'
-
-    },
-    'Português': {
-        plan: 'PLANEAMENTO',
-        conf: 'CONFIGURAÇÃO RIDER',
-        info: 'INFORMAÇÃO ROTA',
-        hist: 'HISTÓRICO',
-        files: 'ARQUIVOS',
-        cont: 'CONTACTO LEGAL',
-        inv: 'Ofereça gasolina',
-        orig: 'Escreva sua Origem',
-        dest: 'Escreva seu Destino',
-        pstop: 'Parada intermediária',
-        curv: 'Curvas',
-        gas2: 'Gasolina x2',
-        toll: 'Evitar portagens',
-        radar: 'Escanear Radares',
-        poidet: 'Info Detalhes POI',
-        wx50: 'Clima cada 50km',
-        gasst: 'Ver Postos',
-        aspd: 'Vel. Média',
-        gen: 'GERAR ROTA',
-        clean: 'Limpar',
-        share: 'Partilhar com...',
-        openm: 'Abrir App Maps',
-        readl: 'Leitor Links',
-        dlgpx: 'Baixar GPX',
-        impgpx: 'Importar GPX',
-        genpdf: 'GERAR PDF',
-        leg_rad: 'Radares',
-        leg_gas: 'Gasolina',
-        leg_toll: 'Portagens',
-                leg_stop: 'Paradas',
-        lbl_km: 'KM', lbl_trip: 'VIAGEM', lbl_toll_stat: 'PORTAGENS', lbl_warn: 'AVISOS',
-        lbl_dest: 'DESTINO', total_gen: 'Total', add_stop: 'Parada', swap: 'Trocar'
-
-    },
-    'Italiano': {
-        plan: 'PIANIFICAZIONE',
-        conf: 'CONFIGURAZIONE RIDER',
-        info: 'INFO PERCORSO',
-        hist: 'STORICO',
-        files: 'FILE',
-        cont: 'CONTATTO LEGALE',
-        inv: 'Offrimi benzina',
-        orig: 'Scrivi la tua Origine',
-        dest: 'Scrivi la tua Destinazione',
-        pstop: 'Fermata intermedia',
-        curv: 'Curve',
-        gas2: 'Benzina x2',
-        toll: 'Evita pedaggi',
-        radar: 'Scansiona Autovelox',
-        poidet: 'Info Dettagli POI',
-        wx50: 'Meteo ogni 50km',
-        gasst: 'Vedi Stazioni',
-        aspd: 'Vel. Media',
-        gen: 'GENERA PERCORSO',
-        clean: 'Pulisci',
-        share: 'Condividi con...',
-        openm: 'Apri App Maps',
-        readl: 'Lettore Link',
-        dlgpx: 'Scarica GPX',
-        impgpx: 'Importa GPX',
-        genpdf: 'GENERA PDF',
-        leg_rad: 'Autovelox',
-        leg_gas: 'Benzina',
-        leg_toll: 'Pedaggi',
-                leg_stop: 'Fermate',
-        lbl_km: 'KM', lbl_trip: 'VIAGGIO', lbl_toll_stat: 'PEDAGGI', lbl_warn: 'AVVISI',
-        lbl_dest: 'DESTINAZIONE', total_gen: 'Totale', add_stop: 'Fermata', swap: 'Scambia'
-
-    },
-    'English': {
-        plan: 'PLANNING',
-        conf: 'RIDER CONFIG',
-        info: 'ROUTE INFO',
-        hist: 'HISTORY',
-        files: 'FILES',
-        cont: 'CONTACT LEGAL',
-        inv: 'Buy me gas',
-        orig: 'Enter your Origin',
-        dest: 'Enter your Destination',
-        pstop: 'Intermediate stop',
-        curv: 'Curves',
-        gas2: 'Fuel x2',
-        toll: 'Avoid tolls',
-        radar: 'Scan Radars',
-        poidet: 'POI Details Info',
-        wx50: 'Weather every 50km',
-        gasst: 'Show Gas Stations',
-        aspd: 'Avg. Speed',
-        gen: 'GENERATE ROUTE',
-        clean: 'Clean',
-        share: 'Share with...',
-        openm: 'Open Maps App',
-        readl: 'Link Reader',
-        dlgpx: 'Download GPX',
-        impgpx: 'Import GPX',
-        genpdf: 'GENERATE PDF',
-        leg_rad: 'Radars',
-        leg_gas: 'Gas',
-        leg_toll: 'Tolls',
-                leg_stop: 'Stops',
-        lbl_km: 'KM', lbl_trip: 'TRIP', lbl_toll_stat: 'TOLLS', lbl_warn: 'WARNINGS',
-        lbl_dest: 'DESTINATION', total_gen: 'Total', add_stop: 'Stop', swap: 'Swap'
-
-    }
-
+// Banderas por idioma
+const LANG_FLAGS = {
+    'Castellano': '🇪🇸',
+    'Català': 'flags/catalonia.png',
+    'Valencià': 'flags/valencia.png',
+    'Galego': 'flags/galicia.png',
+    'Euskera': 'flags/euskadi.png',
+    'Aranés': 'flags/aranes.png',
+    'Français': '🇫🇷',
+    'Brezhoneg': 'flags/brezhoneg.png',
+    'Occità': 'flags/occitania.png',
+    'Português': '🇵🇹',
+    'Italiano': '🇮🇹',
+    'English': '🇬🇧'
 };
 
-
-    // FIN BLOQUE
-// INICIO BLOQUE - COMPATIBILIDAD TEMPORAL (BORRAR DESPUÉS)
+// Configuración de países (usada por updateCountry y updateLangDropdown)
 const LANGS = {
     'España': {
         flag: '🇪🇸',
@@ -1116,22 +759,1071 @@ const LANGS = {
         options: ['Italiano', 'English']
     }
 };
-// FIN BLOQUE COMPATIBILIDAD
+
+// Idiomas no disponibles todavía (mostrar como deshabilitados)
+const UNAVAILABLE = ['Valencià', 'Galego', 'Euskera', 'Aranés', 'Brezhoneg', 'Occità'];
+/// Diccionario de traducciones COMPLETO v2.0.7
+const DICT = {
+    'Castellano': {
+        // Menú principal
+        plan: 'PLANIFICACIÓN',
+        conf: 'CONFIGURACIÓN RIDER',
+        info: 'INFORMACIÓN EN RUTA',
+        hist: 'HISTORIAL',
+        cont: 'CONTACTO / LEGAL',
+                // Botones principales
+        btngen: 'GENERAR RUTA',
 
 
-    // INICIO - WINDOW ONLOAD CON SPLASH
-    window.onload = function() {
-        updateCountry();
-        setTimeout(loadConfig, 100);
-        updateBtnStyle();
-        updateRouteCountUI();
+        // Botones principales
+        btn_gen: 'GENERAR RUTA',
+        btn_clear: 'LIMPIAR MAPA',
+        btn_center: 'CENTRAR',
 
-        // SPLASH: Cerrar al hacer clic en cualquier parte
-        document.getElementById('splash-screen').addEventListener('click', closeSplash);
+        // Estadísticas
+        lbl_km: 'KM',
+        lbl_trip: 'VIAJE',
+        lbl_toll: 'PEAJES',
+        lbl_warn: 'AVISOS',
+        lbl_dest: 'DESTINO',
 
-        // NO abrir menú automáticamente (esperar splash)
+        // Leyenda mapa
+        leg_rad: 'Radares',
+        leg_gas: 'Gasolineras',
+        leg_toll: 'Peajes',
+        leg_stop: 'Paradas',
+
+        // Archivos
+        files: 'ARCHIVOS',
+        gpx: 'GESTIÓN GPX',
+        maps: 'MAPS',
+        pdf: 'GENERAR PDF',
+
+        // Botones archivo
+        btn_download_gpx: '💾 Descargar GPX',
+        btn_import_gpx: '📥 Importar GPX',
+        btn_share: '📤 Compartir con...',
+        btn_open_maps: '🗺️ Abrir App Maps',
+        btn_reader: '🔗 Lector Enlaces',
+
+        // Placeholders inputs
+        ph_origin: 'Escribe tu Origen',
+        ph_dest: 'Escribe tu Destino',
+        ph_stop: 'Escribe dirección o pulsa mapa',
+
+        // Botones generales
+        btn_add_stop: 'Parada',
+                // Configuración switches
+        txt_revirado: 'Revirado',
+        txt_gas_x2: 'Gasolina x2',
+        txt_toll: 'Evitar peajes',
+        txt_scan_radars: 'Escanear Radares',
+        txt_info_poi: 'Info Detalles POI',
+        txt_clima_50: 'Clima cada 50km',
+        txt_gas_vis: 'Ver Gasolineras',
+        txt_vel_media: 'Vel. Media (Km/h)',
+
+        btn_instructions: 'Instrucciones de Uso',
+        btn_legal: 'RutiWay - Legal / Ayuda',
+                // Modal Legal/Ayuda
+        modal_legal_title: 'RutiWay - Tutorial, Legal y Ayuda',
+        modal_tutorial: 'Tutorial',
+        modal_legal: 'Aviso Legal',
+        modal_privacy: 'Privacidad',
+        modal_cookies: 'Cookies',
+        modal_about: 'Acerca de',
+        legal_privacy_title: 'Privacidad',
+        legal_privacy_text: 'RutiWay no almacena su ubicación en ningún servidor. Todos los datos se procesan en tiempo real en su dispositivo para el cálculo de rutas. No compartimos información personal con terceros.',
+        legal_services_title: 'Datos y Servicios',
+        legal_services_text: 'Utilizamos servicios de OpenRouteService (rutas), OpenMeteo (clima) y OpenStreetMap (mapas). Estos servicios pueden recopilar datos de uso según sus propias políticas de privacidad.',
+        legal_files_title: 'Archivos Generados',
+        legal_files_text: 'Los archivos GPX y PDF se generan y guardan localmente en su dispositivo en la carpeta /Descargas/RutiWay/. RutiWay no tiene acceso a otros archivos de su dispositivo.',
+        legal_permissions_title: 'Permisos',
+        legal_permissions_text: '<b>Ubicación:</b> Necesario para centrar el mapa y calcular rutas desde tu posición<br><b>Almacenamiento:</b> Para guardar archivos GPX y PDF en tu dispositivo<br><b>Internet:</b> Para cargar mapas, calcular rutas y obtener información del clima',
+        legal_responsibility_title: 'Responsabilidad',
+        legal_responsibility_text: 'RutiWay es una herramienta de planificación. El usuario es responsable de conducir de forma segura y cumplir las normas de tráfico. La información de radares y peajes es aproximada.',
+                // Instrucciones simplificadas
+        instr_panel: '<b>🎯 USO DEL PANEL</b><br>• Introduce origen, destino y paradas en los campos correspondientes<br>• Configura opciones de ruta (curvas, gasolineras, peajes)<br>• Activa alertas de radares y clima<br>• Consulta el historial de rutas anteriores<br>• Descarga GPX, genera PDF o comparte tu ruta',
+        instr_mapa: '<b>🗺️ USO DEL MAPA</b><br>• <b>Pulsación larga:</b> Añade parada en ese punto<br>• <b>Iconos flotantes:</b> Toca KM/VIAJE/PEAJES/AVISOS para ver detalles<br>• <b>Botones superiores:</b> Centrar mapa, limpiar, cambiar estilo, mostrar lugares guardados<br>• <b>Leyenda:</b> Identifica radares🔴, gasolineras🟠, peajes🟢 y paradas📍<br>• <b>Generar ruta:</b> Botón azul abajo a la derecha',
+                // Iconos Flotantes
+        float_km_title: 'KM Totales',
+        float_km_total: 'Total',
+        float_km_segments: 'Tramos',
+        float_km_segment: 'Tramo',
+
+        float_trip_title: 'Tramos del Viaje',
+        float_trip_segment: 'Tramo',
+        float_trip_from: 'Desde',
+        float_trip_to: 'Hasta',
+        float_trip_distance: 'Distancia',
+
+        float_toll_title: 'Peajes',
+        float_toll_name: 'Nombre',
+        float_toll_cost: 'Coste',
+        float_toll_total: 'Total Peajes',
+        float_toll_none: 'No hay peajes en esta ruta',
+
+        float_warn_title: 'Avisos en Ruta',
+        float_warn_radars: 'Radares',
+        float_warn_weather: 'Alertas Clima',
+        float_warn_gas: 'Gasolineras',
+        float_warn_none: 'No hay avisos en esta ruta',
+
+        float_dest_title: 'Información Destino',
+        float_dest_arrival: 'Hora Llegada',
+        float_dest_duration: 'Duración',
+        float_dest_distance: 'Distancia',
+
+        // Botón Generar Ruta
+        btn_generate: 'GENERAR RUTA',
+                    // Textos dinámicos modales
+        float_toll_avoid_msg: 'Has activado "Evitar Peajes"',
+        float_dest_loading: 'Consultando pronóstico...',
+        float_dest_next_hours: 'Próximas Horas',
+        float_dest_error: 'No se pudo obtener el pronóstico del tiempo',
+
+        // Modal KM
+        modal_km_title: 'Buscar Parada por Kilómetros',
+        modal_km_totaldist: 'Distancia total',
+        modal_km_question: '¿A cuántos KM del origen?',
+        modal_km_btn: 'Ver ubicación de este punto',
+        modal_km_searching: 'Buscando dirección...',
+        modal_km_search_near: 'Busca cerca de este punto',
+        modal_km_gas: 'Gasolinera',
+        modal_km_food: 'Comer',
+        modal_km_sleep: 'Dormir',
+        modal_km_help: 'Pulsa botón y elige el lugar en MAPS, copia dirección o nombre y ponlo en PARADA',
+
+        // Modal TIEMPO
+        modal_time_title: 'Buscar Parada por Tiempo',
+        modal_time_total: 'Tiempo total',
+        modal_time_speed: 'Velocidad Media (Km/h)',
+        modal_time_question: '¿A cuántos MINUTOS del origen?',
+        modal_time_btn: 'Ver ubicación en ese tiempo',
+        modal_time_searching: 'Buscando dirección...',
+        modal_time_atmins: 'A',
+        modal_time_mins: 'min',
+        modal_time_copy: 'Copiar ubicación',
+
+        // Modal PEAJES
+        modal_toll_title: '💰 COSTE ESTIMADO APROXIMADO',
+        modal_toll_moto: '🏍️ MOTO',
+        modal_toll_car: '🚗 COCHE',
+        modal_toll_based: 'Basado en',
+        modal_toll_nobooths: 'No se detectaron cabinas de peaje específicas en el escaneo.',
+        modal_toll_estimate: 'El precio es una estimación basada en la distancia recorrida por autopista.',
+        modal_toll_important: '⚠️ IMPORTANTE:',
+        modal_toll_approx: '• Precios aproximados y orientativos',
+        modal_toll_vary: '• Varían según concesionaria y tramo',
+        modal_toll_change: '• Pueden cambiar sin previo aviso',
+        modal_toll_official: '• Consulta precios oficiales antes del viaje',
+        modal_toll_booths: 'Cabinas Detectadas',
+        modal_toll_detected: 'cabina(s) detectada(s)',
+
+        // Validaciones
+        valid_missing_origin: '❌ Falta Origen',
+        valid_origin_text: 'Debes escribir una dirección de Origen.',
+        valid_missing_dest: '❌ Falta Destino',
+        valid_dest_text: 'Debes escribir una dirección de Destino.',
+        valid_incomplete_stop: '❌ Parada Incompleta',
+        valid_stop_nocoords: 'no tiene coordenadas válidas.',
+        valid_solution: '💡 Solución:',
+        valid_solution_1: '1. Escribe la dirección',
+        valid_solution_2: '2. Selecciona una opción de las sugerencias',
+        valid_understood: 'Entendido',
+        valid_error_origin: 'Error Origen',
+        valid_error_dest: 'Error Destino',
+        valid_notfound_1: 'No se pudo encontrar',
+        valid_notfound_2: 'Selecciona una opción de las sugerencias al escribir.',
+
+        // Donate
+        inv: 'Invítame a gasolina',
+        // Mensajes generales
+        msg_generate_first: "Genera una ruta primero.",
+        msg_no_route: "No hay ruta activa.",
+        msg_no_history: "No hay rutas en el historial.",
+        msg_select_or_generate: "Genera o selecciona una ruta.",
+        msg_info: "Info",
+        msg_error: "Error",
+        msg_share: "Compartir",
+        msg_gpx: "GPX",
+        msg_pdf: "PDF"
+    },
+
+    'Català': {
+        plan: 'PLANIFICACIÓ',
+        conf: 'CONFIGURACIÓ RIDER',
+        info: 'INFORMACIÓ EN RUTA',
+        hist: 'HISTORIAL',
+        cont: 'CONTACTE / LEGAL',
+                // Botones principales
+        btngen: 'GENERAR RUTA',
+
+
+        btn_gen: 'GENERAR RUTA',
+        btn_clear: 'NETEJAR MAPA',
+        btn_center: 'CENTRAR',
+
+        lbl_km: 'KM',
+        lbl_trip: 'VIATGE',
+        lbl_toll: 'PEATGES',
+        lbl_warn: 'AVISOS',
+        lbl_dest: 'DESTÍ',
+
+        leg_rad: 'Radars',
+        leg_gas: 'Benzineres',
+        leg_toll: 'Peatges',
+        leg_stop: 'Parades',
+
+        files: 'ARXIUS',
+        gpx: 'GESTIÓ GPX',
+        maps: 'MAPS',
+        pdf: 'GENERAR PDF',
+
+        btn_download_gpx: '💾 Descarregar GPX',
+        btn_import_gpx: '📥 Importar GPX',
+        btn_share: '📤 Compartir amb...',
+        btn_open_maps: '🗺️ Obrir App Maps',
+        btn_reader: '🔗 Lector Enllaços',
+
+        ph_origin: 'Escriu la teva Origen',
+        ph_dest: 'Escriu la teva Destinació',
+        ph_stop: 'Escriu adreça o prem mapa',
+
+        btn_add_stop: 'Parada',
+                txt_revirado: 'Revirat',
+        txt_gas_x2: 'Benzina x2',
+        txt_toll: 'Evitar peatges',
+        txt_scan_radars: 'Escanejar Radars',
+        txt_info_poi: 'Info Detalls POI',
+        txt_clima_50: 'Clima cada 50km',
+        txt_gas_vis: 'Veure Benzineres',
+        txt_vel_media: 'Vel. Mitjana (Km/h)',
+
+        btn_instructions: 'Instruccions d\'Ús',
+        btn_legal: 'RutiWay - Legal / Ajuda',
+                modal_legal_title: 'RutiWay - Tutorial, Legal i Ajuda',
+        modal_tutorial: 'Tutorial',
+        modal_legal: 'Avís Legal',
+        modal_privacy: 'Privadesa',
+        modal_cookies: 'Cookies',
+        modal_about: 'Quant a',
+        legal_privacy_title: 'Privadesa',
+        legal_privacy_text: 'RutiWay no emmagatzema la seva ubicació en cap servidor. Totes les dades es processen en temps real al seu dispositiu per al càlcul de rutes. No compartim informació personal amb tercers.',
+        legal_services_title: 'Dades i Serveis',
+        legal_services_text: 'Utilitzem serveis d\'OpenRouteService (rutes), OpenMeteo (clima) i OpenStreetMap (mapes). Aquests serveis poden recollir dades d\'ús segons les seves pròpies polítiques de privadesa.',
+        legal_files_title: 'Arxius Generats',
+        legal_files_text: 'Els arxius GPX i PDF es generen i guarden localment al seu dispositiu a la carpeta /Descarregues/RutiWay/. RutiWay no té accés a altres arxius del seu dispositiu.',
+        legal_permissions_title: 'Permisos',
+        legal_permissions_text: '<b>Ubicació:</b> Necessari per centrar el mapa i calcular rutes des de la teva posició<br><b>Emmagatzematge:</b> Per guardar arxius GPX i PDF al teu dispositiu<br><b>Internet:</b> Per carregar mapes, calcular rutes i obtenir informació del clima',
+        legal_responsibility_title: 'Responsabilitat',
+        legal_responsibility_text: 'RutiWay és una eina de planificació. L\'usuari és responsable de conduir de forma segura i complir les normes de trànsit. La informació de radars i peatges és aproximada.',
+                instr_panel: '<b>🎯 ÚS DEL PANELL</b><br>• Introdueix origen, destinació i parades als camps corresponents<br>• Configura opcions de ruta (corbes, benzineres, peatges)<br>• Activa alertes de radars i clima<br>• Consulta l\'historial de rutes anteriors<br>• Descarrega GPX, genera PDF o comparteix la teva ruta',
+        instr_mapa: '<b>🗺️ ÚS DEL MAPA</b><br>• <b>Pulsació llarga:</b> Afegeix parada en aquest punt<br>• <b>Icones flotants:</b> Toca KM/VIATGE/PEATGES/AVISOS per veure detalls<br>• <b>Botons superiors:</b> Centrar mapa, netejar, canviar estil, mostrar llocs guardats<br>• <b>Llegenda:</b> Identifica radars🔴, benzineres🟠, peatges🟢 i parades📍<br>• <b>Generar ruta:</b> Botó blau a baix a la dreta',
+                // Icones Flotants
+        float_km_title: 'KM Totals',
+        float_km_total: 'Total',
+        float_km_segments: 'Trams',
+        float_km_segment: 'Tram',
+
+        float_trip_title: 'Trams del Viatge',
+        float_trip_segment: 'Tram',
+        float_trip_from: 'Des de',
+        float_trip_to: 'Fins a',
+        float_trip_distance: 'Distància',
+
+        float_toll_title: 'Peatges',
+        float_toll_name: 'Nom',
+        float_toll_cost: 'Cost',
+        float_toll_total: 'Total Peatges',
+        float_toll_none: 'No hi ha peatges en aquesta ruta',
+
+        float_warn_title: 'Avisos a la Ruta',
+        float_warn_radars: 'Radars',
+        float_warn_weather: 'Alertes Clima',
+        float_warn_gas: 'Benzineres',
+        float_warn_none: 'No hi ha avisos en aquesta ruta',
+
+        float_dest_title: 'Informació Destinació',
+        float_dest_arrival: 'Hora Arribada',
+        float_dest_duration: 'Durada',
+        float_dest_distance: 'Distància',
+        // Botó Generar Ruta
+        btn_generate: 'GENERAR RUTA',
+            // Textos dinàmics modals
+        float_toll_avoid_msg: 'Has activat "Evitar Peatges"',
+        float_dest_loading: 'Consultant previsió...',
+        float_dest_next_hours: 'Properes Hores',
+        float_dest_error: 'No s\'ha pogut obtenir la previsió del temps',
+
+        // Modal KM
+        modal_km_title: 'Buscar Parada per Quilòmetres',
+        modal_km_totaldist: 'Distància total',
+        modal_km_question: 'A quants KM de l\'origen?',
+        modal_km_btn: 'Veure ubicació d\'aquest punt',
+        modal_km_searching: 'Buscant adreça...',
+        modal_km_search_near: 'Busca prop d\'aquest punt',
+        modal_km_gas: 'Benzinera',
+        modal_km_food: 'Menjar',
+        modal_km_sleep: 'Dormir',
+        modal_km_help: 'Prem botó i tria el lloc a MAPS, copia adreça o nom i posa\'l a PARADA',
+
+        // Modal TIEMPO
+        modal_time_title: 'Buscar Parada per Temps',
+        modal_time_total: 'Temps total',
+        modal_time_speed: 'Velocitat Mitjana (Km/h)',
+        modal_time_question: 'A quants MINUTS de l\'origen?',
+        modal_time_btn: 'Veure ubicació en aquest temps',
+        modal_time_searching: 'Buscant adreça...',
+        modal_time_atmins: 'A',
+        modal_time_mins: 'min',
+        modal_time_copy: 'Copiar ubicació',
+
+        // Modal PEAJES
+        modal_toll_title: '💰 COST ESTIMAT APROXIMAT',
+        modal_toll_moto: '🏍️ MOTO',
+        modal_toll_car: '🚗 COTXE',
+        modal_toll_based: 'Basat en',
+        modal_toll_nobooths: 'No es van detectar cabines de peatge específiques a l\'escaneig.',
+        modal_toll_estimate: 'El preu és una estimació basada en la distància recorreguda per autopista.',
+        modal_toll_important: '⚠️ IMPORTANT:',
+        modal_toll_approx: '• Preus aproximats i orientatius',
+        modal_toll_vary: '• Varien segons concessionària i tram',
+        modal_toll_change: '• Poden canviar sense previ avís',
+        modal_toll_official: '• Consulta preus oficials abans del viatge',
+        modal_toll_booths: 'Cabines Detectades',
+        modal_toll_detected: 'cabina(es) detectada(es)',
+
+        // Validaciones
+        valid_missing_origin: '❌ Falta Origen',
+        valid_origin_text: 'Has d\'escriure una adreça d\'Origen.',
+        valid_missing_dest: '❌ Falta Destinació',
+        valid_dest_text: 'Has d\'escriure una adreça de Destinació.',
+        valid_incomplete_stop: '❌ Parada Incompleta',
+        valid_stop_nocoords: 'no té coordenades vàlides.',
+        valid_solution: '💡 Solució:',
+        valid_solution_1: '1. Escriu l\'adreça',
+        valid_solution_2: '2. Selecciona una opció dels suggeriments',
+        valid_solution_3: '3. O elimina la parada si no la necessites',
+        valid_understood: 'Entès',
+        valid_error_origin: 'Error Origen',
+        valid_error_dest: 'Error Destinació',
+        valid_notfound_1: 'No s\'ha pogut trobar',
+        valid_notfound_2: 'Selecciona una opció dels suggeriments en escriure.',
+
+        inv: 'Convida\'m a benzina',
+        // Missatges generals
+        msg_generate_first: "Genera una ruta primer.",
+        msg_no_route: "No hi ha ruta activa.",
+        msg_no_history: "No hi ha rutes a l'historial.",
+        msg_select_or_generate: "Genera o selecciona una ruta.",
+        msg_info: "Info",
+        msg_error: "Error",
+        msg_share: "Compartir",
+        msg_gpx: "GPX",
+        msg_pdf: "PDF"
+    },
+
+
+    'Français': {
+        plan: 'PLANIFICATION',
+        conf: 'CONFIGURATION RIDER',
+        info: 'INFOS SUR ROUTE',
+        hist: 'HISTORIQUE',
+        cont: 'CONTACT / LEGAL',
+                // Botones principales
+        btngen: 'GENERAR RUTA',
+
+
+        btn_gen: 'GÉNÉRER ROUTE',
+        btn_clear: 'NETTOYER CARTE',
+        btn_center: 'CENTRER',
+
+        lbl_km: 'KM',
+        lbl_trip: 'VOYAGE',
+        lbl_toll: 'PÉAGES',
+        lbl_warn: 'AVERTIS',
+        lbl_dest: 'DESTINATION',
+
+        leg_rad: 'Radars',
+        leg_gas: 'Stations',
+        leg_toll: 'Péages',
+        leg_stop: 'Arrêts',
+                txt_revirado: 'Virages',
+        txt_gas_x2: 'Essence x2',
+        txt_toll: 'Éviter péages',
+        txt_scan_radars: 'Scanner Radars',
+        txt_info_poi: 'Info Détails POI',
+        txt_clima_50: 'Climat tous les 50km',
+        txt_gas_vis: 'Voir Stations',
+        txt_vel_media: 'Vit. Moyenne (Km/h)',
+
+
+        files: 'FICHIERS',
+        gpx: 'GESTION GPX',
+        maps: 'MAPS',
+        pdf: 'GÉNÉRER PDF',
+
+        btn_download_gpx: '💾 Télécharger GPX',
+        btn_import_gpx: '📥 Importer GPX',
+        btn_share: '📤 Partager avec...',
+        btn_open_maps: '🗺️ Ouvrir App Maps',
+        btn_reader: '🔗 Lecteur Liens',
+
+        ph_origin: 'Écrivez votre Origine',
+        ph_dest: 'Écrivez votre Destination',
+        ph_stop: 'Écrivez adresse ou appuyez carte',
+
+        btn_add_stop: 'Arrêt',
+        btn_instructions: 'Instructions d\'Utilisation',
+        btn_legal: 'RutiWay - Légal / Aide',
+                modal_legal_title: 'RutiWay - Tutoriel, Légal et Aide',
+        modal_tutorial: 'Tutoriel',
+        modal_legal: 'Mention Légale',
+        modal_privacy: 'Confidentialité',
+        modal_cookies: 'Cookies',
+        modal_about: 'À propos',
+        legal_privacy_title: 'Confidentialité',
+        legal_privacy_text: 'RutiWay ne stocke pas votre position sur un serveur. Toutes les données sont traitées en temps réel sur votre appareil pour le calcul d\'itinéraires. Nous ne partageons aucune information personnelle avec des tiers.',
+        legal_services_title: 'Données et Services',
+        legal_services_text: 'Nous utilisons les services d\'OpenRouteService (routes), OpenMeteo (météo) et OpenStreetMap (cartes). Ces services peuvent collecter des données d\'utilisation selon leurs propres politiques de confidentialité.',
+        legal_files_title: 'Fichiers Générés',
+        legal_files_text: 'Les fichiers GPX et PDF sont générés et enregistrés localement sur votre appareil dans le dossier /Téléchargements/RutiWay/. RutiWay n\'a pas accès aux autres fichiers de votre appareil.',
+        legal_permissions_title: 'Autorisations',
+        legal_permissions_text: '<b>Localisation:</b> Nécessaire pour centrer la carte et calculer les itinéraires depuis votre position<br><b>Stockage:</b> Pour enregistrer les fichiers GPX et PDF sur votre appareil<br><b>Internet:</b> Pour charger les cartes, calculer les itinéraires et obtenir les informations météo',
+        legal_responsibility_title: 'Responsabilité',
+        legal_responsibility_text: 'RutiWay est un outil de planification. L\'utilisateur est responsable de conduire en toute sécurité et de respecter le code de la route. Les informations sur les radars et péages sont approximatives.',
+                instr_panel: '<b>🎯 UTILISATION DU PANNEAU</b><br>• Saisissez origine, destination et arrêts dans les champs correspondants<br>• Configurez les options d\'itinéraire (virages, stations, péages)<br>• Activez les alertes radars et météo<br>• Consultez l\'historique des itinéraires précédents<br>• Téléchargez GPX, générez PDF ou partagez votre itinéraire',
+        instr_mapa: '<b>🗺️ UTILISATION DE LA CARTE</b><br>• <b>Appui long:</b> Ajouter arrêt à ce point<br>• <b>Icônes flottantes:</b> Touchez KM/VOYAGE/PÉAGES/AVERTIS pour voir détails<br>• <b>Boutons supérieurs:</b> Centrer carte, nettoyer, changer style, afficher lieux sauvegardés<br>• <b>Légende:</b> Identifiez radars🔴, stations🟠, péages🟢 et arrêts📍<br>• <b>Générer itinéraire:</b> Bouton bleu en bas à droite',
+                // Icônes Flottantes
+        float_km_title: 'KM Totaux',
+        float_km_total: 'Total',
+        float_km_segments: 'Tronçons',
+        float_km_segment: 'Tronçon',
+
+        float_trip_title: 'Tronçons du Voyage',
+        float_trip_segment: 'Tronçon',
+        float_trip_from: 'De',
+        float_trip_to: 'À',
+        float_trip_distance: 'Distance',
+
+        float_toll_title: 'Péages',
+        float_toll_name: 'Nom',
+        float_toll_cost: 'Coût',
+        float_toll_total: 'Total Péages',
+        float_toll_none: 'Pas de péages sur cet itinéraire',
+
+        float_warn_title: 'Avertissements sur l\'Itinéraire',
+        float_warn_radars: 'Radars',
+        float_warn_weather: 'Alertes Météo',
+        float_warn_gas: 'Stations-service',
+        float_warn_none: 'Pas d\'avertissements sur cet itinéraire',
+
+        float_dest_title: 'Information Destination',
+        float_dest_arrival: 'Heure d\'Arrivée',
+        float_dest_duration: 'Durée',
+        float_dest_distance: 'Distance',
+        // Bouton Générer Itinéraire
+        btn_generate: 'GÉNÉRER ITINÉRAIRE',
+            // Textes dynamiques modaux
+        float_toll_avoid_msg: 'Vous avez activé "Éviter Péages"',
+        float_dest_loading: 'Consultation des prévisions...',
+        float_dest_next_hours: 'Prochaines Heures',
+        float_dest_error: 'Impossible d\'obtenir les prévisions météo',
+
+        // Modal KM
+        modal_km_title: 'Rechercher Arrêt par Kilomètres',
+        modal_km_totaldist: 'Distance totale',
+        modal_km_question: 'À combien de KM de l\'origine ?',
+        modal_km_btn: 'Voir l\'emplacement de ce point',
+        modal_km_searching: 'Recherche d\'adresse...',
+        modal_km_search_near: 'Rechercher près de ce point',
+        modal_km_gas: 'Station-service',
+        modal_km_food: 'Manger',
+        modal_km_sleep: 'Dormir',
+        modal_km_help: 'Appuyez sur le bouton et choisissez le lieu dans MAPS, copiez l\'adresse ou le nom et mettez-le dans ARRÊT',
+
+        // Modal TIEMPO
+        modal_time_title: 'Rechercher Arrêt par Temps',
+        modal_time_total: 'Temps total',
+        modal_time_speed: 'Vitesse Moyenne (Km/h)',
+        modal_time_question: 'À combien de MINUTES de l\'origine ?',
+        modal_time_btn: 'Voir l\'emplacement à ce moment',
+        modal_time_searching: 'Recherche d\'adresse...',
+        modal_time_atmins: 'À',
+        modal_time_mins: 'min',
+        modal_time_copy: 'Copier l\'emplacement',
+
+        // Modal PEAJES
+        modal_toll_title: '💰 COÛT ESTIMÉ APPROXIMATIF',
+        modal_toll_moto: '🏍️ MOTO',
+        modal_toll_car: '🚗 VOITURE',
+        modal_toll_based: 'Basé sur',
+        modal_toll_nobooths: 'Aucun péage spécifique détecté lors du scan.',
+        modal_toll_estimate: 'Le prix est une estimation basée sur la distance parcourue sur autoroute.',
+        modal_toll_important: '⚠️ IMPORTANT :',
+        modal_toll_approx: '• Prix approximatifs et indicatifs',
+        modal_toll_vary: '• Varient selon le concessionnaire et le tronçon',
+        modal_toll_change: '• Peuvent changer sans préavis',
+        modal_toll_official: '• Consultez les prix officiels avant le voyage',
+        modal_toll_booths: 'Péages Détectés',
+        modal_toll_detected: 'péage(s) détecté(s)',
+
+        // Validaciones
+        valid_missing_origin: '❌ Origine Manquante',
+        valid_origin_text: 'Vous devez écrire une adresse d\'Origine.',
+        valid_missing_dest: '❌ Destination Manquante',
+        valid_dest_text: 'Vous devez écrire une adresse de Destination.',
+        valid_incomplete_stop: '❌ Arrêt Incomplet',
+        valid_stop_nocoords: 'n\'a pas de coordonnées valides.',
+        valid_solution: '💡 Solution :',
+        valid_solution_1: '1. Écrivez l\'adresse',
+        valid_solution_2: '2. Sélectionnez une option des suggestions',
+        valid_solution_3: '3. Ou supprimez l\'arrêt si vous n\'en avez pas besoin',
+        valid_understood: 'Compris',
+        valid_error_origin: 'Erreur Origine',
+        valid_error_dest: 'Erreur Destination',
+        valid_notfound_1: 'Impossible de trouver',
+        valid_notfound_2: 'Sélectionnez une option des suggestions en écrivant.',
+
+        inv: 'Offrez-moi du gaz',
+        // Messages généraux
+        msg_generate_first: "Générez d'abord un itinéraire.",
+        msg_no_route: "Aucun itinéraire actif.",
+        msg_no_history: "Aucun itinéraire dans l'historique.",
+        msg_select_or_generate: "Générez ou sélectionnez un itinéraire.",
+        msg_info: "Info",
+        msg_error: "Erreur",
+        msg_share: "Partager",
+        msg_gpx: "GPX",
+        msg_pdf: "PDF"
+    },
+
+
+    'Português': {
+        plan: 'PLANEAMENTO',
+        conf: 'CONFIGURAÇÃO RIDER',
+        info: 'INFORMAÇÃO ROTA',
+        hist: 'HISTÓRICO',
+        cont: 'CONTACTO / LEGAL',
+                // Botones principales
+        btngen: 'GENERAR RUTA',
+
+
+        btn_gen: 'GERAR ROTA',
+        btn_clear: 'LIMPAR MAPA',
+        btn_center: 'CENTRAR',
+
+        lbl_km: 'KM',
+        lbl_trip: 'VIAGEM',
+        lbl_toll: 'PORTAGENS',
+        lbl_warn: 'AVISOS',
+        lbl_dest: 'DESTINO',
+
+        leg_rad: 'Radares',
+        leg_gas: 'Postos',
+        leg_toll: 'Portagens',
+        leg_stop: 'Paragens',
+        txt_toll: 'Evitar portagens',
+        txt_scan_radars: 'Digitalizar Radares',
+        txt_info_poi: 'Info Detalhes POI',
+        txt_clima_50: 'Clima a cada 50km',
+        txt_gas_vis: 'Ver Postos',
+        txt_vel_media: 'Vel. Média (Km/h)',
+
+
+        files: 'ARQUIVOS',
+        gpx: 'GESTÃO GPX',
+        maps: 'MAPS',
+        pdf: 'GERAR PDF',
+
+        btn_download_gpx: '💾 Baixar GPX',
+        btn_import_gpx: '📥 Importar GPX',
+        btn_share: '📤 Partilhar com...',
+        btn_open_maps: '🗺️ Abrir App Maps',
+        btn_reader: '🔗 Leitor Links',
+
+        ph_origin: 'Escreva sua Origem',
+        ph_dest: 'Escreva seu Destino',
+        ph_stop: 'Escreva endereço ou toque mapa',
+
+        btn_add_stop: 'Paragem',
+                txt_revirado: 'Curve',
+        txt_gas_x2: 'Benzina x2',
+        txt_toll: 'Evitare pedaggi',
+        txt_scan_radars: 'Scansiona Autovelox',
+        txt_info_poi: 'Info Dettagli POI',
+        txt_clima_50: 'Clima ogni 50km',
+        txt_gas_vis: 'Vedi Distributori',
+        txt_vel_media: 'Vel. Media (Km/h)',
+
+        btn_instructions: 'Instruções de Uso',
+        btn_legal: 'RutiWay - Legal / Ajuda',
+                modal_legal_title: 'RutiWay - Tutorial, Legal e Ajuda',
+        modal_tutorial: 'Tutorial',
+        modal_legal: 'Aviso Legal',
+        modal_privacy: 'Privacidade',
+        modal_cookies: 'Cookies',
+        modal_about: 'Sobre',
+        legal_privacy_title: 'Privacidade',
+        legal_privacy_text: 'RutiWay não armazena sua localização em nenhum servidor. Todos os dados são processados em tempo real no seu dispositivo para o cálculo de rotas. Não compartilhamos informações pessoais com terceiros.',
+        legal_services_title: 'Dados e Serviços',
+        legal_services_text: 'Utilizamos serviços do OpenRouteService (rotas), OpenMeteo (clima) e OpenStreetMap (mapas). Esses serviços podem coletar dados de uso de acordo com suas próprias políticas de privacidade.',
+        legal_files_title: 'Arquivos Gerados',
+        legal_files_text: 'Os arquivos GPX e PDF são gerados e salvos localmente no seu dispositivo na pasta /Downloads/RutiWay/. RutiWay não tem acesso a outros arquivos do seu dispositivo.',
+        legal_permissions_title: 'Permissões',
+        legal_permissions_text: '<b>Localização:</b> Necessário para centralizar o mapa e calcular rotas a partir da sua posição<br><b>Armazenamento:</b> Para salvar arquivos GPX e PDF no seu dispositivo<br><b>Internet:</b> Para carregar mapas, calcular rotas e obter informações meteorológicas',
+        legal_responsibility_title: 'Responsabilidade',
+        legal_responsibility_text: 'RutiWay é uma ferramenta de planejamento. O usuário é responsável por dirigir com segurança e cumprir as normas de trânsito. As informações sobre radares e pedágios são aproximadas.',
+                instr_panel: '<b>🎯 USO DO PAINEL</b><br>• Insira origem, destino e paragens nos campos correspondentes<br>• Configure opções de rota (curvas, postos, portagens)<br>• Ative alertas de radares e clima<br>• Consulte o histórico de rotas anteriores<br>• Baixe GPX, gere PDF ou partilhe sua rota',
+        instr_mapa: '<b>🗺️ USO DO MAPA</b><br>• <b>Toque longo:</b> Adicionar paragem neste ponto<br>• <b>Ícones flutuantes:</b> Toque KM/VIAGEM/PORTAGENS/AVISOS para ver detalhes<br>• <b>Botões superiores:</b> Centralizar mapa, limpar, mudar estilo, mostrar locais guardados<br>• <b>Legenda:</b> Identifique radares🔴, postos🟠, portagens🟢 e paragens📍<br>• <b>Gerar rota:</b> Botão azul embaixo à direita',
+                // Ícones Flutuantes
+        float_km_title: 'KM Totais',
+        float_km_total: 'Total',
+        float_km_segments: 'Troços',
+        float_km_segment: 'Troço',
+
+        float_trip_title: 'Troços da Viagem',
+        float_trip_segment: 'Troço',
+        float_trip_from: 'De',
+        float_trip_to: 'Para',
+        float_trip_distance: 'Distância',
+
+        float_toll_title: 'Portagens',
+        float_toll_name: 'Nome',
+        float_toll_cost: 'Custo',
+        float_toll_total: 'Total Portagens',
+        float_toll_none: 'Sem portagens nesta rota',
+
+        float_warn_title: 'Avisos na Rota',
+        float_warn_radars: 'Radares',
+        float_warn_weather: 'Alertas Clima',
+        float_warn_gas: 'Postos de Combustível',
+        float_warn_none: 'Sem avisos nesta rota',
+
+        float_dest_title: 'Informação Destino',
+        float_dest_arrival: 'Hora de Chegada',
+        float_dest_duration: 'Duração',
+        float_dest_distance: 'Distância',
+        // Botão Gerar Rota
+        btn_generate: 'GERAR ROTA',
+                   // Textos dinâmicos modais
+        float_toll_avoid_msg: 'Ativaste "Evitar Portagens"',
+        float_dest_loading: 'A consultar previsão...',
+        float_dest_next_hours: 'Próximas Horas',
+        float_dest_error: 'Não foi possível obter a previsão do tempo',
+
+        // Modal KM
+        modal_km_title: 'Procurar Paragem por Quilómetros',
+        modal_km_totaldist: 'Distância total',
+        modal_km_question: 'A quantos KM da origem?',
+        modal_km_btn: 'Ver localização deste ponto',
+        modal_km_searching: 'A procurar morada...',
+        modal_km_search_near: 'Procurar perto deste ponto',
+        modal_km_gas: 'Posto de gasolina',
+        modal_km_food: 'Comer',
+        modal_km_sleep: 'Dormir',
+        modal_km_help: 'Prima o botão e escolha o local no MAPS, copie a morada ou nome e coloque-o em PARAGEM',
+
+        // Modal TIEMPO
+        modal_time_title: 'Procurar Paragem por Tempo',
+        modal_time_total: 'Tempo total',
+        modal_time_speed: 'Velocidade Média (Km/h)',
+        modal_time_question: 'A quantos MINUTOS da origem?',
+        modal_time_btn: 'Ver localização nesse tempo',
+        modal_time_searching: 'A procurar morada...',
+        modal_time_atmins: 'A',
+        modal_time_mins: 'min',
+        modal_time_copy: 'Copiar localização',
+
+        // Modal PEAJES
+        modal_toll_title: '💰 CUSTO ESTIMADO APROXIMADO',
+        modal_toll_moto: '🏍️ MOTO',
+        modal_toll_car: '🚗 CARRO',
+        modal_toll_based: 'Baseado em',
+        modal_toll_nobooths: 'Não foram detetadas portagens específicas na digitalização.',
+        modal_toll_estimate: 'O preço é uma estimativa baseada na distância percorrida em autoestrada.',
+        modal_toll_important: '⚠️ IMPORTANTE:',
+        modal_toll_approx: '• Preços aproximados e orientativos',
+        modal_toll_vary: '• Variam conforme a concessionária e troço',
+        modal_toll_change: '• Podem mudar sem aviso prévio',
+        modal_toll_official: '• Consulte os preços oficiais antes da viagem',
+        modal_toll_booths: 'Portagens Detetadas',
+        modal_toll_detected: 'portagem(ns) detetada(s)',
+
+        // Validaciones
+        valid_missing_origin: '❌ Falta Origem',
+        valid_origin_text: 'Deve escrever uma morada de Origem.',
+        valid_missing_dest: '❌ Falta Destino',
+        valid_dest_text: 'Deve escrever uma morada de Destino.',
+        valid_incomplete_stop: '❌ Paragem Incompleta',
+        valid_stop_nocoords: 'não tem coordenadas válidas.',
+        valid_solution: '💡 Solução:',
+        valid_solution_1: '1. Escreva a morada',
+        valid_solution_2: '2. Selecione uma opção das sugestões',
+        valid_solution_3: '3. Ou elimine a paragem se não precisar',
+        valid_understood: 'Entendido',
+        valid_error_origin: 'Erro Origem',
+        valid_error_dest: 'Erro Destino',
+        valid_notfound_1: 'Não foi possível encontrar',
+        valid_notfound_2: 'Selecione uma opção das sugestões ao escrever.',
+
+        inv: 'Ofereça gasolina',
+        // Mensagens gerais
+        msg_generate_first: "Gere uma rota primeiro.",
+        msg_no_route: "Não há rota ativa.",
+        msg_no_history: "Não há rotas no histórico.",
+        msg_select_or_generate: "Gere ou selecione uma rota.",
+        msg_info: "Info",
+        msg_error: "Erro",
+        msg_share: "Partilhar",
+        msg_gpx: "GPX",
+        msg_pdf: "PDF"
+    },
+
+    'Italiano': {
+        plan: 'PIANIFICAZIONE',
+        conf: 'CONFIGURAZIONE RIDER',
+        info: 'INFO PERCORSO',
+        hist: 'STORICO',
+        cont: 'CONTATTO / LEGALE',
+                // Botones principales
+        btngen: 'GENERAR RUTA',
+
+
+        btn_gen: 'GENERA PERCORSO',
+        btn_clear: 'PULISCI MAPPA',
+        btn_center: 'CENTRA',
+
+        lbl_km: 'KM',
+        lbl_trip: 'VIAGGIO',
+        lbl_toll: 'PEDAGGI',
+        lbl_warn: 'AVVISI',
+        lbl_dest: 'DESTINAZIONE',
+
+        leg_rad: 'Autovelox',
+        leg_gas: 'Distributori',
+        leg_toll: 'Pedaggi',
+        leg_stop: 'Soste',
+
+        files: 'ARCHIVI',
+        gpx: 'GESTIONE GPX',
+        maps: 'MAPS',
+        pdf: 'GENERA PDF',
+
+        btn_download_gpx: '💾 Scarica GPX',
+        btn_import_gpx: '📥 Importa GPX',
+        btn_share: '📤 Condividi con...',
+        btn_open_maps: '🗺️ Apri App Maps',
+        btn_reader: '🔗 Lettore Link',
+
+        ph_origin: 'Scrivi tua Origine',
+        ph_dest: 'Scrivi tua Destinazione',
+        ph_stop: 'Scrivi indirizzo o tocca mappa',
+
+        btn_add_stop: 'Sosta',
+        btn_instructions: 'Istruzioni d\'Uso',
+        btn_legal: 'RutiWay - Legale / Aiuto',
+                modal_legal_title: 'RutiWay - Tutorial, Legale e Aiuto',
+        modal_tutorial: 'Tutorial',
+        modal_legal: 'Note Legali',
+        modal_privacy: 'Privacy',
+        modal_cookies: 'Cookies',
+        modal_about: 'Informazioni',
+        legal_privacy_title: 'Privacy',
+        legal_privacy_text: 'RutiWay non memorizza la tua posizione su alcun server. Tutti i dati vengono elaborati in tempo reale sul tuo dispositivo per il calcolo dei percorsi. Non condividiamo informazioni personali con terze parti.',
+        legal_services_title: 'Dati e Servizi',
+        legal_services_text: 'Utilizziamo i servizi di OpenRouteService (percorsi), OpenMeteo (meteo) e OpenStreetMap (mappe). Questi servizi possono raccogliere dati di utilizzo secondo le proprie politiche sulla privacy.',
+        legal_files_title: 'File Generati',
+        legal_files_text: 'I file GPX e PDF vengono generati e salvati localmente sul tuo dispositivo nella cartella /Download/RutiWay/. RutiWay non ha accesso ad altri file del tuo dispositivo.',
+        legal_permissions_title: 'Autorizzazioni',
+        legal_permissions_text: '<b>Posizione:</b> Necessaria per centrare la mappa e calcolare percorsi dalla tua posizione<br><b>Archiviazione:</b> Per salvare file GPX e PDF sul tuo dispositivo<br><b>Internet:</b> Per caricare mappe, calcolare percorsi e ottenere informazioni meteo',
+        legal_responsibility_title: 'Responsabilità',
+        legal_responsibility_text: 'RutiWay è uno strumento di pianificazione. L\'utente è responsabile di guidare in sicurezza e rispettare le norme del traffico. Le informazioni su autovelox e pedaggi sono approssimative.',
+                instr_panel: '<b>🎯 USO DEL PANNELLO</b><br>• Inserisci origine, destinazione e soste nei campi corrispondenti<br>• Configura opzioni percorso (curve, distributori, pedaggi)<br>• Attiva avvisi autovelox e meteo<br>• Consulta cronologia percorsi precedenti<br>• Scarica GPX, genera PDF o condividi il tuo percorso',
+        instr_mapa: '<b>🗺️ USO DELLA MAPPA</b><br>• <b>Pressione lunga:</b> Aggiungi sosta in questo punto<br>• <b>Icone flottanti:</b> Tocca KM/VIAGGIO/PEDAGGI/AVVISI per vedere dettagli<br>• <b>Pulsanti superiori:</b> Centrare mappa, pulire, cambiare stile, mostrare luoghi salvati<br>• <b>Legenda:</b> Identifica autovelox🔴, distributori🟠, pedaggi🟢 e soste📍<br>• <b>Genera percorso:</b> Pulsante blu in basso a destra',
+                // Icone Flottanti
+        float_km_title: 'KM Totali',
+        float_km_total: 'Totale',
+        float_km_segments: 'Tratte',
+        float_km_segment: 'Tratta',
+
+        float_trip_title: 'Tratte del Viaggio',
+        float_trip_segment: 'Tratta',
+        float_trip_from: 'Da',
+        float_trip_to: 'A',
+        float_trip_distance: 'Distanza',
+
+        float_toll_title: 'Pedaggi',
+        float_toll_name: 'Nome',
+        float_toll_cost: 'Costo',
+        float_toll_total: 'Totale Pedaggi',
+        float_toll_none: 'Nessun pedaggio su questo percorso',
+
+        float_warn_title: 'Avvisi sul Percorso',
+        float_warn_radars: 'Autovelox',
+        float_warn_weather: 'Allerte Meteo',
+        float_warn_gas: 'Distributori',
+        float_warn_none: 'Nessun avviso su questo percorso',
+
+        float_dest_title: 'Informazioni Destinazione',
+        float_dest_arrival: 'Ora di Arrivo',
+        float_dest_duration: 'Durata',
+        float_dest_distance: 'Distanza',
+        // Pulsante Genera Percorso
+        btn_generate: 'GENERA PERCORSO',
+                    // Testi dinamici modali
+        float_toll_avoid_msg: 'Hai attivato "Evita Pedaggi"',
+        float_dest_loading: 'Consultando previsioni...',
+        float_dest_next_hours: 'Prossime Ore',
+        float_dest_error: 'Impossibile ottenere le previsioni meteo',
+
+        // Modal KM
+        modal_km_title: 'Cerca Sosta per Chilometri',
+        modal_km_totaldist: 'Distanza totale',
+        modal_km_question: 'A quanti KM dall\'origine?',
+        modal_km_btn: 'Vedi posizione di questo punto',
+        modal_km_searching: 'Ricerca indirizzo...',
+        modal_km_search_near: 'Cerca vicino a questo punto',
+        modal_km_gas: 'Distributore',
+        modal_km_food: 'Mangiare',
+        modal_km_sleep: 'Dormire',
+        modal_km_help: 'Premi il pulsante e scegli il luogo in MAPS, copia indirizzo o nome e mettilo in SOSTA',
+
+        // Modal TIEMPO
+        modal_time_title: 'Cerca Sosta per Tempo',
+        modal_time_total: 'Tempo totale',
+        modal_time_speed: 'Velocità Media (Km/h)',
+        modal_time_question: 'A quanti MINUTI dall\'origine?',
+        modal_time_btn: 'Vedi posizione in quel momento',
+        modal_time_searching: 'Ricerca indirizzo...',
+        modal_time_atmins: 'A',
+        modal_time_mins: 'min',
+        modal_time_copy: 'Copia posizione',
+
+        // Modal PEAJES
+        modal_toll_title: '💰 COSTO STIMATO APPROSSIMATIVO',
+        modal_toll_moto: '🏍️ MOTO',
+        modal_toll_car: '🚗 AUTO',
+        modal_toll_based: 'Basato su',
+        modal_toll_nobooths: 'Non sono stati rilevati caselli specifici nella scansione.',
+        modal_toll_estimate: 'Il prezzo è una stima basata sulla distanza percorsa in autostrada.',
+        modal_toll_important: '⚠️ IMPORTANTE:',
+        modal_toll_approx: '• Prezzi approssimativi e indicativi',
+        modal_toll_vary: '• Variano secondo concessionaria e tratto',
+        modal_toll_change: '• Possono cambiare senza preavviso',
+        modal_toll_official: '• Consulta i prezzi ufficiali prima del viaggio',
+        modal_toll_booths: 'Caselli Rilevati',
+        modal_toll_detected: 'casello(i) rilevato(i)',
+
+        // Validaciones
+        valid_missing_origin: '❌ Manca Origine',
+        valid_origin_text: 'Devi scrivere un indirizzo di Origine.',
+        valid_missing_dest: '❌ Manca Destinazione',
+        valid_dest_text: 'Devi scrivere un indirizzo di Destinazione.',
+        valid_incomplete_stop: '❌ Sosta Incompleta',
+        valid_stop_nocoords: 'non ha coordinate valide.',
+        valid_solution: '💡 Soluzione:',
+        valid_solution_1: '1. Scrivi l\'indirizzo',
+        valid_solution_2: '2. Seleziona un\'opzione dai suggerimenti',
+        valid_solution_3: '3. Oppure elimina la sosta se non serve',
+        valid_understood: 'Capito',
+        valid_error_origin: 'Errore Origine',
+        valid_error_dest: 'Errore Destinazione',
+        valid_notfound_1: 'Impossibile trovare',
+        valid_notfound_2: 'Seleziona un\'opzione dai suggerimenti durante la scrittura.',
+
+        inv: 'Offrimi benzina',
+        // Messaggi generali
+        msg_generate_first: "Genera prima un percorso.",
+        msg_no_route: "Nessun percorso attivo.",
+        msg_no_history: "Nessun percorso nello storico.",
+        msg_select_or_generate: "Genera o seleziona un percorso.",
+        msg_info: "Info",
+        msg_error: "Errore",
+        msg_share: "Condividi",
+        msg_gpx: "GPX",
+        msg_pdf: "PDF"
+    },
+
+
+    'English': {
+        plan: 'PLANNING',
+        conf: 'RIDER CONFIG',
+        info: 'ROUTE INFO',
+        hist: 'HISTORY',
+        cont: 'CONTACT / LEGAL',
+                // Botones principales
+        btngen: 'GENERAR RUTA',
+
+
+        btn_gen: 'GENERATE ROUTE',
+        btn_clear: 'CLEAR MAP',
+        btn_center: 'CENTER',
+
+        lbl_km: 'KM',
+        lbl_trip: 'TRIP',
+        lbl_toll: 'TOLLS',
+        lbl_warn: 'WARNINGS',
+        lbl_dest: 'DESTINATION',
+
+        leg_rad: 'Speed Cams',
+        leg_gas: 'Gas Stations',
+        leg_toll: 'Tolls',
+        leg_stop: 'Stops',
+        txt_revirado: 'Curvy Roads',
+        txt_gas_x2: 'Gas x2',
+        txt_toll: 'Avoid tolls',
+        txt_scan_radars: 'Scan Speed Cams',
+        txt_info_poi: 'POI Details Info',
+        txt_clima_50: 'Weather every 50km',
+        txt_gas_vis: 'Show Gas Stations',
+        txt_vel_media: 'Avg Speed (Km/h)',
+
+
+        files: 'FILES',
+        gpx: 'GPX MANAGEMENT',
+        maps: 'MAPS',
+        pdf: 'GENERATE PDF',
+
+        btn_download_gpx: '💾 Download GPX',
+        btn_import_gpx: '📥 Import GPX',
+        btn_share: '📤 Share with...',
+        btn_open_maps: '🗺️ Open Maps App',
+        btn_reader: '🔗 Link Reader',
+
+        ph_origin: 'Type your Origin',
+        ph_dest: 'Type your Destination',
+        ph_stop: 'Type address or tap map',
+
+        btn_add_stop: 'Stop',
+        btn_instructions: 'Usage Instructions',
+        btn_legal: 'RutiWay - Legal / Help',
+                modal_legal_title: 'RutiWay - Tutorial, Legal & Help',
+        modal_tutorial: 'Tutorial',
+        modal_legal: 'Legal Notice',
+        modal_privacy: 'Privacy',
+        modal_cookies: 'Cookies',
+        modal_about: 'About',
+        legal_privacy_title: 'Privacy',
+        legal_privacy_text: 'RutiWay does not store your location on any server. All data is processed in real-time on your device for route calculation. We do not share personal information with third parties.',
+        legal_services_title: 'Data and Services',
+        legal_services_text: 'We use services from OpenRouteService (routes), OpenMeteo (weather) and OpenStreetMap (maps). These services may collect usage data according to their own privacy policies.',
+        legal_files_title: 'Generated Files',
+        legal_files_text: 'GPX and PDF files are generated and saved locally on your device in the /Downloads/RutiWay/ folder. RutiWay does not have access to other files on your device.',
+        legal_permissions_title: 'Permissions',
+        legal_permissions_text: '<b>Location:</b> Required to center the map and calculate routes from your position<br><b>Storage:</b> To save GPX and PDF files on your device<br><b>Internet:</b> To load maps, calculate routes and get weather information',
+        legal_responsibility_title: 'Responsibility',
+        legal_responsibility_text: 'RutiWay is a planning tool. The user is responsible for driving safely and complying with traffic regulations. Speed camera and toll information is approximate.',
+                instr_panel: '<b>🎯 PANEL USAGE</b><br>• Enter origin, destination and stops in the corresponding fields<br>• Configure route options (curves, gas stations, tolls)<br>• Activate speed camera and weather alerts<br>• Check history of previous routes<br>• Download GPX, generate PDF or share your route',
+        instr_mapa: '<b>🗺️ MAP USAGE</b><br>• <b>Long press:</b> Add stop at this point<br>• <b>Floating icons:</b> Tap KM/TRIP/TOLLS/WARNINGS to see details<br>• <b>Top buttons:</b> Center map, clear, change style, show saved places<br>• <b>Legend:</b> Identify speed cams🔴, gas stations🟠, tolls🟢 and stops📍<br>• <b>Generate route:</b> Blue button bottom right',
+                // Floating Icons
+        float_km_title: 'Total KM',
+        float_km_total: 'Total',
+        float_km_segments: 'Segments',
+        float_km_segment: 'Segment',
+
+        float_trip_title: 'Trip Segments',
+        float_trip_segment: 'Segment',
+        float_trip_from: 'From',
+        float_trip_to: 'To',
+        float_trip_distance: 'Distance',
+
+        float_toll_title: 'Tolls',
+        float_toll_name: 'Name',
+        float_toll_cost: 'Cost',
+        float_toll_total: 'Total Tolls',
+        float_toll_none: 'No tolls on this route',
+
+        float_warn_title: 'Route Warnings',
+        float_warn_radars: 'Speed Cameras',
+        float_warn_weather: 'Weather Alerts',
+        float_warn_gas: 'Gas Stations',
+        float_warn_none: 'No warnings on this route',
+
+        float_dest_title: 'Destination Info',
+        float_dest_arrival: 'Arrival Time',
+        float_dest_duration: 'Duration',
+        float_dest_distance: 'Distance',
+        // Generate Route Button
+        btn_generate: 'GENERATE ROUTE',
+                    // Dynamic modal texts
+        float_toll_avoid_msg: 'You have activated "Avoid Tolls"',
+        float_dest_loading: 'Checking forecast...',
+        float_dest_next_hours: 'Next Hours',
+        float_dest_error: 'Could not get weather forecast',
+
+        // Modal KM
+        modal_km_title: 'Search Stop by Kilometers',
+        modal_km_totaldist: 'Total distance',
+        modal_km_question: 'How many KM from origin?',
+        modal_km_btn: 'View location of this point',
+        modal_km_searching: 'Searching address...',
+        modal_km_search_near: 'Search near this point',
+        modal_km_gas: 'Gas station',
+        modal_km_food: 'Eat',
+        modal_km_sleep: 'Sleep',
+        modal_km_help: 'Press button and choose location in MAPS, copy address or name and put it in STOP',
+
+        // Modal TIME
+        modal_time_title: 'Search Stop by Time',
+        modal_time_total: 'Total time',
+        modal_time_speed: 'Average Speed (Km/h)',
+        modal_time_question: 'How many MINUTES from origin?',
+        modal_time_btn: 'View location at that time',
+        modal_time_searching: 'Searching address...',
+        modal_time_atmins: 'At',
+        modal_time_mins: 'min',
+        modal_time_copy: 'Copy location',
+
+        // Modal TOLLS
+        modal_toll_title: '💰 ESTIMATED APPROXIMATE COST',
+        modal_toll_moto: '🏍️ MOTORCYCLE',
+        modal_toll_car: '🚗 CAR',
+        modal_toll_based: 'Based on',
+        modal_toll_nobooths: 'No specific toll booths detected in the scan.',
+        modal_toll_estimate: 'The price is an estimate based on the distance traveled on highways.',
+        modal_toll_important: '⚠️ IMPORTANT:',
+        modal_toll_approx: '• Approximate and indicative prices',
+        modal_toll_vary: '• Vary by concessionaire and section',
+        modal_toll_change: '• May change without notice',
+        modal_toll_official: '• Check official prices before the trip',
+        modal_toll_booths: 'Detected Booths',
+        modal_toll_detected: 'booth(s) detected',
+
+        // Validations
+        valid_missing_origin: '❌ Missing Origin',
+        valid_origin_text: 'You must enter an Origin address.',
+        valid_missing_dest: '❌ Missing Destination',
+        valid_dest_text: 'You must enter a Destination address.',
+        valid_incomplete_stop: '❌ Incomplete Stop',
+        valid_stop_nocoords: 'does not have valid coordinates.',
+        valid_solution: '💡 Solution:',
+        valid_solution_1: '1. Write the address',
+        valid_solution_2: '2. Select an option from the suggestions',
+        valid_solution_3: '3. Or delete the stop if you don\'t need it',
+        valid_understood: 'Understood',
+        valid_error_origin: 'Origin Error',
+        valid_error_dest: 'Destination Error',
+        valid_notfound_1: 'Could not find',
+        valid_notfound_2: 'Select an option from the suggestions when typing.',
+
+                inv: 'Buy me gas',
+        // General messages
+        msg_generate_first: "Generate a route first.",
+        msg_no_route: "No active route.",
+        msg_no_history: "No routes in history.",
+        msg_select_or_generate: "Generate or select a route.",
+        msg_info: "Info",
+        msg_error: "Error",
+        msg_share: "Share",
+        msg_gpx: "GPX",
+        msg_pdf: "PDF"
     }
+};
+// ===== FIN DICCIONARIO TRADUCCIONES =====
 
+// INICIO - FUNCIÓN CLOSESPLASH
 function closeSplash() {
     const splash = document.getElementById('splash-screen');
     splash.classList.add('hide');
@@ -1141,24 +1833,104 @@ function closeSplash() {
         document.body.classList.add('menu-active');
     }, 500);
 }
-// FIN - WINDOW ONLOAD CON SPLASH
+// FIN - FUNCIÓN CLOSESPLASH
 
-    function updateCountry() {
-        const country = document.getElementById('s-country').value;
-        const data = LANGS[country] || LANGS['España'];
-        document.getElementById('flag-display').innerText = data.flag;
-        currentLang = data.def;
-        document.getElementById('lang-btn').innerText = currentLang;
-        updateLangDropdown();
-        translateUI(); updateRegions();
+// INICIO - FUNCIÓN UPDATECOUNTRY
+function updateCountry() {
+    const country = document.getElementById('s-country').value;
+    const data = LANGS[country] || LANGS['España'];
+
+    // 1) BANDERA DEL PAÍS
+    document.getElementById('flag-display').innerText = data.flag;
+
+    // 2) IDIOMA POR DEFECTO
+    currentLang = data.def;
+
+    // 3) BANDERA DEL IDIOMA EN EL BOTÓN
+    const btn = document.getElementById('lang-btn');
+    const flag = LANG_FLAGS[currentLang];
+
+    if (flag && flag.startsWith('flags/')) {
+        // PNG local
+        btn.innerHTML = `<img src="${flag}" style="width:20px;height:15px;object-fit:cover;margin-right:4px;vertical-align:middle;border-radius:2px;" onerror="this.style.display='none'"> <span>${currentLang}</span>`;
+    } else if (flag) {
+        // Emoji
+        btn.innerHTML = `<span style="font-size:1.1rem;margin-right:4px;">${flag}</span> <span>${currentLang}</span>`;
+    } else {
+        // Sin bandera
+        btn.innerText = currentLang;
     }
+
+    // 4) Actualizar dropdown + traducciones + regiones
+    updateLangDropdown();
+    translateUI();
+    updateRegions();
+}
+// FIN - FUNCIÓN UPDATECOUNTRY
+
+// INICIO - FUNCIÓN UPDATELEGEND
+function updateLegend() {
+    const t = DICT[currentLang] || DICT['Castellano'];
+    const legendContainer = document.querySelector('.map-legend');
+
+    if (!legendContainer) return;
+
+    let html = '<div id="l-routes"></div>';
+    html += '<hr style="border:0; border-top:1px solid #444; margin:5px 0">';
+    html += `<div class="leg-i"><span class="leg-left"><span class="dot" style="background:#ff4b2b"></span> ${t.leg_rad}</span></div>`;
+    html += `<div class="leg-i"><span class="leg-left"><span class="dot" style="background:#ff9800"></span> ${t.leg_gas}</span></div>`;
+    html += `<div class="leg-i"><span class="leg-left"><span class="dot" style="background:#4caf50"></span> ${t.leg_toll}</span></div>`;
+    html += `<div class="leg-i"><span class="leg-left">📍 ${t.leg_stop}</span></div>`;
+
+    legendContainer.innerHTML = html;
+
+    // Actualizar rutas del historial
+    updateLegendRoutes();
+}
+
+function updateLegendRoutes() {
+    const routesDiv = document.getElementById('l-routes');
+    if (!routesDiv) return;
+
+    if (history.length === 0) {
+        routesDiv.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+    history.forEach(h => {
+        const isActive = activeRoute === h ? 'font-weight:bold;' : '';
+        html += `<div class="leg-i" style="${isActive}cursor:pointer;" onclick="selectHistoryItem(${history.indexOf(h)})">
+            <span style="color:${h.color};font-size:1.2rem;">━━</span>
+            <span style="color:#ddd;">Ruta #${h.num}</span>
+            <span style="color:#888;font-size:0.65rem;margin-left:auto;">${h.dist} km</span>
+        </div>`;
+    });
+
+    routesDiv.innerHTML = html;
+}
+// FIN - FUNCIÓN UPDATELEGEND
+
+// INICIO - WINDOW ONLOAD CON SPLASH
+window.onload = function() {
+    updateCountry();
+    setTimeout(loadConfig, 100);
+    updateBtnStyle();
+    updateRouteCountUI();
+
+    // SPLASH: Cerrar al hacer clic en cualquier parte
+    document.getElementById('splash-screen').addEventListener('click', closeSplash);
+
+    // NO abrir menú automáticamente (esperar splash)
+};
+// FIN - WINDOW ONLOAD
+
+
 
     function toggleLangDropdown() {
         const el = document.getElementById('lang-list');
         el.style.display = el.style.display === 'block' ? 'none' : 'block';
     }
-// Idiomas no disponibles todavía (mostrar como deshabilitados)
-const UNAVAILABLE = ['Valencià', 'Galego', 'Euskera', 'Aranés', 'Brezhoneg', 'Occità'];
 
     function updateLangDropdown() {
     const country = document.getElementById('s-country').value;
@@ -1220,132 +1992,254 @@ const UNAVAILABLE = ['Valencià', 'Galego', 'Euskera', 'Aranés', 'Brezhoneg', '
 
 
 
-// INICIO BLOQUE - FUNCIÓN translateUI COMPLETA v2.0.4 CORREGIDA
+    // INICIO BLOQUE - FUNCIÓN translateUI() COMPLETA v2.0.7
 function translateUI() {
-    const t = DICT[currentLang];
-    if(!t) return;
+    const t = DICT[currentLang] || DICT['Castellano'];
 
-    // === MENÚ LATERAL ===
-    document.querySelector('.t-plan').innerText = t.plan;
-    document.querySelector('.t-conf').innerText = t.conf;
-    document.querySelector('.t-info').innerText = t.info;
-    document.querySelector('.t-hist').innerText = t.hist;
-    document.querySelector('.t-contact').innerText = t.cont;
-    document.getElementById('t-invite').innerText = t.inv;
-    document.getElementById('t-invite-2').innerText = t.inv;
+    // 1) TÍTULOS SECCIONES MENÚ
+    const planTitle = document.querySelector('.t-plan');
+    const confTitle = document.querySelector('.t-conf');
+    const infoTitle = document.querySelector('.t-info');
+    const histTitle = document.querySelector('.t-hist');
+    const contTitle = document.querySelector('.t-contact');
 
-    // === PLACEHOLDERS ===
-    document.getElementById('ori').placeholder = t.orig;
-    document.getElementById('des').placeholder = t.dest;
-    document.querySelectorAll('.waypoint-input').forEach(input => {
-        input.placeholder = t.pstop;
+    if (planTitle) planTitle.innerText = t.plan;
+    if (confTitle) confTitle.innerText = t.conf;
+    if (infoTitle) infoTitle.innerText = t.info;
+    if (histTitle) histTitle.innerText = t.hist;
+    if (contTitle) contTitle.innerText = t.cont;
+
+    // 2) ESTADÍSTICAS (KM, VIAJE, PEAJES, AVISOS, DESTINO)
+    const lblKm = document.getElementById('lbl-km');
+    const lblTrip = document.getElementById('lbl-trip');
+    const lblToll = document.getElementById('lbl-toll');
+    const lblWarn = document.getElementById('lbl-warn');
+    const lblDest = document.getElementById('lbl-dest');
+
+    if (lblKm) lblKm.innerText = t.lbl_km;
+    if (lblTrip) lblTrip.innerText = t.lbl_trip;
+    if (lblToll) lblToll.innerText = t.lbl_toll;
+    if (lblWarn) lblWarn.innerText = t.lbl_warn;
+    if (lblDest) lblDest.innerText = t.lbl_dest;
+
+    // 3) PLACEHOLDERS INPUTS
+    const oriInput = document.getElementById('ori');
+    const desInput = document.getElementById('des');
+
+    if (oriInput) oriInput.placeholder = t.ph_origin;
+    if (desInput) desInput.placeholder = t.ph_dest;
+
+    // Actualizar placeholders de paradas existentes
+    document.querySelectorAll('input[id^="stop-input-"]').forEach(input => {
+        input.placeholder = t.ph_stop;
     });
 
-    // === CHECKBOXES ===
-    const reviradoDiv = document.getElementById('c-curvy')?.closest('.conf-item');
-    if(reviradoDiv) reviradoDiv.querySelector('div').innerHTML = `<i class="fa fa-route"></i> ${t.curv}`;
+    // 4) BOTONES ARCHIVO (dentro de sub-colls)
+    const btnDownloadGpx = document.querySelector('button[onclick="saveGPX()"]');
+    const btnShare = document.querySelector('button[onclick="shareRoute()"]');
+    const btnOpenMaps = document.querySelector('button[onclick="openInMaps()"]');
+    const btnReader = document.querySelector('button[onclick="impMaps()"]');
+    const btnPdf = document.querySelector('button[onclick="prePrintCheck()"]');
 
-    const gasDiv = document.getElementById('c-gas-x2')?.closest('.conf-item');
-    if(gasDiv) gasDiv.querySelector('div').innerHTML = `<span style="font-size:1.2em">⛽</span> ${t.gas2}`;
+    if (btnDownloadGpx) btnDownloadGpx.innerHTML = t.btn_download_gpx;
+    if (btnShare) btnShare.innerHTML = t.btn_share;
+    if (btnOpenMaps) btnOpenMaps.innerHTML = t.btn_open_maps;
+    if (btnReader) btnReader.innerHTML = t.btn_reader;
+    if (btnPdf) btnPdf.innerHTML = `<i class="fa fa-file-pdf"></i> ${t.pdf}`;
 
-    const tollDiv = document.getElementById('c-toll')?.closest('.row-s');
-    if(tollDiv) tollDiv.querySelector('div').innerHTML = `<i class="fa fa-money-bill-wave"></i> ${t.toll}`;
+    // 5) TÍTULOS SUB-COLLS (GESTIÓN GPX, MAPS)
+    const gpxTitle = document.querySelector('.file-col-btn[onclick*="gpx-box"]');
+    const mapsTitle = document.querySelector('.file-col-btn[onclick*="maps-box"]');
 
-    const radarDiv = document.getElementById('c-r')?.closest('.row-s');
-    if(radarDiv) radarDiv.querySelector('div').innerHTML = `<i class="fa fa-camera"></i> ${t.radar}`;
+    if (gpxTitle) {
+        const icon = gpxTitle.querySelector('i');
+        gpxTitle.innerHTML = '';
+        if (icon) gpxTitle.appendChild(icon.cloneNode());
+        gpxTitle.innerHTML += ` ${t.gpx}`;
+    }
 
-    const poiDiv = document.getElementById('c-info')?.closest('.row-s');
-    if(poiDiv) poiDiv.querySelector('div').innerHTML = `<i class="fa fa-info-circle"></i> ${t.poidet}`;
+    if (mapsTitle) {
+        const icon = mapsTitle.querySelector('i');
+        mapsTitle.innerHTML = '';
+        if (icon) mapsTitle.appendChild(icon.cloneNode());
+        mapsTitle.innerHTML += ` ${t.maps}`;
+    }
 
-    const weatDiv = document.getElementById('c-weat')?.closest('.row-s');
-    if(weatDiv) weatDiv.querySelector('div').innerHTML = `<i class="fa fa-cloud-sun"></i> ${t.wx50}`;
+    // 6) BOTÓN AÑADIR PARADA
+    const addStopBtn = document.querySelector('.add-stop-btn span');
+    if (addStopBtn) addStopBtn.innerText = t.btn_add_stop;
 
-    const gasStDiv = document.getElementById('c-gas-vis')?.closest('.row-s');
-    if(gasStDiv) gasStDiv.querySelector('div:first-child').innerHTML = `<i class="fa fa-gas-pump" style="color:#ff9800;margin-right:5px;"></i> ${t.gasst}`;
+    // 7) BOTONES CONTACTO/LEGAL
+    const btnInstructions = document.querySelector('button[onclick="openInstructions()"]');
+    const btnLegal = document.querySelector('button[onclick="openFullMenu()"]');
 
-    const speedDiv = document.getElementById('avg-speed')?.closest('.row-s');
-    if(speedDiv) speedDiv.querySelector('div:first-child').innerHTML = `<i class="fa fa-tachometer-alt" style="color:#5bc0de;margin-right:5px;"></i> ${t.aspd} (Km/h)`;
+    if (btnInstructions) {
+        const icon = btnInstructions.querySelector('i');
+        btnInstructions.innerHTML = '';
+        if (icon) btnInstructions.appendChild(icon.cloneNode());
+        btnInstructions.innerHTML += ` ${t.btn_instructions}`;
+    }
 
-    // === BOTONES ARCHIVOS ===
-    const saveGpxBtn = document.querySelector('button[onclick="saveGPX()"]');
-    if(saveGpxBtn) saveGpxBtn.innerText = `💾 ${t.dlgpx}`;
+    if (btnLegal) {
+        const icon = btnLegal.querySelector('i');
+        btnLegal.innerHTML = '';
+        if (icon) btnLegal.appendChild(icon.cloneNode());
+        btnLegal.innerHTML += ` ${t.btn_legal}`;
+    }
 
-    const importLabel = document.querySelector('label.file-sub-btn');
-    if(importLabel && importLabel.childNodes[0]) importLabel.childNodes[0].nodeValue = `📥 ${t.impgpx} `;
+    // 8) DONATE BUTTONS
+    document.querySelectorAll('#t-invite, #t-invite-2').forEach(el => {
+        if (el) el.innerText = t.inv;
+    });
 
-    const shareBtn = document.querySelector('button[onclick="shareRoute()"]');
-    if(shareBtn) shareBtn.innerText = `📤 ${t.share}`;
+              // 9) TEXTOS CONFIGURACIÓN RIDER
+    // Usar selectores directos del DOM real
+    const configDiv = document.getElementById('p-config');
+    if (configDiv) {
+        // Revirado (primer conf-item > div > texto después del icono)
+        const reviradoDiv = configDiv.querySelector('.conf-item:first-child > div:first-child');
+        if (reviradoDiv) {
+            const icon = reviradoDiv.querySelector('i');
+            reviradoDiv.innerHTML = '';
+            if (icon) reviradoDiv.appendChild(icon.cloneNode(true));
+            reviradoDiv.innerHTML += ` ${t.txt_revirado}`;
+        }
 
-    const mapsBtn = document.querySelector('button[onclick="openInMaps()"]');
-    if(mapsBtn) mapsBtn.innerText = `🗺️ ${t.openm}`;
+        // Gasolina x2 (segundo conf-item > div > texto después del emoji)
+        const gasX2Div = configDiv.querySelector('.conf-item:last-child > div:first-child');
+        if (gasX2Div) {
+            const emoji = gasX2Div.querySelector('span');
+            gasX2Div.innerHTML = '';
+            if (emoji) gasX2Div.appendChild(emoji.cloneNode(true));
+            gasX2Div.innerHTML += ` ${t.txt_gas_x2}`;
+        }
 
-    const readerBtn = document.querySelector('button[onclick="impMaps()"]');
-    if(readerBtn) readerBtn.innerText = `🔗 ${t.readl}`;
-
-    const pdfBtn = document.querySelector('button[onclick="prePrintCheck()"]');
-    if(pdfBtn) pdfBtn.innerHTML = `<i class="fa fa-file-pdf"></i> ${t.genpdf}`;
-
-    // === BOTÓN SECCIÓN ARCHIVOS ===
-    const filesBtn = document.querySelector('button[onclick*="p-files"]');
-    if(filesBtn) filesBtn.innerHTML = `${t.files} <i class="fa fa-caret-down"></i>`;
-
-    // === BOTONES FLOTANTES STATS ===
-    const lblKm = document.getElementById('lbl-km');
-    if(lblKm) lblKm.innerText = t.lbl_km;
-
-    const lblTrip = document.getElementById('lbl-trip');
-    if(lblTrip) lblTrip.innerText = t.lbl_trip;
-
-    const lblToll = document.getElementById('lbl-toll');
-    if(lblToll) lblToll.innerText = t.lbl_toll_stat;
-
-    const lblWarn = document.getElementById('lbl-warn');
-    if(lblWarn) lblWarn.innerText = t.lbl_warn;
-
-    const lblDest = document.getElementById('lbl-dest');
-    if(lblDest) lblDest.innerText = t.lbl_dest;
-
-    // === BOTÓN GENERAR RUTA ===
-    const genBtn = document.getElementById('m-btn');
-    if(genBtn && !genBtn.classList.contains('generating')) {
-        const routeNum = genBtn.innerText.match(/#(\d+)/);
-        if(routeNum) {
-            genBtn.innerText = `${t.gen} #${routeNum[1]}`;
-        } else {
-            genBtn.innerText = `${t.gen} #1`;
+        // Evitar peajes (dentro de row-s)
+        const tollDiv = configDiv.querySelector('.row-s > div:first-child');
+        if (tollDiv) {
+            const icon = tollDiv.querySelector('i');
+            tollDiv.innerHTML = '';
+            if (icon) tollDiv.appendChild(icon.cloneNode(true));
+            tollDiv.innerHTML += ` ${t.txt_toll}`;
         }
     }
 
-    // === HISTORIAL BADGE ===
-    const badge = document.getElementById('total-routes-badge');
-    if(badge && routeGenCount > 0) {
-        badge.innerText = `${t.total_gen}: ${routeGenCount}`;
+    // 10) TEXTOS INFORMACIÓN EN RUTA
+    const infoDiv = document.getElementById('p-info');
+    if (infoDiv) {
+        // Obtener todos los row-s en orden
+        const rows = infoDiv.querySelectorAll('.row-s');
+
+        // Escanear Radares (primera row)
+        if (rows[0]) {
+            const div = rows[0].querySelector('div:first-child');
+            if (div) {
+                const icon = div.querySelector('i');
+                div.innerHTML = '';
+                if (icon) div.appendChild(icon.cloneNode(true));
+                div.innerHTML += ` ${t.txt_scan_radars}`;
+            }
+        }
+
+        // Info Detalles POI (segunda row)
+        if (rows[1]) {
+            const div = rows[1].querySelector('div:first-child');
+            if (div) {
+                const icon = div.querySelector('i');
+                div.innerHTML = '';
+                if (icon) div.appendChild(icon.cloneNode(true));
+                div.innerHTML += ` ${t.txt_info_poi}`;
+            }
+        }
+
+        // Clima cada 50km (tercera row)
+        if (rows[2]) {
+            const div = rows[2].querySelector('div:first-child');
+            if (div) {
+                const icon = div.querySelector('i');
+                div.innerHTML = '';
+                if (icon) div.appendChild(icon.cloneNode(true));
+                div.innerHTML += ` ${t.txt_clima_50}`;
+            }
+        }
+
+        // Ver Gasolineras (cuarta row - tiene estructura especial)
+        if (rows[3]) {
+            const div = rows[3].querySelector('div:first-child');
+            if (div) {
+                const icon = div.querySelector('i');
+                div.innerHTML = '';
+                if (icon) div.appendChild(icon.cloneNode(true));
+                div.innerHTML += ` ${t.txt_gas_vis}`;
+            }
+        }
+
+        // Vel. Media (quinta row)
+        if (rows[4]) {
+            const div = rows[4].querySelector('div:first-child');
+            if (div) {
+                const icon = div.querySelector('i');
+                div.innerHTML = '';
+                if (icon) div.appendChild(icon.cloneNode(true));
+                div.innerHTML += ` ${t.txt_vel_media}`;
+            }
+        }
+    }
+    // 11) TEXTO "ARCHIVOS"
+    const filesTitle = document.querySelector('.t-files');
+    if (filesTitle) filesTitle.innerText = t.files;
+
+
+
+     // 9. ACTUALIZAR LEYENDA DEL MAPA
+    updateLegend();
+
+    // 10. ACTUALIZAR BOTÓN GENERAR RUTA
+    updateBtnStyle();
+}
+// FIN BLOQUE - translateUI
+// INICIO BLOQUE - updateLegend() TRADUCIDO v2.0.7
+function updateLegend() {
+    const t = DICT[currentLang] || DICT['Castellano'];
+    const legendContainer = document.querySelector('.map-legend');
+
+    if (!legendContainer) return;
+
+    let html = '<div id="l-routes"></div>';
+    html += '<hr style="border:0; border-top:1px solid #444; margin:5px 0">';
+    html += `<div class="leg-i"><span class="leg-left"><span class="dot" style="background:#ff4b2b"></span> ${t.leg_rad}</span></div>`;
+    html += `<div class="leg-i"><span class="leg-left"><span class="dot" style="background:#ff9800"></span> ${t.leg_gas}</span></div>`;
+    html += `<div class="leg-i"><span class="leg-left"><span class="dot" style="background:#4caf50"></span> ${t.leg_toll}</span></div>`;
+    html += `<div class="leg-i"><span class="leg-left">📍 ${t.leg_stop}</span></div>`;
+
+    legendContainer.innerHTML = html;
+
+    // Actualizar rutas del historial
+    updateLegendRoutes();
+}
+
+function updateLegendRoutes() {
+    const routesDiv = document.getElementById('l-routes');
+    if (!routesDiv) return;
+
+    if (history.length === 0) {
+        routesDiv.innerHTML = '';
+        return;
     }
 
-    // === BOTÓN AÑADIR PARADA ===
-    const addStopBtn = document.querySelector('.add-stop-btn');
-    if(addStopBtn) addStopBtn.innerHTML = `<i class="fa fa-map-marker-alt"></i> ${t.add_stop}`;
+    let html = '';
+    history.forEach(h => {
+        const isActive = activeRoute === h ? 'font-weight:bold;' : '';
+        html += `<div class="leg-i" style="${isActive}cursor:pointer;" onclick="selectHistoryItem(${history.indexOf(h)})">
+            <span style="color:${h.color};font-size:1.2rem;">━━</span>
+            <span style="color:#ddd;">Ruta #${h.num}</span>
+            <span style="color:#888;font-size:0.65rem;margin-left:auto;">${h.dist} km</span>
+        </div>`;
+    });
 
-       // === BOTÓN INTERCAMBIAR ===
-    const swapBtn = document.querySelector('.swap-btn');
-    if(swapBtn) swapBtn.setAttribute('title', t.swap);
-
-    // === ACTUALIZAR LEYENDA ===
-    if(typeof updateLegend === 'function') updateLegend();
-
-    // === BOTONES MODAL CONTACTO ===
-    const legalBtn = document.querySelector('button[onclick="openFullMenu()"]');
-    if(legalBtn) legalBtn.innerHTML = `<i class="fa fa-balance-scale"></i> ${t.btn_legal}`;
-
-    const instructBtn = document.querySelector('button[onclick="openInstructions()"]');
-    if(instructBtn) instructBtn.innerHTML = `<i class="fa fa-lightbulb"></i> ${t.btn_instructions}`;
+    routesDiv.innerHTML = html;
 }
-// FIN BLOQUE
-
-
-
-// FIN BLOQUE
-
+// FIN BLOQUE updateLegend()
 
 
 
@@ -1467,96 +2361,30 @@ function translateUI() {
         setTimeout(() => { layer.style.display = 'none'; }, 3500);
     }
 
-    // INICIO BLOQUE - FUNCIÓN openFullMenu MEJORADA v2.0.4
-// INICIO BLOQUE - FUNCIÓN openFullMenu TRADUCIBLE v2.0.4
+    // INICIO BLOQUE - openFullMenu() TRADUCIDO v2.0.8
 function openFullMenu() {
     const t = DICT[currentLang] || DICT['Castellano'];
 
     const legalTxt = `
-        <b>${t.modal_legal_privacy}</b><br>
-        ${t.modal_legal_privacy_txt}<br><br>
+        <b>1. ${t.legal_privacy_title}</b><br>
+        ${t.legal_privacy_text}<br><br>
 
-        <b>${t.modal_legal_data}</b><br>
-        ${t.modal_legal_data_txt}<br><br>
+        <b>2. ${t.legal_services_title}</b><br>
+        ${t.legal_services_text}<br><br>
 
-        <b>${t.modal_legal_files}</b><br>
-        ${t.modal_legal_files_txt}<br><br>
+        <b>3. ${t.legal_files_title}</b><br>
+        ${t.legal_files_text}<br><br>
 
-        <b>${t.modal_legal_perms}</b><br>
-        ${t.modal_legal_perms_txt.replace(/\n/g, '<br>')}<br><br>
+        <b>4. ${t.legal_permissions_title}</b><br>
+        ${t.legal_permissions_text}<br><br>
 
-        <b>${t.modal_legal_resp}</b><br>
-        ${t.modal_legal_resp_txt}
+        <b>5. ${t.legal_responsibility_title}</b><br>
+        ${t.legal_responsibility_text}
     `;
 
-    const pIns = `
-        <div style="line-height: 1.8;">
-        <b style="color: var(--accent); font-size: 1.1rem;">🎯 ELEMENTOS DEL PANEL</b><br><br>
+        const pIns = `<div style="line-height: 1.8;">${t.instr_panel}</div>`;
+    const mIns = `<div style="line-height: 1.8;">${t.instr_mapa}</div>`;
 
-        <b>📍 SECCIÓN: CABECERA</b><br>
-        • <b>Logo RutiWay:</b> Pulsa para abrir esta pantalla de Ayuda completa<br>
-        • <b>Bandera + País:</b> Selecciona el país (España, Francia, Italia, Portugal, Andorra).
-          Esto carga las regiones disponibles y actualiza los idiomas compatibles<br>
-        • <b>Botón Idioma:</b> Pulsa para cambiar el idioma de la interfaz<br><br>
-
-        <b>🗺️ SECCIÓN: PLANIFICACIÓN</b><br>
-        • <b>Input Origen:</b> Escribe la dirección de origen o mantén pulsado en el mapa<br>
-        • <b>Botón "+ Parada":</b> Añade puntos intermedios (hasta 23 paradas)<br>
-        • <b>Input Destino:</b> Escribe la dirección de destino<br>
-        • <b>Botón 🔃:</b> Intercambia origen y destino<br><br>
-
-        <b>🏍️ CONFIGURACIÓN RIDER</b><br>
-        • <b>Revirado:</b> Prioriza carreteras con curvas<br>
-        • <b>Gasolina x2:</b> Más paradas de gasolina<br>
-        • <b>Evitar Peajes:</b> Evita autopistas de pago<br><br>
-
-        <b>ℹ️ INFORMACIÓN EN RUTA</b><br>
-        • <b>Radares:</b> Muestra radares fijos (📷)<br>
-        • <b>Clima:</b> Iconos de clima cada 50km<br>
-        • <b>Gasolineras:</b> Estaciones cercanas (⛽)<br><br>
-
-        <b>📜 HISTORIAL</b><br>
-        • Guarda todas las rutas generadas<br>
-        • Pulsa sobre una ruta para recargarla<br><br>
-
-        <b>📁 ARCHIVOS</b><br>
-        • <b>Descargar GPX:</b> Guarda en /Descargas/RutiWay/<br>
-        • <b>Importar GPX:</b> Carga archivos externos<br>
-        • <b>Compartir:</b> Envía por WhatsApp, email, etc.<br>
-        • <b>App Maps:</b> Abre en Google Maps<br>
-        • <b>Generar PDF:</b> Crea informe detallado
-        </div>
-    `;
-
-    const mIns = `
-        <div style="line-height: 1.8;">
-        <b style="color: var(--accent); font-size: 1.1rem;">🗺️ CONTROLES DEL MAPA</b><br><br>
-
-        <b>👆 INTERACCIONES</b><br>
-        • <b>Pulsación Larga:</b> Añade parada en ese punto<br>
-        • <b>Zoom:</b> Pellizco con dos dedos<br>
-        • <b>Tocar Iconos:</b> Ver información detallada<br><br>
-
-        <b>🎛️ BOTONES ESTADÍSTICAS</b><br>
-        • <b>KM:</b> Distancia total<br>
-        • <b>VIAJE:</b> Tiempo estimado<br>
-        • <b>PEAJES:</b> Coste aproximado<br>
-        • <b>AVISOS:</b> Total de incidencias<br><br>
-
-        <b>🎯 BOTONES ACCIÓN</b><br>
-        • <b>🎯 Centro:</b> Ajusta el mapa a la ruta<br>
-        • <b>🧹 Escoba:</b> Limpia todo<br>
-        • <b>🌙 Luna:</b> Cambia estilo del mapa<br>
-        • <b>🚩 Bandera:</b> Sitios guardados<br><br>
-
-        <b>📍 ICONOS EN EL MAPA</b><br>
-        • 🔴 Radares fijos<br>
-        • 🟠 Gasolineras<br>
-        • 🟢 Peajes<br>
-        • 🚩 Paradas<br>
-        • ☀️🌤️☁️ Clima
-        </div>
-    `;
 
     const html = `
         <div style="text-align:center; margin-bottom:15px;">
@@ -1566,62 +2394,35 @@ function openFullMenu() {
         </div>
 
         <button class="acc-btn" onclick="toggleAcc('acc-panel')">
-            📱 ${t.modal_panel_title} <i class="fa fa-caret-down"></i>
+            📱 ${t.modal_tutorial} - PANEL <i class="fa fa-caret-down"></i>
         </button>
         <div id="acc-panel" class="acc-panel" style="font-size:0.75rem;">${pIns}</div>
 
         <button class="acc-btn" onclick="toggleAcc('acc-map')">
-            🗺️ ${t.modal_map_title} <i class="fa fa-caret-down"></i>
+            🗺️ ${t.modal_tutorial} - MAPA <i class="fa fa-caret-down"></i>
         </button>
         <div id="acc-map" class="acc-panel" style="font-size:0.75rem;">${mIns}</div>
 
         <button class="acc-btn" onclick="toggleAcc('acc-legal')">
-            ⚖️ LEGAL Y PRIVACIDAD <i class="fa fa-caret-down"></i>
+            ⚖️ ${t.modal_legal} <i class="fa fa-caret-down"></i>
         </button>
         <div id="acc-legal" class="acc-panel">${legalTxt}</div>
 
         <div class="donate-sidebar" style="margin-top:20px;" onclick="openNative('https://paypal.me/leydenruben')">
             <div class="mini-moto">🏍️</div>
             <div style="display:flex; align-items:center; justify-content:center; gap:5px; z-index:2; width:100%;">
-                <i class="fab fa-paypal"></i> ${t.inv} <i class="fa fa-gas-pump"></i>
+                <i class="fab fa-paypal"></i> Invítame a gasolina <i class="fa fa-gas-pump"></i>
             </div>
         </div>
     `;
 
     showM('', html);
 }
-// FIN BLOQUE
+// FIN BLOQUE openFullMenu()
 
 
     function toggleAcc(id) { const el = document.getElementById(id); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
-// INICIO BLOQUE - FUNCIÓN openInstructions TRADUCIBLE v2.0.4
-function openInstructions() {
-    const t = DICT[currentLang] || DICT['Castellano'];
-
-    const html = `
-        <div style="text-align:center; margin-bottom:15px;">
-            <h3>📖 ${t.btn_instructions}</h3>
-        </div>
-        <p style="line-height:1.6; text-align:left;">
-            <b>🏍️ Cómo usar RutiWay:</b><br><br>
-            1️⃣ Selecciona país e idioma<br>
-            2️⃣ Escribe origen y destino<br>
-            3️⃣ Añade paradas si quieres (opcional)<br>
-            4️⃣ Configura opciones (Revirado, Gasolina, Peajes)<br>
-            5️⃣ Pulsa GENERAR RUTA<br>
-            6️⃣ Descarga GPX, comparte o genera PDF<br><br>
-
-            <b>💡 Consejos:</b><br>
-            • Pulsación larga en el mapa añade paradas<br>
-            • Toca los iconos para ver detalles<br>
-            • Revisa el historial para recargar rutas<br>
-        </p>
-    `;
-
-    showM('', html);
-}
-// FIN BLOQUE
-
+    function openInstructions() { openFullMenu(); }
 
     map.on('contextmenu', async (e)=>{
         const coords = [e.latlng.lng, e.latlng.lat];
@@ -1935,36 +2736,16 @@ function togSubExcl(id) {
     function doC(){ if(rLines.getLayers().length) map.fitBounds(rLines.getBounds(), {padding:[50,50]}); }
     function markUpdate(){ document.getElementById('m-btn').classList.add('blink'); }
     function wipeMap(){ pL.clearLayers(); wL.clearLayers(); rLines.clearLayers(); history=[]; warningsLog=[]; document.getElementById('v-k').innerText='0.0'; document.getElementById('v-time').innerText='0h 0m'; document.getElementById('v-t').innerText='0.00€'; document.getElementById('v-p').innerText='0'; document.getElementById('h-list').innerHTML=''; stops=[]; renderStops(); updateLegendRoutes(); updateBtnStyle(); saveConfig(); }
-    function updateBtnStyle() { const idx = history.length; const color = COLS[idx % COLS.length]; const btn = document.getElementById('m-btn'); btn.innerText = `GENERAR RUTA #${idx + 1}`; btn.style.color = color; btn.style.borderColor = color; btn.classList.remove('blink'); }
-// INICIO BLOQUE - FUNCIÓN updateLegend TRADUCIBLE v2.0.4
-function updateLegend() {
+function updateBtnStyle() {
     const t = DICT[currentLang] || DICT['Castellano'];
-    let html = `<div style="font-weight:bold; margin-bottom:5px;">${t.leg_legend}</div>`;
-
-    routeHistory.forEach((r, i) => {
-        const curv = r.config.revirado ? '🔄' : '';
-        const gas = r.config.gas ? '⛽' : '';
-        const toll = r.config.tolls ? '💰' : '';
-        html += `<div><span style="color:${r.color};">━━</span> ${t.leg_route} ${i+1} ${curv}${gas}${toll}</div>`;
-    });
-
-    if(document.getElementById('c-r')?.checked) {
-        html += `<div>🔴 ${t.leg_rad}</div>`;
-    }
-    if(document.getElementById('c-gas-vis')?.checked) {
-        html += `<div>🟠 ${t.leg_gas}</div>`;
-    }
-    if(currentRoute && currentRoute.tolls && currentRoute.tolls.length > 0) {
-        html += `<div>🟢 ${t.leg_toll}</div>`;
-    }
-    if(waypointMarkers.length > 0) {
-        html += `<div>🚩 ${t.leg_stop}: ${waypointMarkers.length}</div>`;
-    }
-
-    document.getElementById('map-legend').innerHTML = html;
+    const idx = history.length;
+    const color = COLS[idx % COLS.length];
+    const btn = document.getElementById('m-btn');
+    btn.innerText = t.btn_generate + ' ' + (idx + 1);
+    btn.style.color = color;
+    btn.style.borderColor = color;
+    btn.classList.remove('blink');
 }
-// FIN BLOQUE
-
     function clr(id){ document.getElementById(id).value=''; if(id==='ori') o=null; if(id==='des') d=null; markUpdate(); }
 
 // INICIO - BÚSQUEDA CON DEBOUNCE
@@ -2040,22 +2821,24 @@ search('des', 'des-s', 'd');
 
 
     async function resolveAndGen() {
-  const oriText = document.getElementById('ori').value;
-  const desText = document.getElementById('des').value;
+    const t = DICT[currentLang] || DICT['Castellano'];
+    const oriText = document.getElementById('ori').value;
+    const desText = document.getElementById('des').value;
 
-  // VALIDAR PARADAS
-  for (let i = 0; i < stops.length; i++) {
-    if (!stops[i].c || !stops[i].c[0] || !stops[i].c[1]) {
-      return showM('❌ Parada Incompleta', `
-        <p><b>Parada ${i+1}</b> no tiene coordenadas válidas.</p>
-        <p style="font-size:0.8rem; color:#aaa; margin-top:10px;">
-          💡 <b>Solución:</b><br>
-          1. Escribe la dirección<br>
-          2. Selecciona una opción de las sugerencias<br>
-          3. O elimina la parada si no la necesitas
-        </p>
-        <button class="popup-btn" style="margin-top:10px;" onclick="closeM()">Entendido</button>
-      `);
+    // VALIDAR PARADAS
+    for (let i = 0; i < stops.length; i++) {
+        if (!stops[i].c || !stops[i].c[0] || !stops[i].c[1]) {
+            return showM(t.valid_incomplete_stop, `
+  <p><b>${t.floattripto} ${i+1}</b> ${t.valid_stop_nocoords}</p>
+  <p style="font-size:0.8rem; color:#aaa; margin-top:10px;">
+    💡 <b>${t.valid_solution}:</b><br>
+    ${t.valid_solution_1}<br>
+    ${t.valid_solution_2}<br>
+    ${t.valid_solution_3}
+  </p>
+  <button class="popup-btn" style="margin-top:10px;" onclick="closeM()">${t.valid_understood}</button>
+`);
+
     }
 
     if (!stops[i].name || stops[i].name.trim() === '') {
@@ -2067,41 +2850,35 @@ search('des', 'des-s', 'd');
   console.log('Origen coords:', o);
   console.log('Destino coords:', d);
 
-  // VALIDAR ORIGEN
-  if (!oriText || oriText.trim() === '') {
-    return showM('❌ Falta Origen', 'Debes escribir una dirección de Origen.');
-  }
-
-  if (!o || !o[0] || !o[1]) {
-    console.log('Intentando geocodificar origen...');
-    const success = await autoGeo('ori', 'o');
-    if (!success || !o) {
-      return showM('❌ Error Origen', `
-        <p>No se pudo encontrar: <b>${oriText}</b></p>
-        <p style="font-size:0.8rem; color:#aaa; margin-top:10px;">
-          💡 Selecciona una opción de las sugerencias al escribir.
-        </p>
-      `);
+      // VALIDAR ORIGEN
+    if (!oriText || !oriText.trim()) {
+        return showM(t.valid_missing_origin, `<p>${t.valid_origin_text}</p>`);
     }
-  }
 
-  // VALIDAR DESTINO
-  if (!desText || desText.trim() === '') {
-    return showM('❌ Falta Destino', 'Debes escribir una dirección de Destino.');
-  }
 
-  if (!d || !d[0] || !d[1]) {
-    console.log('Intentando geocodificar destino...');
-    const success = await autoGeo('des', 'd');
-    if (!success || !d) {
-      return showM('❌ Error Destino', `
-        <p>No se pudo encontrar: <b>${desText}</b></p>
-        <p style="font-size:0.8rem; color:#aaa; margin-top:10px;">
-          💡 Selecciona una opción de las sugerencias al escribir.
-        </p>
-      `);
+      if (!o || !o[0] || !o[1]) {
+        console.log("Intentando geocodificar origen...");
+        const success = await autoGeo('ori', 'o');
+        if (!success || !o) {
+            return showM(t.valid_error_origin, `<p>${t.valid_notfound_1} <b>"${oriText}"</b></p> <p style="font-size:0.8rem;color:#aaa;margin-top:10px;">${t.valid_notfound_2}</p>`);
+        }
     }
-  }
+
+
+      // VALIDAR DESTINO
+    if (!desText || !desText.trim()) {
+        return showM(t.valid_missing_dest, `<p>${t.valid_dest_text}</p>`);
+    }
+
+
+      if (!d || !d[0] || !d[1]) {
+        console.log("Intentando geocodificar destino...");
+        const success = await autoGeo('des', 'd');
+        if (!success || !d) {
+            return showM(t.valid_error_dest, `<p>${t.valid_notfound_1} <b>"${desText}"</b></p> <p style="font-size:0.8rem;color:#aaa;margin-top:10px;">${t.valid_notfound_2}</p>`);
+        }
+    }
+
 
   // VALIDACIÓN FINAL
   if (!o || o.length !== 2 || !o[0] || !o[1]) {
@@ -2338,42 +3115,33 @@ function checkDuplicateRoute(currentCfg) {
 
     if(type === 'km') {
         const defaultKm = (totalDist / 2).toFixed(0);
-        modalHtml = `
-            <h3>🗺️ Buscar Parada por Kilómetros</h3>
-            <p style="font-size:0.9rem; color:#aaa; margin-bottom:15px;">Distancia total: ${totalDist} KM</p>
+        const t = DICT[currentLang] || DICT['Castellano'];
+modalHtml = `<h3>🚏 ${t.modal_km_title}</h3>
+<p style="font-size:0.9rem;color:#aaa;margin-bottom:15px">${t.modal_km_totaldist}: ${totalDist} KM</p>
+
             <div style="margin-bottom:15px;">
-                <label style="font-size:0.8rem; color:var(--accent); display:block; margin-bottom:5px;">¿A cuántos KM del origen?</label>
+                <label style="font-size:0.8rem;color:var(--accent);display:block;margin-bottom:5px">${t.modal_km_question}</label>
+
                 <input type="number" id="km-input" value="${defaultKm}" min="1" max="${totalDist}" style="width:100%; padding:10px; background:#1a1b26; border:1px solid #414868; color:white; border-radius:4px; font-size:1rem; text-align:center;">
             </div>
 
-            <button class="popup-btn" style="background:#4caf50;margin-bottom:15px;width:100%;" onclick="showLocationAtKm();">
-                <i class="fa fa-map-marker-alt"></i> Ver ubicación de este punto
-            </button>
+            <button class="popup-btn" style="background:#4caf50;margin-bottom:15px;width:100%" onclick="showLocationAtKm()"><i class="fa fa-map-marker-alt"></i> ${t.modal_km_btn}</button>
 
-            <div id="location-display" style="font-size:0.75rem;color:#aaa;margin-bottom:15px;padding:10px;background:rgba(255,255,255,0.05);border-radius:6px;display:none;text-align:left;">
-                <i class="fa fa-spinner fa-spin"></i> Buscando dirección...
-            </div>
+
+            <div id="location-display" style="font-size:0.75rem;color:#aaa;margin-bottom:15px;padding:10px;background:rgba(255,255,255,0.05);border-radius:6px;display:none;text-align:left"><i class="fa fa-spinner fa-spin"></i> ${t.modal_km_searching}</div>
+
 
             <div id="poi-search-section" style="display:none;">
-                <p style="font-size:0.85rem;color:#888;margin-bottom:10px;margin-top:15px;border-top:1px solid #333;padding-top:15px;">Busca cerca de este punto:</p>
+                <p style="font-size:0.85rem;color:#888;margin-bottom:10px;margin-top:15px;border-top:1px solid #333;padding-top:15px">${t.modal_km_search_near}</p>
 
                 <div class="cat-btn-grid">
-                    <div class="cat-btn" onclick="searchNearbyWithCoords('fuel', 'km')">
-                        <i class="fa fa-gas-pump" style="font-size:1.5rem; color:#ff9800;"></i>
-                        <span>Gasolinera</span>
-                    </div>
-                    <div class="cat-btn" onclick="searchNearbyWithCoords('restaurant', 'km')">
-                        <i class="fa fa-utensils" style="font-size:1.5rem; color:#4caf50;"></i>
-                        <span>Comer</span>
-                    </div>
-                    <div class="cat-btn" onclick="searchNearbyWithCoords('hotel', 'km')">
-                        <i class="fa fa-bed" style="font-size:1.5rem; color:#2b7cff;"></i>
-                        <span>Dormir</span>
-                    </div>
+                    <div class="cat-btn" onclick="searchNearbyWithCoords('fuel', 'km')"><i class="fa fa-gas-pump" style="font-size:1.5rem;color:#ff9800"></i> <span>${t.modal_km_gas}</span></div>
+<div class="cat-btn" onclick="searchNearbyWithCoords('restaurant', 'km')"><i class="fa fa-utensils" style="font-size:1.5rem;color:#4caf50"></i> <span>${t.modal_km_food}</span></div>
+<div class="cat-btn" onclick="searchNearbyWithCoords('hotel', 'km')"><i class="fa fa-bed" style="font-size:1.5rem;color:#2b7cff"></i> <span>${t.modal_km_sleep}</span></div>
+
                 </div>
-                <div class="modal-help-text">
-                    💡 <b>Pulsa botón y elige el lugar en MAPS, copia dirección o nombre y ponlo en +PARADA</b>
-                </div>
+                <div class="modal-help-text"><b>${t.modal_km_help}</b></div>
+
             </div>
         `;
     } else if(type === 'min') {
@@ -2384,46 +3152,38 @@ function checkDuplicateRoute(currentCfg) {
         }
         const defaultMin = Math.floor(totalMinutes / 2);
 
-        modalHtml = `
-            <h3>⏱️ Buscar Parada por Tiempo</h3>
-            <p style="font-size:0.9rem; color:#aaa; margin-bottom:15px;">Tiempo total: ${totalTime}</p>
+        modalHtml = `<h3>⏱️ ${t.modal_time_title}</h3>
+<p style="font-size:0.9rem;color:#aaa;margin-bottom:15px">${t.modal_time_total}: ${totalTime}</p>
+
             <div style="margin-bottom:10px;">
-                <label style="font-size:0.8rem; color:var(--accent); display:block; margin-bottom:5px;">Velocidad Media (Km/h)</label>
+                <label style="font-size:0.8rem;color:var(--accent);display:block;margin-bottom:5px">${t.modal_time_speed}</label>
+
                 <input type="number" id="speed-input" value="${avgSpeed}" min="10" max="140" style="width:100%; padding:8px; background:#1a1b26; border:1px solid #414868; color:white; border-radius:4px; font-size:0.9rem; text-align:center;">
             </div>
             <div style="margin-bottom:15px;">
-                <label style="font-size:0.8rem; color:var(--accent); display:block; margin-bottom:5px;">¿A cuántos MINUTOS del origen?</label>
+                <label style="font-size:0.8rem;color:var(--accent);display:block;margin-bottom:5px">${t.modal_time_question}</label>
+
                 <input type="number" id="time-input" value="${defaultMin}" min="1" max="${totalMinutes}" style="width:100%; padding:10px; background:#1a1b26; border:1px solid #414868; color:white; border-radius:4px; font-size:1rem; text-align:center;">
             </div>
 
-            <button class="popup-btn" style="background:#4caf50;margin-bottom:15px;width:100%;" onclick="showLocationAtTime();">
-                <i class="fa fa-clock"></i> Ver ubicación en ese tiempo
-            </button>
+            <button class="popup-btn" style="background:#4caf50;margin-bottom:15px;width:100%" onclick="showLocationAtTime()"><i class="fa fa-clock"></i> ${t.modal_time_btn}</button>
 
-            <div id="location-display-time" style="font-size:0.75rem;color:#aaa;margin-bottom:15px;padding:10px;background:rgba(255,255,255,0.05);border-radius:6px;display:none;text-align:left;">
-                <i class="fa fa-spinner fa-spin"></i> Buscando dirección...
-            </div>
+
+            <div id="location-display-time" style="font-size:0.75rem;color:#aaa;margin-bottom:15px;padding:10px;background:rgba(255,255,255,0.05);border-radius:6px;display:none;text-align:left"><i class="fa fa-spinner fa-spin"></i> ${t.modal_time_searching}</div>
+
 
             <div id="poi-search-section-time" style="display:none;">
-                <p style="font-size:0.85rem;color:#888;margin-bottom:10px;margin-top:15px;border-top:1px solid #333;padding-top:15px;">Busca cerca de este punto:</p>
+                <p style="font-size:0.85rem;color:#888;margin-bottom:10px;margin-top:15px;border-top:1px solid #333;padding-top:15px">${t.modal_km_search_near}</p>
+
 
                 <div class="cat-btn-grid">
-                    <div class="cat-btn" onclick="searchNearbyWithCoords('fuel', 'min')">
-                        <i class="fa fa-gas-pump" style="font-size:1.5rem; color:#ff9800;"></i>
-                        <span>Gasolinera</span>
-                    </div>
-                    <div class="cat-btn" onclick="searchNearbyWithCoords('restaurant', 'min')">
-                        <i class="fa fa-utensils" style="font-size:1.5rem; color:#4caf50;"></i>
-                        <span>Comer</span>
-                    </div>
-                    <div class="cat-btn" onclick="searchNearbyWithCoords('hotel', 'min')">
-                        <i class="fa fa-bed" style="font-size:1.5rem; color:#2b7cff;"></i>
-                        <span>Dormir</span>
-                    </div>
+                   <div class="cat-btn" onclick="searchNearbyWithCoords('fuel', 'min')"><i class="fa fa-gas-pump" style="font-size:1.5rem;color:#ff9800"></i> <span>${t.modal_km_gas}</span></div>
+<div class="cat-btn" onclick="searchNearbyWithCoords('restaurant', 'min')"><i class="fa fa-utensils" style="font-size:1.5rem;color:#4caf50"></i> <span>${t.modal_km_food}</span></div>
+<div class="cat-btn" onclick="searchNearbyWithCoords('hotel', 'min')"><i class="fa fa-bed" style="font-size:1.5rem;color:#2b7cff"></i> <span>${t.modal_km_sleep}</span></div>
+
                 </div>
-                <div class="modal-help-text">
-                    💡 <b>Pulsa botón y elige el lugar en MAPS, copia dirección o nombre y ponlo en +PARADA</b>
-                </div>
+                <div class="modal-help-text"><b>${t.modal_km_help}</b></div>
+
             </div>
         `;
     }
@@ -2493,19 +3253,23 @@ function searchNearby(category, mode) {
 }
 
     function showTollsList() {
-    if(!activeRoute) return showM("Info", "Genera una ruta primero.");
+    if (!activeRoute) return showM("Info", "Genera una ruta primero.");
     const distKm = parseFloat(activeRoute.dist);
     const avoidTolls = activeRoute.cfg && activeRoute.cfg.toll;
-    const tollBooths = warningsLog.filter(w => w.t.includes('Peaje') || w.t.includes('€') || w.t.includes('💶'));
-    let html = '<h3 style="margin-bottom:15px">💶 Peajes en Ruta</h3>';
-    if(avoidTolls) {
-        html += '<div style="text-align:center; padding:20px; background:rgba(76,175,80,0.1); border-radius:8px; border:1px solid #4caf50">';
-        html += '<i class="fa fa-check-circle" style="color:#4caf50; font-size:2.5rem"></i>';
-        html += '<p style="color:#4caf50; font-weight:bold; margin-top:10px">✅ Ruta SIN PEAJES</p>';
-        html += '<p style="font-size:0.75rem; color:#888; margin-top:5px">Has activado "Evitar Peajes"</p></div>';
-        showM('', html);
-        return;
-    }
+    const tollBooths = warningsLog.filter(w => w.t.includes("Peaje") || w.t.includes("🚧") || w.t.includes("💲"));
+
+    const t = DICT[currentLang] || DICT['Castellano'];
+    let html = `<h3 style="margin-bottom:15px;">${t.modal_toll_title}</h3>`;
+
+if(avoidTolls) {
+    html += '<div style="text-align:center; padding:20px; background:rgba(76,175,80,0.1); border-radius:8px; border:1px solid #4caf50">';
+    html += '<i class="fa fa-check-circle" style="color:#4caf50; font-size:2.5rem;"></i>';
+    html += `<p style="color:#4caf50; font-weight:bold; margin-top:10px;">${t.float_toll_none}</p>`;
+    html += `<p style="font-size:0.75rem; color:#888; margin-top:5px">${t.float_toll_avoid_msg}</p></div>`;
+    showM('', html);
+    return;
+}
+
     let totalEstimadoMoto = 0;
     let totalEstimadoCoche = 0;
     if(tollBooths.length > 0) {
@@ -2518,11 +3282,13 @@ function searchNearby(category, mode) {
     html += '<div style="background:rgba(255,152,0,0.1); padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ff9800">';
     html += '<div style="text-align:center"><div style="font-size:0.8rem; color:#ff9800; margin-bottom:10px">💰 COSTE ESTIMADO APROXIMADO</div>';
     html += '<div style="display:flex; justify-content:space-around; margin-bottom:10px">';
-    html += '<div style="text-align:center"><div style="font-size:0.7rem; color:#aaa">🏍️ MOTO</div><div style="font-size:1.5rem; font-weight:bold; color:#ff9800">' + totalEstimadoMoto.toFixed(2) + '€</div></div>';
-    html += '<div style="text-align:center"><div style="font-size:0.7rem; color:#aaa">🚗 COCHE</div><div style="font-size:1.5rem; font-weight:bold; color:#ff9800">' + totalEstimadoCoche.toFixed(2) + '€</div></div>';
-    html += '</div><div style="font-size:0.65rem; color:#666">Basado en ' + distKm + ' km' + (tollBooths.length > 0 ? ' y ' + tollBooths.length + ' cabina(s) detectada(s)' : '') + '</div></div></div>';
-    if(tollBooths.length > 0) {
-        html += '<h4 style="font-size:0.85rem; margin-bottom:10px; color:var(--accent)">📍 Cabinas Detectadas:</h4><div style="font-size:0.85rem">';
+    html += `<div style="text-align:center;"><div style="font-size:0.7rem;color:#aaa;">${t.modal_toll_moto}</div><div style="font-size:1.5rem;font-weight:bold;color:#ff9800;">${totalEstimadoMoto.toFixed(2)}€</div></div>`;
+html += `<div style="text-align:center;"><div style="font-size:0.7rem;color:#aaa;">${t.modal_toll_car}</div><div style="font-size:1.5rem;font-weight:bold;color:#ff9800;">${totalEstimadoCoche.toFixed(2)}€</div></div>`;
+
+    html += `</div><div style="font-size:0.65rem; color:#666">${t.modal_toll_based} ${distKm} km${tollBooths.length > 0 ? ' y ' + tollBooths.length + ' ' + t.modal_toll_detected : ''}</div></div></div>`;
+    if (tollBooths.length > 0) {
+    html += `<h4 style="font-size:0.85rem;margin-bottom:10px;color:var(--accent);">${t.modal_toll_booths}</h4><div style="font-size:0.85rem;">`;
+
         tollBooths.forEach((toll, idx) => {
             const tollName = toll.n || 'Peaje ' + (idx + 1);
             const priceMotorbike = '2.50€ - 5.00€';
@@ -2538,24 +3304,27 @@ function searchNearby(category, mode) {
     } else {
         html += '<div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:6px; margin-bottom:10px; text-align:center">';
         html += '<i class="fa fa-info-circle" style="color:#5bc0de; font-size:1.5rem"></i>';
-        html += '<p style="font-size:0.85rem; color:#aaa; margin-top:10px">No se detectaron cabinas de peaje específicas en el escaneo.</p>';
-        html += '<p style="font-size:0.75rem; color:#666">El precio es una estimación basada en la distancia recorrida por autopista.</p></div>';
+        html += `<p style="font-size:0.85rem;color:#aaa;margin-top:10px;">${t.modal_toll_nobooths}</p>`;
+html += `<p style="font-size:0.75rem;color:#666;">${t.modal_toll_estimate}</p></div>`;
+
     }
-    html += '<div style="background:rgba(255,255,0,0.05); padding:10px; border-radius:6px; border-left:3px solid #ffd700; margin-top:15px">';
-    html += '<div style="font-size:0.7rem; color:#888"><b style="color:#ffd700">⚠️ IMPORTANTE:</b><br>';
-    html += '• Precios <b>aproximados</b> y orientativos<br>• Varían según concesionaria y tramo<br>';
-    html += '• Pueden cambiar sin previo aviso<br>• Consulta precios oficiales antes del viaje</div></div>';
+    html += '<div style="background:rgba(255,255,0,0.05);padding:10px;border-radius:6px;border-left:3px solid #ffd700;margin-top:15px;">';
+html += `<div style="font-size:0.7rem;color:#888;"><b style="color:#ffd700;">${t.modal_toll_important}</b><br>`;
+html += `${t.modal_toll_approx}<br>`;
+html += `${t.modal_toll_vary}<br>`;
+html += `${t.modal_toll_change}<br>`;
+html += `${t.modal_toll_official}</div></div>`;
+
     showM('', html);
 }
 
     function showWarningsList() {
-        if(!activeRoute) return showM("Info", "Genera una ruta primero.");
+    const t = DICT[currentLang] || DICT['Castellano'];
+    if(!activeRoute) return showM('Info', 'Genera una ruta primero.');
+    if(warningsLog.length === 0) return showM(t.float_warn_title, `<p style="text-align:center; color:#4caf50; font-size:1.2rem;">✓ ${t.float_warn_none}</p>`);
 
-        if(warningsLog.length === 0) {
-            return showM("⚠️ Avisos", "<p style='text-align:center; color:#4caf50; font-size:1.2rem;'>✅ Sin avisos en esta ruta</p>");
-        }
+    let html = `<h3 style="margin-bottom:15px;">${t.float_warn_title}</h3>`;
 
-        let html = '<h3 style="margin-bottom:15px;">⚠️ Lista de Avisos</h3>';
         html += '<div style="font-size:0.85rem;">';
 
         warningsLog.forEach((warning, idx) => {
@@ -2586,26 +3355,24 @@ function searchNearby(category, mode) {
     }
 
     async function getDestWeather() {
-        if(!d) return showM("Info", "Establece un destino primero.");
+    const t = DICT[currentLang] || DICT['Castellano'];
+    if(!d) return showM('Info', 'Establece un destino primero.');
 
-        showM("⏳ Clima", "<div style='text-align:center;'><i class='fa fa-spinner fa-spin' style='font-size:2rem;'></i><p>Consultando pronóstico...</p></div>");
+    showM('Clima', `<div style="text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i><p>${t.float_dest_loading}</p></div>`);
 
-        try {
-            const revRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lon=${d[0]}&lat=${d[1]}`);
-            const revData = await revRes.json();
-            const destName = revData.address.city || revData.address.town || revData.address.village || "Destino";
+    try {
+        const revRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lon=${d[0]}&lat=${d[1]}`);
+        const revData = await revRes.json();
+        const destName = revData.address.city || revData.address.town || revData.address.village || 'Destino';
 
-            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${d[1]}&longitude=${d[0]}&daily=weathercode,temperature_2m_max,temperature_2m_min&hourly=weathercode,temperature_2m&timezone=auto&forecast_days=3`);
-            const weatherData = await weatherRes.json();
+        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${d[1]}&longitude=${d[0]}&daily=weathercode,temperature_2m_max,temperature_2m_min&hourly=weathercode,temperature_2m&timezone=auto&forecast_days=3`);
+        const weatherData = await weatherRes.json();
 
-            // GUARDAR DATOS PARA PDF
-            destWeatherData = {
-                location: destName,
-                daily: weatherData.daily,
-                hourly: weatherData.hourly
-            };
+        // GUARDAR DATOS PARA PDF
+        destWeatherData = { location: destName, daily: weatherData.daily, hourly: weatherData.hourly };
 
-            let html = `<h3 style="margin-bottom:10px;">🌦️ TIEMPO EN DESTINO</h3>`;
+        let html = `<h3 style="margin-bottom:10px;">${t.float_dest_title}</h3>`;
+
             html += `<p style="font-size:0.9rem; color:var(--accent); margin-bottom:15px;">${destName}</p>`;
 
             html += '<div class="w-grid">';
@@ -2627,7 +3394,7 @@ function searchNearby(category, mode) {
             }
             html += '</div>';
 
-            html += '<div style="margin-top:15px;"><h4 style="font-size:0.8rem; margin-bottom:10px; color:var(--accent);">Próximas Horas</h4>';
+            html += `<div style="margin-top:15px;"><h4 style="font-size:0.8rem; margin-bottom:10px; color:var(--accent);">${t.float_dest_next_hours}</h4>`;
             html += '<div class="w-hourly">';
 
             for(let i = 0; i < 8; i++) {
@@ -2650,7 +3417,7 @@ function searchNearby(category, mode) {
             showM("", html);
 
         } catch(err) {
-            showM("Error", "No se pudo obtener el pronóstico del tiempo.");
+            showM("Error", t.float_dest_error);
         }
     }
 
