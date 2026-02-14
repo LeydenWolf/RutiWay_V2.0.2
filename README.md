@@ -40,6 +40,34 @@
 - [🙏 Agradecimientos](#-agradecimientos)
 
 ---
+## 🚀 Changelog
+
+### v2.0.5 (14/02/2026)
+#### ✨ Nuevas Funcionalidades
+- **Modal "Rutas Legendarias"**: Popup cada 6 rutas generadas con mensaje traducido
+- **Sonidos animación moto**: Efecto vespa + bocina "MEC MEC" al abrir panel donación
+- **Carpeta sounds/**: Organización de recursos de audio
+
+#### 🌍 Traducciones
+- Añadidas claves multiidioma al modal donación:
+    - `legendary_routes` - "rutas legendarias" / "rutes llegendàries" / etc.
+    - `donation_text` - Mensaje ahorro gasolina/tiempo
+    - `donation_question` - "¿Me invitas a un café?"
+
+#### 🔧 Mejoras UX
+- Botón donación cierra modal y lanza animación automáticamente
+- Panel lateral se abre tras animación mostrando opción PayPal
+- Archivos MP3 organizados en `/assets/sounds/`
+
+#### 📋 Pendiente
+- [ ] Actualizar textos botones ventana "Ruta X encontrada"
+
+---
+
+### v2.0.4 (13/02/2026)
+- Leyenda de rutas desplegable
+- Selector idioma compacto
+- [cambios anteriores...]
 
 ## ✨ Novedades v2.0.4
 
