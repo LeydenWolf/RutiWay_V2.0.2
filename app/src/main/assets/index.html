@@ -1687,25 +1687,27 @@
 <div id="gps-modal" class="custom-modal" style="display:none;">
     <div class="modal-content" style="max-width: 350px;">
         <span class="close-modal" onclick="closeGPSModal()">×</span>
-        <h2 style="margin-top: 0; color: var(--accent);">📍 Usar mi ubicación</h2>
-        <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 20px;">
-            Selecciona dónde colocar tu posición actual:
-        </p>
+        <h2 style="margin-top: 0; color: var(--accent); display: flex; align-items: center; gap: 10px;">
+            <img src="here-24.png" alt="GPS" style="width: 24px; height: 24px;">
+            <span id="gps-modal-title"></span>
+        </h2>
+        <p id="gps-modal-subtitle" style="font-size: 0.85rem; color: #aaa; margin-bottom: 20px;"></p>
 
         <div style="display: flex; flex-direction: column; gap: 10px;">
             <button class="gps-option-btn" onclick="setGPSToOrigin()">
-                🟢 Origen
+                <span id="gps-btn-origin"></span>
             </button>
             <button class="gps-option-btn" onclick="setGPSToDestination()">
-                🔴 Destino
+                <span id="gps-btn-destination"></span>
             </button>
             <button class="gps-option-btn" onclick="setGPSToNewStop()">
-                🚩 Nueva Parada
+                <span id="gps-btn-stop"></span>
             </button>
         </div>
     </div>
 </div>
 <!-- FIN - MODAL GPS -->
+
 
 
 <div id="fixed-switch-btn">
@@ -2311,7 +2313,15 @@
             donation_text: 'Si RutiWay te ahorra gasolina, tiempo y multas...',
             donation_question: '¿Me invitas a un café?',
             region_all: 'Todas',
-
+            // INICIO - GPS MODAL
+            gps_modal_title: ' Usar mi ubicación',
+            gps_modal_subtitle: 'Selecciona dónde colocar tu posición actual:',
+            gps_option_origin: '🟢 Origen',
+            gps_option_destination: '🔴 Destino',
+            gps_option_stop: '🚩 Nueva Parada',
+            gps_error_unavailable: 'Geolocalización no disponible en este dispositivo',
+            gps_error_location: 'Error obteniendo ubicación',
+            // FIN - GPS MODAL
 
         },
 
@@ -2497,10 +2507,17 @@
             donation_text: 'Si RutiWay t\'estalvia gasolina, temps i multes...',
             donation_question: 'M\'invites a un cafè?',
             region_all: 'Totes',
-
+            // INICIO - GPS MODAL
+            gps_modal_title: '📍 Utilitzar la meva ubicació',
+            gps_modal_subtitle: 'Selecciona on col·locar la teva posició actual:',
+            gps_option_origin: '🟢 Origen',
+            gps_option_destination: '🔴 Destinació',
+            gps_option_stop: '🚩 Nova Parada',
+            gps_error_unavailable: 'Geolocalització no disponible en aquest dispositiu',
+            gps_error_location: 'Error obtenint la ubicació',
+            // FIN - GPS MODAL
 
         },
-
 
         'Français': {
             plan: 'PLANIFICATION',
@@ -2682,9 +2699,17 @@
             donation_text: 'Si RutiWay vous fait économiser de l\'essence, du temps et des amendes...',
             donation_question: 'M\'offrez-vous un café ?',
             region_all: 'Toutes',
+            // INICIO - GPS MODAL
+            gps_modal_title: '📍 Utiliser ma position',
+            gps_modal_subtitle: 'Sélectionnez où placer votre position actuelle :',
+            gps_option_origin: '🟢 Origine',
+            gps_option_destination: '🔴 Destination',
+            gps_option_stop: '🚩 Nouvel Arrêt',
+            gps_error_unavailable: 'Géolocalisation non disponible sur cet appareil',
+            gps_error_location: 'Erreur lors de l\'obtention de la position',
+            // FIN - GPS MODAL
 
         },
-
 
         'Português': {
             plan: 'PLANEAMENTO',
@@ -2875,7 +2900,15 @@
             donation_text: 'Se RutiWay te poupa gasolina, tempo e multas...',
             donation_question: 'Convidas-me para um café?',
             region_all: 'Todas',
-
+            // INICIO - GPS MODAL
+            gps_modal_title: '📍 Usar minha localização',
+            gps_modal_subtitle: 'Selecione onde colocar sua posição atual:',
+            gps_option_origin: '🟢 Origem',
+            gps_option_destination: '🔴 Destino',
+            gps_option_stop: '🚩 Nova Parada',
+            gps_error_unavailable: 'Geolocalização não disponível neste dispositivo',
+            gps_error_location: 'Erro ao obter localização',
+            // FIN - GPS MODAL
 
         },
 
@@ -3052,10 +3085,18 @@
             donation_text: 'Se RutiWay ti fa risparmiare benzina, tempo e multe...',
             donation_question: 'Mi offri un caffè?',
             region_all: 'Tutte',
+            // INICIO - GPS MODAL
+            gps_modal_title: '📍 Usa la mia posizione',
+            gps_modal_subtitle: 'Seleziona dove posizionare la tua posizione attuale:',
+            gps_option_origin: '🟢 Origine',
+            gps_option_destination: '🔴 Destinazione',
+            gps_option_stop: '🚩 Nuova Fermata',
+            gps_error_unavailable: 'Geolocalizzazione non disponibile su questo dispositivo',
+            gps_error_location: 'Errore durante il recupero della posizione',
+            // FIN - GPS MODAL
 
 
         },
-
 
         'English': {
             plan: 'PLANNING',
@@ -3237,6 +3278,15 @@
             donation_text: 'If RutiWay saves you gas, time and fines...',
             donation_question: 'Buy me a coffee?',
             region_all: 'All',
+            // INICIO - GPS MODAL
+            gps_modal_title: '📍 Use my location',
+            gps_modal_subtitle: 'Select where to place your current position:',
+            gps_option_origin: '🟢 Origin',
+            gps_option_destination: '🔴 Destination',
+            gps_option_stop: '🚩 New Stop',
+            gps_error_unavailable: 'Geolocation not available on this device',
+            gps_error_location: 'Error getting location'
+            // FIN - GPS MODAL
 
         }
     };
@@ -4319,9 +4369,20 @@ function renderStops() {
         }
         // FIN - FUNCIÓN GPS PARA PARADAS
         // INICIO - SISTEMA GPS CON MODAL
+        // INICIO - ABRIR MODAL GPS CON TRADUCCIONES
         function openGPSModal() {
+            const t = DICT[currentLang] || DICT['Castellano'];
+
+            document.getElementById('gps-modal-title').textContent = t.gps_modal_title;
+            document.getElementById('gps-modal-subtitle').textContent = t.gps_modal_subtitle;
+            document.getElementById('gps-btn-origin').textContent = t.gps_option_origin;
+            document.getElementById('gps-btn-destination').textContent = t.gps_option_destination;
+            document.getElementById('gps-btn-stop').textContent = t.gps_option_stop;
+
             document.getElementById('gps-modal').style.display = 'flex';
         }
+        // FIN - ABRIR MODAL GPS CON TRADUCCIONES
+
 
         function closeGPSModal() {
             document.getElementById('gps-modal').style.display = 'none';
