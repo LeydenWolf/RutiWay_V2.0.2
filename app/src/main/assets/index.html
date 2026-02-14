@@ -426,7 +426,6 @@
             cursor: pointer;
         }
 
-        /* --- SIDEBAR --- */
         .sidebar {
             position: fixed;
             top: 0;
@@ -437,11 +436,13 @@
             z-index: 5000;
             transition: 0.3s;
             padding: 20px;
+            padding-top: 40px; /* ← AÑADIR ESTA LÍNEA */
             padding-bottom: 200px;
             border-right: 1px solid var(--accent);
             overflow-y: auto;
             box-sizing: border-box;
         }
+
 
         body.menu-active .sidebar {
             left: 0;
@@ -703,25 +704,42 @@
             margin-left: 30px;
         }
 
+        .add-stop-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            margin-left: 30px;
+        }
+
         .swap-btn {
-            padding: 4px 8px;
-            background: rgba(91, 192, 222, 0.15);
-            border: 1px dashed var(--accent);
+            padding: 6px 8px;
+            background: transparent;
+            border: none;
             color: var(--accent);
             border-radius: 4px;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
+            font-size: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 32px;
-            height: 32px;
-            transition: background 0.3s;
+            min-width: auto;
+            line-height: 1;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            -webkit-tap-highlight-color: transparent;
         }
 
+
         .swap-btn:hover {
-            background: rgba(91, 192, 222, 0.3);
+            opacity: 1;
+            border-radius: 4px;
+        }
+
+
+        .swap-btn:active {
+            transform: scale(0.9);
         }
 
         .add-stop-btn {
@@ -738,10 +756,95 @@
             gap: 5px;
         }
 
+        .add-stop-btn:hover {
+            background: rgba(91, 192, 222, 0.3);
+        }
+
         .stop-row {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
+            margin-bottom: 8px;
+            background: rgba(91, 192, 222, 0.1);
+            border-radius: 4px;
+            padding: 4px;
+        }
+
+        .stop-row input {
+            flex: 1;
+            background: #1a1b26;
+            border: 1px solid var(--accent);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        /* INICIO - BOTÓN GPS */
+        .gps-btn {
+            background: #2d3142;
+            border: 1px solid #414868;
+            border-radius: 4px;
+            padding: 6px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            margin-left: 4px;
+        }
+
+        .gps-btn:hover {
+            background: #3d4152;
+        }
+
+        .gps-btn:active {
+            background: #4d5162;
+        }
+        /* FIN - BOTÓN GPS */
+
+        .add-stop-btn {
+            padding: 4px 15px;
+            background: rgba(91, 192, 222, 0.15);
+            border: 1px dashed var(--accent);
+            color: var(--accent);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: bold;
             display: flex;
             align-items: center;
             gap: 5px;
+        }
+        /* INICIO - BOTÓN GPS GLOBAL */
+        .gps-global-btn {
+            padding: 3px 8px;
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px dashed #4caf50;
+            color: #4caf50;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            margin-left: 8px;
+        }
+
+        .gps-global-btn:hover {
+            background: rgba(76, 175, 80, 0.25);
+            border-color: #66bb6a;
+        }
+
+        .gps-global-btn:active {
+            background: rgba(76, 175, 80, 0.35);
+        }
+        /* FIN - BOTÓN GPS GLOBAL */
+
+
+        .stop-row {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
             margin-bottom: 8px;
             background: rgba(91, 192, 222, 0.1);
             border-radius: 4px;
@@ -1517,6 +1620,35 @@
         #des {
             transition: border-color 0.3s ease, border-width 0.3s ease;
         }
+        /* INICIO - MODAL GPS */
+        .gps-option-btn {
+            width: 100%;
+            padding: 15px;
+            background: #2d3142;
+            border: 1px solid #414868;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-align: left;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gps-option-btn:hover {
+            background: #3d4152;
+            border-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .gps-option-btn:active {
+            background: #4d5162;
+        }
+        /* FIN - MODAL GPS */
+
     </style>
 </head>
 
@@ -1551,6 +1683,30 @@
         <div class="modal-body" id="m-body"></div>
     </div>
 </div>
+<!-- INICIO - MODAL GPS -->
+<div id="gps-modal" class="custom-modal" style="display:none;">
+    <div class="modal-content" style="max-width: 350px;">
+        <span class="close-modal" onclick="closeGPSModal()">×</span>
+        <h2 style="margin-top: 0; color: var(--accent);">📍 Usar mi ubicación</h2>
+        <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 20px;">
+            Selecciona dónde colocar tu posición actual:
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="gps-option-btn" onclick="setGPSToOrigin()">
+                🟢 Origen
+            </button>
+            <button class="gps-option-btn" onclick="setGPSToDestination()">
+                🔴 Destino
+            </button>
+            <button class="gps-option-btn" onclick="setGPSToNewStop()">
+                🚩 Nueva Parada
+            </button>
+        </div>
+    </div>
+</div>
+<!-- FIN - MODAL GPS -->
+
 
 <div id="fixed-switch-btn">
     <button class="side-switch-btn" id="toggle-sidebar-btn" onclick="toggleS()">MAPA</button>
@@ -1664,10 +1820,16 @@
             <div class="swap-btn" onclick="swapOriginDestino()"
                  title="Intercambiar Origen y Destino">🔃
             </div>
-            <div class="add-stop-btn" onclick="addBlankStop()"><i class="fa fa-map-marker-alt"></i>
+            <div class="add-stop-btn" onclick="addBlankStop()">
+                <i class="fa fa-map-marker-alt"></i>
                 <span>Parada</span>
             </div>
+            <div class="gps-global-btn" onclick="openGPSModal()" title="Usar mi ubicación">
+                <img src="here-24.png" alt="GPS" style="width:20px; height:20px;">
+            </div>
         </div>
+
+
 
         <div class="in-wrap">
             <div class="in-wrap-icon"><i class="fa fa-flag-checkered"></i></div>
@@ -2147,7 +2309,8 @@
             // Modal Donación cada 6 rutas
             legendary_routes: 'rutas legendarias',
             donation_text: 'Si RutiWay te ahorra gasolina, tiempo y multas...',
-            donation_question: '¿Me invitas a un café?'
+            donation_question: '¿Me invitas a un café?',
+            region_all: 'Todas',
 
 
         },
@@ -2332,7 +2495,8 @@
             // Modal Donación cada 6 rutas
             legendary_routes: 'rutes llegendàries',
             donation_text: 'Si RutiWay t\'estalvia gasolina, temps i multes...',
-            donation_question: 'M\'invites a un cafè?'
+            donation_question: 'M\'invites a un cafè?',
+            region_all: 'Totes',
 
 
         },
@@ -2516,7 +2680,8 @@
             // Modal Donación cada 6 rutas
             legendary_routes: 'itinéraires légendaires',
             donation_text: 'Si RutiWay vous fait économiser de l\'essence, du temps et des amendes...',
-            donation_question: 'M\'offrez-vous un café ?'
+            donation_question: 'M\'offrez-vous un café ?',
+            region_all: 'Toutes',
 
         },
 
@@ -2708,7 +2873,8 @@
             // Modal Donación cada 6 rutas
             legendary_routes: 'rotas lendárias',
             donation_text: 'Se RutiWay te poupa gasolina, tempo e multas...',
-            donation_question: 'Convidas-me para um café?'
+            donation_question: 'Convidas-me para um café?',
+            region_all: 'Todas',
 
 
         },
@@ -2884,7 +3050,8 @@
             // Modal Donación cada 6 rutas
             legendary_routes: 'percorsi leggendari',
             donation_text: 'Se RutiWay ti fa risparmiare benzina, tempo e multe...',
-            donation_question: 'Mi offri un caffè?'
+            donation_question: 'Mi offri un caffè?',
+            region_all: 'Tutte',
 
 
         },
@@ -3068,7 +3235,8 @@
             // Modal Donación cada 6 rutas
             legendary_routes: 'legendary routes',
             donation_text: 'If RutiWay saves you gas, time and fines...',
-            donation_question: 'Buy me a coffee?'
+            donation_question: 'Buy me a coffee?',
+            region_all: 'All',
 
         }
     };
@@ -3215,6 +3383,7 @@
 
                     toggleLangDropdown();
                     translateUI();
+                    updateRegions(); //
                     saveConfig();
                 };
             }
@@ -3502,7 +3671,8 @@
     function updateRegions() {
         const country = document.getElementById('s-country').value;
         const regionSelect = document.getElementById('s-region');
-        let options = '<option value="" selected>Todas</option>'; // TODAS por defecto
+        const t = DICT[currentLang] || DICT['Castellano'];
+        let options = `<option value="" selected>${t.region_all || 'Todas'}</option>`;
 
         if (country === 'España') {
             options += `
@@ -3865,17 +4035,17 @@
     // FIN BLOQUE
 
     function addBlankStop() { stops.push({ c: null, name: '' }); renderStops(); }
-    // INICIO - RENDERIZAR PARADAS CON BÚSQUEDA
-    function renderStops() {
-        const c = document.getElementById('stops-container');
-        c.innerHTML = '';
+    // INICIO - RENDERIZAR PARADAS CON BÚSQUEDA Y GPS
+function renderStops() {
+    const c = document.getElementById('stops-container');
+    c.innerHTML = '';
 
-        stops.forEach((s, i) => {
-            const val = s.name ? s.name : '';
-            const inputId = `stop-input-${i}`;
-            const suggId = `stop-sugg-${i}`;
+    stops.forEach((s, i) => {
+        const val = s.name ? s.name : '';
+        const inputId = `stop-input-${i}`;
+        const suggId = `stop-sugg-${i}`;
 
-            c.innerHTML += `
+        c.innerHTML += `
   <div class="stop-row">
     <div class="in-wrap-icon" style="font-size:0.8rem">🚩</div>
     <div style="position:relative; flex:1;">
@@ -3888,16 +4058,21 @@
       >
       <div id="${suggId}" class="suggestions"></div>
     </div>
+    <button class="gps-btn" onclick="setStopToCurrentLocation(${i})" title="Usar ubicación actual">
+      <img src="here-24.png" alt="GPS" style="width:20px; height:20px;">
+    </button>
     <div class="stop-del" onclick="removeStop(${i})">✖</div>
   </div>
 `;
-        });
+    });
 
-        // Asignar búsqueda a cada parada
-        stops.forEach((s, i) => {
-            attachStopSearch(i);
-        });
-    }
+    // Asignar búsqueda a cada parada
+    stops.forEach((s, i) => {
+        attachStopSearch(i);
+    });
+}
+// FIN - RENDERIZAR PARADAS CON BÚSQUEDA Y GPS
+
 
     // NUEVA FUNCIÓN: Búsqueda para paradas
     function attachStopSearch(index) {
@@ -4112,6 +4287,108 @@
             setTimeout(() => { s.style.display = 'none'; }, 200);
         };
     }
+        // INICIO - FUNCIÓN GPS PARA PARADAS
+        function setStopToCurrentLocation(index) {
+            if (!navigator.geolocation) {
+                alert('Geolocalización no disponible');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    stops[index].c = [lon, lat]; // ← Nota: [lon, lat] como en tu código
+                    stops[index].name = `📍 ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+
+                    renderStops();
+
+                    // Centrar mapa en la ubicación
+                    if (typeof map !== 'undefined') {
+                        map.setView([lat, lon], 16);
+                    }
+
+                    markUpdate();
+                },
+                (error) => {
+                    alert('Error obteniendo ubicación: ' + error.message);
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+        // FIN - FUNCIÓN GPS PARA PARADAS
+        // INICIO - SISTEMA GPS CON MODAL
+        function openGPSModal() {
+            document.getElementById('gps-modal').style.display = 'flex';
+        }
+
+        function closeGPSModal() {
+            document.getElementById('gps-modal').style.display = 'none';
+        }
+
+        function getCurrentPosition(callback) {
+            if (!navigator.geolocation) {
+                alert('Geolocalización no disponible en este dispositivo');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    callback(lat, lon);
+
+                    // Centrar mapa
+                    if (typeof map !== 'undefined') {
+                        map.setView([lat, lon], 16);
+                    }
+                },
+                (error) => {
+                    alert('Error obteniendo ubicación: ' + error.message);
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        function setGPSToOrigin() {
+            getCurrentPosition((lat, lon) => {
+                o = [lon, lat];
+                document.getElementById('ori').value = `📍 ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                document.getElementById('ori').style.borderColor = '#4caf50';
+                document.getElementById('ori').style.borderWidth = '2px';
+                markUpdate();
+                closeGPSModal();
+            });
+        }
+
+        function setGPSToDestination() {
+            getCurrentPosition((lat, lon) => {
+                d = [lon, lat];
+                document.getElementById('des').value = `📍 ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                document.getElementById('des').style.borderColor = '#4caf50';
+                document.getElementById('des').style.borderWidth = '2px';
+                markUpdate();
+                closeGPSModal();
+            });
+        }
+
+        function setGPSToNewStop() {
+            getCurrentPosition((lat, lon) => {
+                stops.push({
+                    c: [lon, lat],
+                    name: `📍 ${lat.toFixed(5)}, ${lon.toFixed(5)}`
+                });
+                renderStops();
+                markUpdate();
+                closeGPSModal();
+            });
+        }
+        // FIN - SISTEMA GPS CON MODAL
+
+        search('ori', 'ori-s', 'o');
+        search('des', 'des-s', 'd');
+        // FIN
 
     search('ori', 'ori-s', 'o');
     search('des', 'des-s', 'd');

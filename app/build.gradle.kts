@@ -12,7 +12,7 @@ android {
         applicationId = "com.leyden.rutiway"
 
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
 
         // CAMBIO: versión para RutiWay 2.0.2
         // Recomendación: versionCode entero creciente; ejemplo 110 para 1.1.0
@@ -22,15 +22,31 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            // Temporal: se configurará después con tu keystore
+            // storeFile = file("../keystore/rutiway-release.jks")
+            // storePassword = "TU_PASSWORD"
+            // keyAlias = "rutiway"
+            // keyPassword = "TU_PASSWORD"
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // signingConfig = signingConfigs.getByName("release")
+        }
+        debug {
+            isMinifyEnabled = false
         }
     }
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

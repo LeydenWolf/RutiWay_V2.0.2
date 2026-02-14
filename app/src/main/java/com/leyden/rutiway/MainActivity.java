@@ -46,10 +46,15 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setGeolocationEnabled(true);
         webSettings.setDatabaseEnabled(true);
 
-        // Habilitar debugging (remover en producción)
+        // INICIO - DEBUGGING MANUAL
+        // Habilitar debugging en desarrollo
+        // IMPORTANTE: Comentar la línea de abajo antes de generar Release/APK para Play Store
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WebView.setWebContentsDebuggingEnabled(true);
+            WebView.setWebContentsDebuggingEnabled(true);  // ← COMENTAR ANTES DE RELEASE
         }
+        // FIN - DEBUGGING MANUAL
+
+
 
         // Añadir AndroidBridge al WebView
         webView.addJavascriptInterface(androidBridge, "Android");
