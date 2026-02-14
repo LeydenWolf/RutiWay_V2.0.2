@@ -1657,18 +1657,19 @@
 <div id="splash-screen">
     <div class="splash-content">
         <h1 class="splash-title">RutiWay</h1>
-        <p class="splash-subtitle">La app de crear rutas</p>
+        <p id="splash-subtitle" class="splash-subtitle"></p>
         <img src="rutiwaylogo.png" class="splash-logo" onerror="this.style.display='none'"
              alt="RutiWay Logo">
 
         <p class="splash-by">By Leyden <span class="splash-ver">Ver. 2.0.5</span></p>
         <button class="splash-btn" onclick="closeSplash()">
-            🏍️ ¡Comenzamos!
+            🏍️ <span id="splash-btn-text"></span>
         </button>
-        <p class="splash-tap">Toca en cualquier lugar para continuar</p>
+        <p id="splash-tap" class="splash-tap"></p>
     </div>
 </div>
 <!-- FIN - SPLASH SCREEN -->
+
 
 <div class="loading-backdrop" id="loading-back"></div>
 <div id="loading-panel">
@@ -1695,13 +1696,15 @@
 
         <div style="display: flex; flex-direction: column; gap: 10px;">
             <button class="gps-option-btn" onclick="setGPSToOrigin()">
-                <span id="gps-btn-origin"></span>
+                🟢 <span id="gps-btn-origin"></span>
             </button>
             <button class="gps-option-btn" onclick="setGPSToDestination()">
-                <span id="gps-btn-destination"></span>
+                🔴 <span id="gps-btn-destination"></span>
             </button>
             <button class="gps-option-btn" onclick="setGPSToNewStop()">
-                <span id="gps-btn-stop"></span>
+                🚩 <span id="gps-btn-stop"></span>
+            </button>
+
             </button>
         </div>
     </div>
@@ -2129,6 +2132,12 @@
             // Botones principales
             btngen: 'GENERAR RUTA',
 
+            // INICIO - SPLASH SCREEN
+            splash_subtitle: 'La app de crear rutas',
+            splash_btn: '¡Comenzamos!',
+            splash_tap: 'Toca en cualquier lugar para continuar',
+            splash_language_changed: 'Idioma cambiado',
+            // FIN - SPLASH SCREEN
 
             // Botones principales
             btn_gen: 'GENERAR RUTA',
@@ -2316,9 +2325,9 @@
             // INICIO - GPS MODAL
             gps_modal_title: ' Usar mi ubicación',
             gps_modal_subtitle: 'Selecciona dónde colocar tu posición actual:',
-            gps_option_origin: '🟢 Origen',
-            gps_option_destination: '🔴 Destino',
-            gps_option_stop: '🚩 Nueva Parada',
+            gps_option_origin: 'Origen',
+            gps_option_destination: 'Destino',
+            gps_option_stop: 'Nueva Parada',
             gps_error_unavailable: 'Geolocalización no disponible en este dispositivo',
             gps_error_location: 'Error obteniendo ubicación',
             // FIN - GPS MODAL
@@ -2334,6 +2343,12 @@
             // Botones principales
             btngen: 'GENERAR RUTA',
 
+            // INICIO - SPLASH SCREEN
+            splash_subtitle: 'L\'app de crear rutes',
+            splash_btn: 'Comencem!',
+            splash_tap: 'Toca a qualsevol lloc per continuar',
+            splash_language_changed: 'Idioma modificat',
+            // FIN - SPLASH SCREEN
 
             btn_gen: 'GENERAR RUTA',
             btn_clear: 'NETEJAR MAPA',
@@ -2508,11 +2523,11 @@
             donation_question: 'M\'invites a un cafè?',
             region_all: 'Totes',
             // INICIO - GPS MODAL
-            gps_modal_title: '📍 Utilitzar la meva ubicació',
+            gps_modal_title: 'Utilitzar la meva ubicació',
             gps_modal_subtitle: 'Selecciona on col·locar la teva posició actual:',
-            gps_option_origin: '🟢 Origen',
-            gps_option_destination: '🔴 Destinació',
-            gps_option_stop: '🚩 Nova Parada',
+            gps_option_origin: 'Origen',
+            gps_option_destination: 'Destinació',
+            gps_option_stop: 'Nova Parada',
             gps_error_unavailable: 'Geolocalització no disponible en aquest dispositiu',
             gps_error_location: 'Error obtenint la ubicació',
             // FIN - GPS MODAL
@@ -2528,6 +2543,12 @@
             // Botones principales
             btngen: 'GENERAR RUTA',
 
+            // INICIO - SPLASH SCREEN
+            splash_subtitle: 'L\'application pour créer des itinéraires',
+            splash_btn: 'Commençons !',
+            splash_tap: 'Touchez n\'importe où pour continuer',
+            splash_language_changed: 'Langue modifiée',
+            // FIN - SPLASH SCREEN
 
             btn_gen: 'GÉNÉRER ROUTE',
             btn_clear: 'NETTOYER CARTE',
@@ -2700,11 +2721,11 @@
             donation_question: 'M\'offrez-vous un café ?',
             region_all: 'Toutes',
             // INICIO - GPS MODAL
-            gps_modal_title: '📍 Utiliser ma position',
+            gps_modal_title: 'Utiliser ma position',
             gps_modal_subtitle: 'Sélectionnez où placer votre position actuelle :',
-            gps_option_origin: '🟢 Origine',
-            gps_option_destination: '🔴 Destination',
-            gps_option_stop: '🚩 Nouvel Arrêt',
+            gps_option_origin: 'Origine',
+            gps_option_destination: 'Destination',
+            gps_option_stop: 'Nouvel Arrêt',
             gps_error_unavailable: 'Géolocalisation non disponible sur cet appareil',
             gps_error_location: 'Erreur lors de l\'obtention de la position',
             // FIN - GPS MODAL
@@ -2720,6 +2741,12 @@
             // Botones principales
             btngen: 'GENERAR RUTA',
 
+            // INICIO - SPLASH SCREEN
+            splash_subtitle: 'O app para criar rotas',
+            splash_btn: 'Vamos começar!',
+            splash_tap: 'Toque em qualquer lugar para continuar',
+            splash_language_changed: 'Idioma alterado',
+            // FIN - SPLASH SCREEN
 
             btn_gen: 'GERAR ROTA',
             btn_clear: 'LIMPAR MAPA',
@@ -2901,11 +2928,11 @@
             donation_question: 'Convidas-me para um café?',
             region_all: 'Todas',
             // INICIO - GPS MODAL
-            gps_modal_title: '📍 Usar minha localização',
+            gps_modal_title: 'Usar minha localização',
             gps_modal_subtitle: 'Selecione onde colocar sua posição atual:',
-            gps_option_origin: '🟢 Origem',
-            gps_option_destination: '🔴 Destino',
-            gps_option_stop: '🚩 Nova Parada',
+            gps_option_origin: 'Origem',
+            gps_option_destination: 'Destino',
+            gps_option_stop: 'Nova Parada',
             gps_error_unavailable: 'Geolocalização não disponível neste dispositivo',
             gps_error_location: 'Erro ao obter localização',
             // FIN - GPS MODAL
@@ -2921,6 +2948,12 @@
             // Botones principales
             btngen: 'GENERAR RUTA',
 
+            // INICIO - SPLASH SCREEN
+            splash_subtitle: 'L\'app per creare percorsi',
+            splash_btn: 'Iniziamo!',
+            splash_tap: 'Tocca ovunque per continuare',
+            splash_language_changed: 'Lingua modificata',
+            // FIN - SPLASH SCREEN
 
             btn_gen: 'GENERA PERCORSO',
             btn_clear: 'PULISCI MAPPA',
@@ -3086,11 +3119,11 @@
             donation_question: 'Mi offri un caffè?',
             region_all: 'Tutte',
             // INICIO - GPS MODAL
-            gps_modal_title: '📍 Usa la mia posizione',
+            gps_modal_title: 'Usa la mia posizione',
             gps_modal_subtitle: 'Seleziona dove posizionare la tua posizione attuale:',
-            gps_option_origin: '🟢 Origine',
-            gps_option_destination: '🔴 Destinazione',
-            gps_option_stop: '🚩 Nuova Fermata',
+            gps_option_origin: 'Origine',
+            gps_option_destination: 'Destinazione',
+            gps_option_stop: 'Nuova Fermata',
             gps_error_unavailable: 'Geolocalizzazione non disponibile su questo dispositivo',
             gps_error_location: 'Errore durante il recupero della posizione',
             // FIN - GPS MODAL
@@ -3107,6 +3140,12 @@
             // Botones principales
             btngen: 'GENERAR RUTA',
 
+            // INICIO - SPLASH SCREEN
+            splash_subtitle: 'The route planning app',
+            splash_btn: 'Let\'s go!',
+            splash_tap: 'Tap anywhere to continue',
+            splash_language_changed: 'Language changed',
+            // FIN - SPLASH SCREEN
 
             btn_gen: 'GENERATE ROUTE',
             btn_clear: 'CLEAR MAP',
@@ -3279,11 +3318,11 @@
             donation_question: 'Buy me a coffee?',
             region_all: 'All',
             // INICIO - GPS MODAL
-            gps_modal_title: '📍 Use my location',
+            gps_modal_title: 'Use my location',
             gps_modal_subtitle: 'Select where to place your current position:',
-            gps_option_origin: '🟢 Origin',
-            gps_option_destination: '🔴 Destination',
-            gps_option_stop: '🚩 New Stop',
+            gps_option_origin: 'Origin',
+            gps_option_destination: 'Destination',
+            gps_option_stop: 'New Stop',
             gps_error_unavailable: 'Geolocation not available on this device',
             gps_error_location: 'Error getting location'
             // FIN - GPS MODAL
@@ -3417,26 +3456,61 @@
             div.innerHTML = optHTML;
 
             // Evento click solo si está disponible
+            // Evento click solo si está disponible
             if (!isUnavail) {
                 div.onclick = () => {
                     currentLang = l;
                     const btn = document.getElementById('lang-btn');
 
                     // Actualizar botón con bandera
-                    if (flag && flag.startsWith('flags/')) {
-                        btn.innerHTML = `<img src="${flag}" style="width:22px;height:16px;object-fit:cover;margin-right:6px;vertical-align:middle;border-radius:2px;" onerror="this.innerHTML='${l}'"> <span>${l}</span>`;
-                    } else if (flag) {
-                        btn.innerHTML = `<span style="font-size:1.2rem;margin-right:6px;">${flag}</span> <span>${l}</span>`;
-                    } else {
-                        btn.innerText = l;
+                    if (flag) {
+                        if (flag.startsWith('flags/')) {
+                            btn.innerHTML = `<img src="${flag}" style="width:22px;height:16px;object-fit:cover;margin-right:6px;vertical-align:middle;border-radius:2px;" onerror="this.innerText='${l}'"> <span>${l}</span>`;
+                        } else if (flag) {
+                            btn.innerHTML = `<span style="font-size:1.2rem;margin-right:6px;">${flag}</span> <span>${l}</span>`;
+                        } else {
+                            btn.innerText = l;
+                        }
                     }
 
                     toggleLangDropdown();
                     translateUI();
-                    updateRegions(); //
+                    updateRegions();
+                    loadSplashTranslations();
+
+                    // INICIO - MOSTRAR SPLASH TRADUCIDO AL CAMBIAR IDIOMA
+                    const splash = document.getElementById('splash-screen');
+                    if (splash) {
+                        loadSplashTranslations(); // Cargar traducciones primero
+
+                        // Añadir texto grande y vistoso "Idioma cambiado"
+                        const subtitle = document.getElementById('splash-subtitle');
+                        const t = DICT[currentLang] || DICT['Castellano'];
+
+                        subtitle.innerHTML = `<div style="font-size: 1.8rem; font-weight: 900; color: #4caf50; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 20px #4caf50, 0 0 40px #4caf50; animation: titlePulse 2s infinite ease-in-out;">${t.splash_language_changed}</div>`;
+
+                        splash.classList.remove('hide');
+                        splash.style.display = 'flex';
+
+                        // Restaurar texto original después de que el usuario cierre
+                        const originalCloseSplash = window.closeSplash;
+                        window.closeSplash = function() {
+                            subtitle.innerHTML = ''; // Limpiar
+                            subtitle.textContent = t.splash_subtitle; // Restaurar texto normal
+                            subtitle.style = ''; // Restaurar estilos
+                            window.closeSplash = originalCloseSplash; // Restaurar función original
+                            originalCloseSplash(); // Cerrar splash
+                        };
+                    }
+                    // FIN - MOSTRAR SPLASH TRADUCIDO AL CAMBIAR IDIOMA
+
+
+
+
                     saveConfig();
                 };
             }
+
 
             list.appendChild(div);
         });
@@ -4446,15 +4520,49 @@ function renderStops() {
             });
         }
         // FIN - SISTEMA GPS CON MODAL
+        // INICIO - DETECTAR IDIOMA DEL SISTEMA PARA SPLASH
+        function detectSystemLanguage() {
+            const browserLang = navigator.language || navigator.userLanguage;
+
+            // Mapear códigos de idioma
+            const langMap = {
+                'es': 'Castellano',
+                'ca': 'Català',
+                'fr': 'Français',
+                'pt': 'Português',
+                'it': 'Italiano',
+                'en': 'English'
+            };
+
+            const lang = browserLang.split('-')[0]; // 'es-ES' → 'es'
+            return langMap[lang] || 'Castellano'; // Por defecto Castellano
+        }
+
+        function loadSplashTranslations() {
+            // PRIORIDAD: 1. Idioma guardado, 2. Idioma del sistema
+            const savedLang = localStorage.getItem('selectedLanguage');
+            const lang = savedLang || detectSystemLanguage();
+
+            const t = DICT[lang] || DICT['Castellano'];
+
+            const splashSubtitle = document.getElementById('splash-subtitle');
+            const splashBtnText = document.getElementById('splash-btn-text');
+            const splashTap = document.getElementById('splash-tap');
+
+            if (splashSubtitle) splashSubtitle.textContent = t.splash_subtitle;
+            if (splashBtnText) splashBtnText.textContent = t.splash_btn;
+            if (splashTap) splashTap.textContent = t.splash_tap;
+        }
+
+        // Llamar al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSplashTranslations();
+        });
+        // FIN - DETECTAR IDIOMA DEL SISTEMA PARA SPLASH
 
         search('ori', 'ori-s', 'o');
         search('des', 'des-s', 'd');
         // FIN
-
-    search('ori', 'ori-s', 'o');
-    search('des', 'des-s', 'd');
-    // FIN
-
 
     async function resolveAndGen() {
         const t = DICT[currentLang] || DICT['Castellano'];
